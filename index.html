@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ma Présentation</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <style>
+    :root {
+      --accent: #ff6b6b;
+      --accent-2: #4ecdc4;
+    }
+    .reveal {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    .reveal h1, .reveal h2, .reveal h3 {
+      text-transform: none;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+    .reveal h1 {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .reveal .accent { color: var(--accent); }
+    .reveal .accent-2 { color: var(--accent-2); }
+    .reveal .muted { opacity: 0.6; font-size: 0.7em; }
+    .reveal section.title-slide {
+      text-align: left;
+    }
+    .reveal blockquote {
+      border-left: 4px solid var(--accent);
+      background: rgba(255, 107, 107, 0.08);
+      padding: 1em 1.5em;
+      border-radius: 4px;
+    }
+    .reveal pre {
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      border-radius: 8px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2em;
+      align-items: center;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 1.5em;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <section class="title-slide">
+        <h1>Ma Présentation</h1>
+        <p class="muted">Un sous-titre qui donne envie de lire la suite</p>
+        <p style="margin-top: 2em;">
+          <span class="accent-2">→</span> Flèches ou espace pour naviguer
+        </p>
+      </section>
+
+      <section>
+        <h2>Au programme</h2>
+        <ol>
+          <li>Une idée forte</li>
+          <li>Pourquoi ça compte</li>
+          <li>Comment on s'y prend</li>
+          <li>Ce qu'il faut retenir</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>L'idée <span class="accent">centrale</span></h2>
+        <blockquote>
+          « Une citation marquante ou ta thèse principale, en une phrase. »
+        </blockquote>
+        <p class="muted">— Source / contexte</p>
+      </section>
+
+      <section>
+        <h2>Comparaison</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="accent">Avant</h3>
+            <ul>
+              <li>Point A</li>
+              <li>Point B</li>
+              <li>Point C</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="accent-2">Après</h3>
+            <ul>
+              <li>Point A amélioré</li>
+              <li>Point B repensé</li>
+              <li>Point C nouveau</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Un exemple de code</h2>
+        <pre><code class="language-javascript" data-trim data-line-numbers>
+function bonjour(nom) {
+  return `Salut ${nom} !`;
+}
+
+console.log(bonjour('le monde'));
+        </code></pre>
+      </section>
+
+      <section>
+        <section>
+          <h2>Section verticale</h2>
+          <p>Appuie sur <span class="accent">↓</span> pour descendre</p>
+        </section>
+        <section>
+          <h3>Sous-slide 1</h3>
+          <p>Tu peux empiler des slides verticalement pour grouper des sujets.</p>
+        </section>
+        <section>
+          <h3>Sous-slide 2</h3>
+          <p>Et continuer la présentation horizontalement avec <span class="accent-2">→</span>.</p>
+        </section>
+      </section>
+
+      <section>
+        <h2>À retenir</h2>
+        <ul>
+          <li class="fragment">Premier point qui apparaît</li>
+          <li class="fragment">Puis le deuxième</li>
+          <li class="fragment">Et le troisième</li>
+        </ul>
+        <p class="fragment muted" style="margin-top: 2em;">
+          (Les fragments apparaissent un par un à chaque clic)
+        </p>
+      </section>
+
+      <section class="title-slide">
+        <h1>Merci.</h1>
+        <p class="muted">Questions ?</p>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      controls: true,
+      progress: true,
+      center: true,
+      plugins: [RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+</html>

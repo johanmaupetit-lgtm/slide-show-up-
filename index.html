@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALIA BTP — Présentations</title>
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--noir);
+      color: var(--blanc);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      box-sizing: border-box;
+    }
+    .logo-scalia { font-size: 80px; margin-bottom: 60px; }
+    h1 {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--or);
+      font-size: 24px;
+      margin: 0 0 8px 0;
+    }
+    .lead {
+      color: var(--gris-clair);
+      font-size: 14px;
+      margin-bottom: 48px;
+      max-width: 560px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .list {
+      width: 100%;
+      max-width: 720px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .list a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: var(--noir-card);
+      border: 0.5px solid var(--anthracite);
+      border-radius: 4px;
+      color: var(--blanc);
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .list a:hover {
+      border-color: var(--or);
+      background: #161616;
+    }
+    .list .title {
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.01em;
+    }
+    .list .arrow {
+      color: var(--or);
+      font-family: var(--font-serif);
+      font-size: 18px;
+    }
+    .footer {
+      margin-top: 60px;
+      font-size: 11px;
+      color: var(--gris-leg);
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-scalia">
+    <span class="scalia">SCALIA</span>
+    <span class="rule"></span>
+    <span class="btp">BTP</span>
+  </div>
+
+  <h1>Présentations</h1>
+  <p class="lead">Index des slides Scalia BTP. Cliquez pour ouvrir une présentation en plein écran.</p>
+
+  <ul class="list">
+    <li>
+      <a href="presentations/preparation-rdv/">
+        <span class="title">Préparer votre rendez-vous</span>
+        <span class="arrow">→</span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="footer">SCALIABTP.FR</p>
+</body>
+</html>

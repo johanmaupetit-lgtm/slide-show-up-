@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALIA BTP — [Titre de la présentation]</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+  <!-- Profondeur du dossier : ajuster ../ selon l'emplacement -->
+  <link rel="stylesheet" href="../../theme.css">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- COUVERTURE -->
+      <section class="cover">
+        <div class="logo-scalia">
+          <span class="scalia">SCALIA</span>
+          <span class="rule"></span>
+          <span class="btp">BTP</span>
+        </div>
+        <p class="cover-title">Titre principal</p>
+        <p class="cover-sub">Sous-titre / contexte</p>
+      </section>
+
+      <!-- SLIDE STANDARD -->
+      <section>
+        <h2>Titre de section</h2>
+        <ul>
+          <li>Point un</li>
+          <li>Point deux</li>
+          <li>Point trois</li>
+        </ul>
+      </section>
+
+      <!-- SLIDE CHIFFRE-CLÉ -->
+      <section class="stat">
+        <div class="big-number">99,9 %</div>
+        <p class="stat-label">Description du chiffre.</p>
+      </section>
+
+      <!-- SLIDE NUMÉROTÉE -->
+      <section class="numbered">
+        <div class="num">01</div>
+        <div class="num-title">Titre du point</div>
+        <p class="num-detail">Détail du point en Inter, fond noir, texte blanc cassé.</p>
+      </section>
+
+      <!-- SLIDE FINALE -->
+      <section class="cover">
+        <div class="logo-scalia">
+          <span class="scalia">SCALIA</span>
+          <span class="rule"></span>
+          <span class="btp">BTP</span>
+        </div>
+        <p class="cover-title">À très vite</p>
+        <p class="cover-sub">scaliabtp.fr</p>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'fade',
+      controls: true,
+      progress: true,
+      center: true,
+      width: 1920,
+      height: 1080,
+      margin: 0.05
+    });
+  </script>
+</body>
+</html>

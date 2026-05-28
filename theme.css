@@ -268,14 +268,47 @@
   border: 1px solid var(--or);
 }
 
-/* ----- Numérotation des slides (charte : bas droit, or foncé sur clair / blanc sur noir) ----- */
+/* ----- Numérotation des slides (déplacée en bas gauche pour libérer la place au sujet) ----- */
 .reveal .slide-number {
   font-family: var(--font-sans);
-  font-size: 9px;
-  color: var(--blanc);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--gris-clair);
   background: transparent;
-  right: 24px;
-  bottom: 24px;
+  right: auto;
+  left: 36px;
+  bottom: 28px;
+}
+
+/* ----- Overlays persistants : logo haut-gauche + sujet bas-droite ----- */
+.persistent-header {
+  position: fixed;
+  top: 28px;
+  left: 36px;
+  z-index: 100;
+  pointer-events: none;
+}
+.persistent-header .logo-scalia { font-size: 32px; }
+
+.persistent-footer {
+  position: fixed;
+  bottom: 28px;
+  right: 36px;
+  z-index: 100;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: var(--or);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* Masquer les overlays sur les slides de couverture (logo géant déjà présent) */
+body:has(.reveal section.present.cover) .persistent-header,
+body:has(.reveal section.present.cover) .persistent-footer,
+body:has(.reveal section.present.cover) .reveal .slide-number {
+  display: none;
 }
 
 /* ----- Progress bar discrète or ----- */

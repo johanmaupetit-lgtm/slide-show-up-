@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALIA BTP — Calculateur ROI PILOT</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap">
+
+  <!-- Polices clients dynamiquement injectées au runtime -->
+  <link id="client-fonts" rel="stylesheet" href="">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            noir: '#0D0D0D',
+            'noir-card': '#1A1A1A',
+            or: '#C9A84C',
+            'or-fonce': '#A88736',
+            rouge: '#8B1A1A',
+            anthracite: '#2A2A2A',
+          },
+          fontFamily: {
+            serif: ['Cinzel', 'Georgia', 'serif'],
+            sans: ['Inter', 'Helvetica Neue', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --client-primary: #1E5F8E;
+      --client-secondary: #F5A623;
+      --client-primary-light: #1E5F8E20;
+      --client-font: 'Inter';
+    }
+    html, body { background: #FAFAFA; color: #1A1A1A; font-family: 'Inter', sans-serif; }
+    body.mode-gains { background: #0D0D0D; color: #FFFFFF; }
+    .tabular { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }
+
+    /* Logo Scalia CSS pur */
+    .logo-scalia { display: inline-block; text-align: center; font-family: 'Cinzel', serif; font-weight: 400; color: #C9A84C; text-transform: uppercase; line-height: 1; }
+    .logo-scalia .scalia { display: block; font-size: 1em; letter-spacing: 0.55em; padding-left: 0.55em; }
+    .logo-scalia .rule { display: block; width: 100%; height: 1px; background: #C9A84C; opacity: 0.7; margin: 0.25em 0; }
+    .logo-scalia .btp { display: block; font-size: 0.37em; letter-spacing: 0.95em; padding-left: 0.95em; }
+
+    /* Animations counter */
+    @keyframes fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fade-up 0.6s ease forwards; }
+
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fade-in 0.5s ease forwards; }
+
+    /* Mode transitions */
+    .mode-transition { transition: opacity 0.4s ease, background-color 0.5s ease; }
+
+    /* Invisible click zone */
+    .dev-switch-zone {
+      position: fixed; top: 0; right: 0; width: 60px; height: 60px;
+      z-index: 9999; cursor: default;
+    }
+
+    /* Scrollbar discret */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+    body.mode-gains ::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); }
+
+    /* Inputs cleanup */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+
+    /* Form inputs (admin) */
+    .form-input {
+      width: 100%;
+      background: #0D0D0D;
+      border: 1px solid #2A2A2A;
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { outline: none; border-color: #C9A84C; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.3.1",
+      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from 'react';
+    import { createRoot } from 'react-dom/client';
+    window.React = React;
+    window.ReactHooks = { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext };
+    window.createRoot = createRoot;
+    window.dispatchEvent(new Event('react-ready'));
+  </script>
+
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+  <script type="text/babel" data-presets="react">
+    (async function bootApp() {
+      // ATTENTE DU CHARGEMENT REACT
+      await new Promise(resolve => {
+        if (window.React) return resolve();
+        window.addEventListener('react-ready', resolve, { once: true });
+      });
+
+      const React = window.React;
+      const { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } = window.ReactHooks;
+      const createRoot = window.createRoot;
+
+    // ============================================================
+    // CONSTANTES — TAUX MARCHÉ + SOURCES
+    // ============================================================
+
+    const MARKET_RATES_DEFAULT = {
+      leadTraite: 1.00,       // MIT Oldroyd 2011 — 100% en <5min
+      leadRdv: 0.35,          // Edilead 2024 — 35% lead → RDV
+      rdvHonore: 0.95,        // DETECTOUR — 95%
+      devisSignature: 0.43,   // ELCIA 2025 + Yumens — 43%
+      devisDormants: 0.04,    // Pharow 2024 — 4%
+    };
+
+    const SCENARIO_RATES = {
+      pessimiste: { leadTraite: 1.0, leadRdv: null, rdvHonore: null, devisSignature: null, devisDormants: 0.02 },
+      neutre:     { leadTraite: 1.0, leadRdv: 0.25, rdvHonore: 0.86, devisSignature: 0.33, devisDormants: 0.03 },
+      optimiste:  { leadTraite: 1.0, leadRdv: 0.35, rdvHonore: 0.95, devisSignature: 0.43, devisDormants: 0.04 },
+    };
+
+    const SOURCES = {
+      leadTraite: { name: 'MIT Oldroyd 2011', url: '[URL_MIT_OLDROYD]' },
+      leadRdv: { name: 'Edilead 2024', url: '[URL_EDILEAD]' },
+      rdvHonore: { name: 'DETECTOUR', url: '[URL_DETECTOUR]' },
+      devisSignature: { name: 'ELCIA 2025 + Yumens', url: '[URL_ELCIA_2025]' },
+      devisDormants: { name: 'Pharow 2024', url: '[URL_PHAROW_2024]' },
+    };
+
+    const DEFAULT_CAUSES = {
+      leadTraite: "Pas de rappel automatique <5min, équipes saturées sur les chantiers",
+      leadRdv: "Pas de script de qualification structuré, leads peu requalifiés",
+      rdvHonore: "Pas de séquence anti no-show (mail J-2, SMS J-1, confirmation J-2h)",
+      devisSignature: "Aucune relance structurée, devis envoyés trop tard, pas de scoring d'intérêt",
+      devisDormants: "Aucune réactivation, base oubliée, devis perdus dans le CRM",
+    };
+
+    const STEP_LABELS = {
+      leadTraite: 'Lead → traité',
+      leadRdv: 'Lead → RDV pris',
+      rdvHonore: 'RDV → honoré',
+      devisSignature: 'Devis → signature',
+      devisDormants: 'Devis dormants',
+    };
+
+    const GOOGLE_FONTS = [
+      'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins',
+      'Raleway', 'Source Sans Pro', 'Oswald', 'Roboto Slab', 'Playfair Display',
+      'Merriweather', 'PT Sans', 'Nunito', 'Mulish', 'Work Sans', 'Manrope',
+    ];
+
+    const ADMIN_PASSWORD = 'scalia2026';
+    const STORAGE_KEY = 'scalia-roi-app-state';
+    const INVESTMENT = 16000;
+
+    // ============================================================
+    // UTILS
+    // ============================================================
+
+    const formatEUR = (n) => {
+      if (n == null || isNaN(n)) return '—';
+      return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(n)) + ' €';
+    };
+    const formatPct = (n) => {
+      if (n == null || isNaN(n)) return '—';
+      return Math.round(n * 100) + ' %';
+    };
+    const formatNumber = (n) => {
+      if (n == null || isNaN(n)) return '—';
+      return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(n));
+    };
+    const slugify = (s) => s.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const dateSlug = (d) => {
+      const date = new Date(d);
+      const months = ['jan','fev','mar','avr','mai','jun','jul','aou','sep','oct','nov','dec'];
+      return date.getDate() + months[date.getMonth()];
+    };
+    const lightenHex = (hex, amount = 0.85) => {
+      // Mix hex with white to create a light version
+      const h = hex.replace('#','');
+      const r = parseInt(h.substring(0,2),16);
+      const g = parseInt(h.substring(2,4),16);
+      const b = parseInt(h.substring(4,6),16);
+      const nr = Math.round(r + (255-r)*amount);
+      const ng = Math.round(g + (255-g)*amount);
+      const nb = Math.round(b + (255-b)*amount);
+      return '#' + [nr,ng,nb].map(x => x.toString(16).padStart(2,'0')).join('');
+    };
+
+    // ============================================================
+    // STORAGE
+    // ============================================================
+
+    const loadState = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : { sessions: [] };
+      } catch { return { sessions: [] }; }
+    };
+    const saveState = (state) => {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+      catch (e) { console.error('Save failed', e); }
+    };
+
+    // ============================================================
+    // CALCULATIONS
+    // ============================================================
+
+    const calcProspectRates = (inputs) => {
+      const leadsRecus = +inputs.leadsRecus || 0;
+      const leadsTraites = +inputs.leadsTraites || 0;
+      const rdvPris = +inputs.rdvPris || 0;
+      const rdvHonores = +inputs.rdvHonores || 0;
+      const signatures = +inputs.signatures || 0;
+
+      return {
+        leadTraite: leadsRecus > 0 ? leadsTraites / leadsRecus : 0,
+        leadRdv: leadsTraites > 0 ? rdvPris / leadsTraites : 0,
+        rdvHonore: rdvPris > 0 ? rdvHonores / rdvPris : 0,
+        devisSignature: rdvHonores > 0 ? signatures / rdvHonores : 0,
+      };
+    };
+
+    const calcLosses = (inputs, marketRates) => {
+      const p = calcProspectRates(inputs);
+      const leadsRecus = +inputs.leadsRecus || 0;
+      const ticket = +inputs.ticket || 0;
+      const devisDormants = +inputs.devisDormants || 0;
+      const m = marketRates;
+
+      // Pertes par étape : calcul cascadé sur le funnel
+      // Pour chaque étape, on calcule combien de signatures supplémentaires on ferait
+      // si on avait le taux marché à cette étape (taux prospects ailleurs).
+
+      const baseSignatures = leadsRecus * p.leadTraite * p.leadRdv * p.rdvHonore * p.devisSignature;
+
+      const calcStepLoss = (stepKey) => {
+        const rates = { ...p };
+        // Override only this step with market
+        rates[stepKey] = m[stepKey];
+        // Ceiling : if prospect already at or above market, no loss
+        if (p[stepKey] >= m[stepKey]) return { loss: 0, delta: 0, atMarket: true };
+        const newSigs = leadsRecus * rates.leadTraite * rates.leadRdv * rates.rdvHonore * rates.devisSignature;
+        const extraSigs = newSigs - baseSignatures;
+        return { loss: extraSigs * ticket, delta: m[stepKey] - p[stepKey], atMarket: false };
+      };
+
+      const lossLeadTraite = calcStepLoss('leadTraite');
+      const lossLeadRdv = calcStepLoss('leadRdv');
+      const lossRdvHonore = calcStepLoss('rdvHonore');
+      const lossDevisSignature = calcStepLoss('devisSignature');
+
+      // Devis dormants — one-shot
+      const lossDormants = devisDormants * m.devisDormants * m.devisSignature * ticket;
+
+      const monthly = lossLeadTraite.loss + lossLeadRdv.loss + lossRdvHonore.loss + lossDevisSignature.loss;
+      const annual = monthly * 12;
+      const caActuel = baseSignatures * ticket;
+      const caPotentielMensuel = caActuel + monthly;
+
+      return {
+        prospectRates: p,
+        baseSignatures,
+        steps: {
+          leadTraite: { ...lossLeadTraite, prospectRate: p.leadTraite, marketRate: m.leadTraite },
+          leadRdv: { ...lossLeadRdv, prospectRate: p.leadRdv, marketRate: m.leadRdv },
+          rdvHonore: { ...lossRdvHonore, prospectRate: p.rdvHonore, marketRate: m.rdvHonore },
+          devisSignature: { ...lossDevisSignature, prospectRate: p.devisSignature, marketRate: m.devisSignature },
+          devisDormants: { loss: lossDormants, prospectRate: 0, marketRate: m.devisDormants, atMarket: false },
+        },
+        monthly,
+        annual,
+        oneShot: lossDormants,
+        caActuel,
+        caPotentielMensuel,
+      };
+    };
+
+    const calcGains = (inputs, scenarioKey, marketRates) => {
+      const p = calcProspectRates(inputs);
+      const sc = SCENARIO_RATES[scenarioKey];
+      const leadsRecus = +inputs.leadsRecus || 0;
+      const ticket = +inputs.ticket || 0;
+      const devisDormants = +inputs.devisDormants || 0;
+
+      // Apply scenario with ceiling rule
+      const apply = (key) => {
+        if (sc[key] == null) return p[key]; // pessimiste keeps prospect rates
+        return Math.max(p[key] || 0, sc[key]);
+      };
+
+      const rates = {
+        leadTraite: apply('leadTraite'),
+        leadRdv: apply('leadRdv'),
+        rdvHonore: apply('rdvHonore'),
+        devisSignature: apply('devisSignature'),
+      };
+
+      const todaySigs = leadsRecus * p.leadTraite * p.leadRdv * p.rdvHonore * p.devisSignature;
+      const systemSigs = leadsRecus * rates.leadTraite * rates.leadRdv * rates.rdvHonore * rates.devisSignature;
+      const monthlyGain = (systemSigs - todaySigs) * ticket;
+      const annualGain = monthlyGain * 12;
+      const oneShot = devisDormants * sc.devisDormants * 0.33 * ticket;
+      const total12mo = annualGain + oneShot;
+      const roiMultiplier = Math.round(total12mo / INVESTMENT);
+      const breakEvenMonth = oneShot >= INVESTMENT
+        ? 1
+        : (monthlyGain > 0 ? Math.ceil((INVESTMENT - oneShot) / monthlyGain) : null);
+
+      const caActuel = todaySigs * ticket;
+      const caPotentielMensuel = systemSigs * ticket;
+
+      return { monthlyGain, annualGain, oneShot, total12mo, roiMultiplier, breakEvenMonth, caActuel, caPotentielMensuel };
+    };
+
+    // ============================================================
+    // ROUTER (HASH-BASED)
+    // ============================================================
+
+    const useHashRoute = () => {
+      const [route, setRoute] = useState(() => parseHash(window.location.hash));
+      useEffect(() => {
+        const onHashChange = () => setRoute(parseHash(window.location.hash));
+        window.addEventListener('hashchange', onHashChange);
+        return () => window.removeEventListener('hashchange', onHashChange);
+      }, []);
+      return route;
+    };
+    function parseHash(hash) {
+      const clean = (hash || '#/').replace(/^#/, '');
+      const parts = clean.split('/').filter(Boolean);
+      if (parts.length === 0) return { name: 'home' };
+      if (parts[0] === 'admin') return { name: 'admin' };
+      if (parts[0] === 'session' && parts[1]) return { name: 'session', slug: parts[1] };
+      return { name: 'home' };
+    }
+    const navigate = (path) => { window.location.hash = path; };
+
+    // ============================================================
+    // CONTEXT
+    // ============================================================
+
+    const AppContext = createContext(null);
+
+    const AppProvider = ({ children }) => {
+      const [state, setState] = useState(loadState);
+      const saveTimer = useRef(null);
+      useEffect(() => {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = setTimeout(() => saveState(state), 400);
+      }, [state]);
+
+      const createSession = (data) => {
+        const baseSlug = slugify(data.companyName);
+        const ds = dateSlug(data.meetingDate);
+        const slug = `${baseSlug}-${ds}`;
+        const session = {
+          slug,
+          dirigeantName: data.dirigeantName,
+          companyName: data.companyName,
+          clientLogoUrl: data.clientLogoUrl || '',
+          clientPrimaryColor: data.clientPrimaryColor || '#1E5F8E',
+          clientSecondaryColor: data.clientSecondaryColor || '#888888',
+          clientPrimaryFont: data.clientPrimaryFont || 'Inter',
+          meetingDate: data.meetingDate,
+          inputs: { leadsRecus: '', leadsTraites: '', rdvPris: '', rdvHonores: '', signatures: '', ticket: '', devisDormants: '' },
+          marketRatesOverrides: {},
+          causes: { ...DEFAULT_CAUSES },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        setState(s => ({ ...s, sessions: [...s.sessions, session] }));
+        return slug;
+      };
+      const updateSession = (slug, patch) => {
+        setState(s => ({
+          ...s,
+          sessions: s.sessions.map(ss => ss.slug === slug
+            ? { ...ss, ...patch, updatedAt: new Date().toISOString() }
+            : ss),
+        }));
+      };
+      const deleteSession = (slug) => {
+        if (!confirm('Supprimer cette session définitivement ?')) return;
+        setState(s => ({ ...s, sessions: s.sessions.filter(ss => ss.slug !== slug) }));
+      };
+      const getSession = (slug) => state.sessions.find(s => s.slug === slug);
+      const exportAll = () => {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `scalia-roi-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+      const importAll = (jsonText) => {
+        try {
+          const data = JSON.parse(jsonText);
+          if (!data.sessions || !Array.isArray(data.sessions)) throw new Error();
+          if (!confirm(`Importer ${data.sessions.length} session(s) ? Cela écrasera vos données actuelles.`)) return;
+          setState(data);
+          return true;
+        } catch { alert('Fichier JSON invalide.'); return false; }
+      };
+
+      return (
+        <AppContext.Provider value={{ state, createSession, updateSession, deleteSession, getSession, exportAll, importAll }}>
+          {children}
+        </AppContext.Provider>
+      );
+    };
+    const useApp = () => useContext(AppContext);
+
+    // ============================================================
+    // COMPONENTS — ADMIN
+    // ============================================================
+
+    const PasswordGate = ({ onUnlock }) => {
+      const [pwd, setPwd] = useState('');
+      const [err, setErr] = useState(false);
+      const submit = (e) => {
+        e.preventDefault();
+        if (pwd === ADMIN_PASSWORD) onUnlock();
+        else { setErr(true); setPwd(''); }
+      };
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-noir text-white">
+          <form onSubmit={submit} className="w-full max-w-sm p-8 border border-or/30 rounded">
+            <div className="logo-scalia mx-auto mb-8" style={{fontSize:'40px'}}>
+              <span className="scalia">SCALIA</span>
+              <span className="rule"></span>
+              <span className="btp">BTP</span>
+            </div>
+            <p className="font-serif uppercase tracking-[0.18em] text-or text-sm text-center mb-6">Calculateur ROI · Admin</p>
+            <input
+              type="password"
+              value={pwd}
+              onChange={e => { setPwd(e.target.value); setErr(false); }}
+              placeholder="Mot de passe"
+              className={`w-full bg-noir-card border ${err ? 'border-rouge' : 'border-anthracite'} rounded px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-or transition`}
+              autoFocus
+            />
+            <button type="submit" className="mt-4 w-full bg-or text-noir font-semibold py-3 rounded uppercase tracking-wider text-sm hover:bg-or-fonce transition">
+              Accéder
+            </button>
+            {err && <p className="text-rouge text-sm mt-3 text-center">Mot de passe incorrect</p>}
+          </form>
+        </div>
+      );
+    };
+
+    const AdminPage = () => {
+      const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('scalia-admin') === '1');
+      useEffect(() => { if (unlocked) sessionStorage.setItem('scalia-admin', '1'); }, [unlocked]);
+
+      if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
+      return <AdminDashboard />;
+    };
+
+    const AdminDashboard = () => {
+      const { state, createSession, deleteSession, exportAll, importAll } = useApp();
+      const [showForm, setShowForm] = useState(false);
+
+      return (
+        <div className="min-h-screen bg-noir text-white">
+          <div className="max-w-5xl mx-auto px-8 py-12">
+            <div className="flex items-center justify-between mb-12">
+              <div className="logo-scalia" style={{fontSize:'48px'}}>
+                <span className="scalia">SCALIA</span>
+                <span className="rule"></span>
+                <span className="btp">BTP</span>
+              </div>
+              <div className="text-right">
+                <p className="font-serif uppercase tracking-[0.25em] text-or text-xs">Calculateur ROI</p>
+                <p className="text-gray-400 text-sm mt-1">Console admin</p>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-serif uppercase tracking-[0.18em] text-white text-lg">Sessions</h2>
+              <button onClick={() => setShowForm(s => !s)} className="bg-or text-noir px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+                {showForm ? 'Annuler' : '+ Nouvelle session'}
+              </button>
+            </div>
+
+            {showForm && <SessionForm onCreate={(data) => { const slug = createSession(data); setShowForm(false); navigate(`/session/${slug}`); }} onCancel={() => setShowForm(false)} />}
+
+            <SessionList sessions={state.sessions} onDelete={deleteSession} />
+
+            <div className="mt-16 pt-8 border-t border-anthracite">
+              <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-4">Sauvegarde</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Les sessions sont stockées dans ce navigateur (localStorage). Exportez régulièrement le JSON pour ne rien perdre lors d'un changement de PC.
+              </p>
+              <div className="flex gap-3">
+                <button onClick={exportAll} className="bg-noir-card border border-or/40 text-or px-4 py-2 rounded text-sm hover:border-or transition">
+                  ↓ Exporter toutes les sessions (JSON)
+                </button>
+                <label className="bg-noir-card border border-anthracite text-gray-300 px-4 py-2 rounded text-sm hover:border-or/40 cursor-pointer transition">
+                  ↑ Importer un JSON
+                  <input type="file" accept="application/json" className="hidden" onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = ev => importAll(ev.target.result);
+                    reader.readAsText(file);
+                    e.target.value = '';
+                  }} />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const SessionForm = ({ onCreate, onCancel }) => {
+      const [data, setData] = useState({
+        dirigeantName: '',
+        companyName: '',
+        meetingDate: new Date().toISOString().slice(0, 10),
+        clientPrimaryColor: '#1E5F8E',
+        clientSecondaryColor: '#888888',
+        clientPrimaryFont: 'Inter',
+        clientLogoUrl: '',
+      });
+      const [analysisText, setAnalysisText] = useState('');
+      const [notice, setNotice] = useState('');
+
+      const handleLogo = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+          const compressed = await compressImage(file);
+          setData(d => ({ ...d, clientLogoUrl: compressed }));
+        } catch (err) {
+          alert('Erreur compression : ' + err.message);
+        }
+      };
+
+      const analyzeCharte = () => {
+        const text = analysisText;
+        const hexMatches = text.match(/#[0-9A-Fa-f]{6}/g) || [];
+        const fonts = [];
+        const fontLineMatch = text.match(/[Pp]olice[^:]*:\s*([A-Za-zÀ-ÿ\s]+)/g) || [];
+        fontLineMatch.forEach(line => {
+          const m = line.match(/:\s*([A-Za-zÀ-ÿ\s]+)/);
+          if (m) fonts.push(m[1].trim());
+        });
+        const patch = {};
+        if (hexMatches[0]) patch.clientPrimaryColor = hexMatches[0];
+        if (hexMatches[1]) patch.clientSecondaryColor = hexMatches[1];
+        let foundFont = null;
+        for (const f of fonts) {
+          const exact = GOOGLE_FONTS.find(g => g.toLowerCase() === f.toLowerCase());
+          if (exact) { foundFont = exact; break; }
+        }
+        if (foundFont) {
+          patch.clientPrimaryFont = foundFont;
+          setNotice(`Charte appliquée : ${patch.clientPrimaryColor || ''} · ${foundFont}`);
+        } else if (fonts[0]) {
+          patch.clientPrimaryFont = 'Inter';
+          setNotice(`Police "${fonts[0]}" non disponible — Inter utilisée par défaut.`);
+        } else {
+          setNotice('Couleurs appliquées (aucune police détectée).');
+        }
+        setData(d => ({ ...d, ...patch }));
+      };
+
+      const submit = (e) => {
+        e.preventDefault();
+        if (!data.dirigeantName.trim() || !data.companyName.trim()) {
+          alert('Nom du dirigeant et de l\'entreprise requis.');
+          return;
+        }
+        onCreate(data);
+      };
+
+      return (
+        <form onSubmit={submit} className="bg-noir-card border border-anthracite rounded-lg p-8 mb-8 fade-in">
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <Field label="Nom du dirigeant *">
+              <input required value={data.dirigeantName} onChange={e => setData(d => ({...d, dirigeantName: e.target.value}))} className="form-input" />
+            </Field>
+            <Field label="Nom de l'entreprise *">
+              <input required value={data.companyName} onChange={e => setData(d => ({...d, companyName: e.target.value}))} className="form-input" />
+            </Field>
+            <Field label="Date du rendez-vous">
+              <input type="date" value={data.meetingDate} onChange={e => setData(d => ({...d, meetingDate: e.target.value}))} className="form-input" />
+            </Field>
+            <Field label="Logo client (PNG, JPG, SVG)">
+              <input type="file" accept="image/*" onChange={handleLogo} className="form-input" />
+              {data.clientLogoUrl && <img src={data.clientLogoUrl} alt="Logo preview" className="mt-2 max-h-12 bg-white p-1 rounded" />}
+            </Field>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-xs uppercase tracking-wider text-or mb-2">Analyse de la charte client (collez ici la réponse de l'IA)</label>
+            <textarea
+              value={analysisText}
+              onChange={e => setAnalysisText(e.target.value)}
+              rows={5}
+              placeholder={"Couleur principale : #1E5F8E\nCouleur secondaire : #F5A623\nPolice principale : Roboto\nStyle général : Modern, industrial"}
+              className="form-input font-mono text-sm"
+            />
+            <div className="flex gap-3 mt-3">
+              <button type="button" onClick={analyzeCharte} className="bg-or text-noir px-4 py-2 rounded text-sm font-semibold uppercase tracking-wider hover:bg-or-fonce transition">
+                Analyser et appliquer la charte
+              </button>
+              {notice && <p className="text-xs text-or self-center">{notice}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 mb-6 pt-6 border-t border-anthracite">
+            <Field label="Couleur principale">
+              <div className="flex gap-2">
+                <input type="color" value={data.clientPrimaryColor} onChange={e => setData(d => ({...d, clientPrimaryColor: e.target.value}))} className="h-10 w-12 rounded border border-anthracite bg-noir cursor-pointer" />
+                <input type="text" value={data.clientPrimaryColor} onChange={e => setData(d => ({...d, clientPrimaryColor: e.target.value}))} className="form-input flex-1" />
+              </div>
+            </Field>
+            <Field label="Couleur secondaire">
+              <div className="flex gap-2">
+                <input type="color" value={data.clientSecondaryColor} onChange={e => setData(d => ({...d, clientSecondaryColor: e.target.value}))} className="h-10 w-12 rounded border border-anthracite bg-noir cursor-pointer" />
+                <input type="text" value={data.clientSecondaryColor} onChange={e => setData(d => ({...d, clientSecondaryColor: e.target.value}))} className="form-input flex-1" />
+              </div>
+            </Field>
+            <Field label="Police principale">
+              <select value={data.clientPrimaryFont} onChange={e => setData(d => ({...d, clientPrimaryFont: e.target.value}))} className="form-input">
+                {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+            </Field>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <button type="button" onClick={onCancel} className="px-5 py-2.5 text-gray-400 hover:text-white transition text-sm">Annuler</button>
+            <button type="submit" className="bg-or text-noir px-6 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+              Générer la session
+            </button>
+          </div>
+        </form>
+      );
+    };
+
+    const Field = ({ label, children }) => (
+      <div>
+        <label className="block text-xs uppercase tracking-wider text-or mb-2">{label}</label>
+        {children}
+      </div>
+    );
+
+    const SessionList = ({ sessions, onDelete }) => {
+      if (sessions.length === 0) {
+        return (
+          <div className="bg-noir-card border border-anthracite rounded-lg p-12 text-center text-gray-500">
+            Aucune session encore. Créez-en une pour commencer.
+          </div>
+        );
+      }
+      const sorted = [...sessions].sort((a,b) => new Date(b.meetingDate) - new Date(a.meetingDate));
+      return (
+        <div className="space-y-2">
+          {sorted.map(s => (
+            <div key={s.slug} className="bg-noir-card border border-anthracite rounded-lg p-5 flex items-center justify-between hover:border-or/40 transition">
+              <div className="flex-1">
+                <p className="font-semibold text-white">{s.companyName}</p>
+                <p className="text-sm text-gray-400 mt-0.5">{s.dirigeantName} · {new Date(s.meetingDate).toLocaleDateString('fr-FR')}</p>
+                <p className="text-xs text-gray-600 mt-1 font-mono">{s.slug}</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { navigator.clipboard.writeText(window.location.origin + window.location.pathname + '#/session/' + s.slug); alert('URL copiée'); }} className="px-3 py-2 text-xs text-gray-300 hover:text-or border border-anthracite hover:border-or/40 rounded transition">
+                  Copier URL
+                </button>
+                <button onClick={() => navigate(`/session/${s.slug}`)} className="px-4 py-2 text-xs text-noir bg-or rounded font-semibold uppercase tracking-wider hover:bg-or-fonce transition">
+                  Ouvrir
+                </button>
+                <button onClick={() => onDelete(s.slug)} className="px-3 py-2 text-xs text-rouge hover:text-white hover:bg-rouge border border-rouge/40 rounded transition">
+                  Suppr.
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
+
+    // Compression Canvas
+    const compressImage = (file) => new Promise((resolve, reject) => {
+      if (file.type === 'image/svg+xml') {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+        return;
+      }
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxW = 600;
+          const ratio = Math.min(1, maxW / img.width);
+          canvas.width = img.width * ratio;
+          canvas.height = img.height * ratio;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    // ============================================================
+    // SESSION PAGE
+    // ============================================================
+
+    const SessionPage = ({ slug }) => {
+      const { getSession, updateSession } = useApp();
+      const session = getSession(slug);
+      const [mode, setMode] = useState('pertes');
+      const [transitioning, setTransitioning] = useState(false);
+      const [scenario, setScenario] = useState('neutre');
+      const devMode = new URLSearchParams(window.location.search).get('dev') === '1';
+
+      // Apply client font dynamically
+      useEffect(() => {
+        if (session?.clientPrimaryFont && session.clientPrimaryFont !== 'Inter') {
+          const link = document.getElementById('client-fonts');
+          link.href = `https://fonts.googleapis.com/css2?family=${session.clientPrimaryFont.replace(/\s+/g,'+')}:wght@400;500;600;700&display=swap`;
+        }
+        if (session) {
+          document.documentElement.style.setProperty('--client-primary', session.clientPrimaryColor);
+          document.documentElement.style.setProperty('--client-secondary', session.clientSecondaryColor);
+          document.documentElement.style.setProperty('--client-primary-light', lightenHex(session.clientPrimaryColor, 0.92));
+          document.documentElement.style.setProperty('--client-font', session.clientPrimaryFont || 'Inter');
+        }
+      }, [session]);
+
+      // Body class for mode background
+      useEffect(() => {
+        document.body.classList.toggle('mode-gains', mode === 'gains');
+        return () => document.body.classList.remove('mode-gains');
+      }, [mode]);
+
+      // Switch handler
+      const triggerSwitch = useCallback(() => {
+        if (transitioning) return;
+        setTransitioning(true);
+        setTimeout(() => {
+          setMode(m => m === 'pertes' ? 'gains' : 'pertes');
+          setTimeout(() => setTransitioning(false), 100);
+        }, 400);
+      }, [transitioning]);
+
+      useEffect(() => {
+        const onKey = (e) => {
+          if (e.ctrlKey && e.shiftKey && (e.key === 'B' || e.key === 'b')) {
+            e.preventDefault();
+            triggerSwitch();
+          }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+      }, [triggerSwitch]);
+
+      if (!session) {
+        return (
+          <div className="min-h-screen flex items-center justify-center text-gray-400">
+            <div className="text-center">
+              <p>Session introuvable.</p>
+              <button onClick={() => navigate('/admin')} className="mt-4 text-or underline">Retour admin</button>
+            </div>
+          </div>
+        );
+      }
+
+      const updateInputs = (patch) => updateSession(slug, { inputs: { ...session.inputs, ...patch } });
+      const updateCauses = (patch) => updateSession(slug, { causes: { ...session.causes, ...patch } });
+      const updateMarketOverride = (key, value) => updateSession(slug, {
+        marketRatesOverrides: { ...session.marketRatesOverrides, [key]: value }
+      });
+
+      const marketRates = useMemo(() => ({
+        ...MARKET_RATES_DEFAULT,
+        ...session.marketRatesOverrides,
+      }), [session.marketRatesOverrides]);
+
+      return (
+        <>
+          <div className="dev-switch-zone" onClick={triggerSwitch} title="" />
+          {devMode && (
+            <button onClick={triggerSwitch} className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] bg-rouge text-white text-xs px-3 py-1 rounded uppercase tracking-wider">
+              Mode : {mode} (dev)
+            </button>
+          )}
+          <div className={`mode-transition ${transitioning ? 'opacity-0' : 'opacity-100'}`}>
+            {mode === 'pertes'
+              ? <ModePertes session={session} updateInputs={updateInputs} updateCauses={updateCauses} updateMarketOverride={updateMarketOverride} marketRates={marketRates} />
+              : <ModeGains session={session} scenario={scenario} setScenario={setScenario} marketRates={marketRates} />
+            }
+          </div>
+        </>
+      );
+    };
+
+    // ============================================================
+    // MODE PERTES
+    // ============================================================
+
+    const ModePertes = ({ session, updateInputs, updateCauses, updateMarketOverride, marketRates }) => {
+      const [expanded, setExpanded] = useState(false);
+      const losses = useMemo(() => calcLosses(session.inputs, marketRates), [session.inputs, marketRates]);
+      const allFilled = ['leadsRecus','rdvPris','signatures','ticket'].every(k => +session.inputs[k] > 0);
+
+      const primary = session.clientPrimaryColor;
+      const primaryLight = lightenHex(primary, 0.92);
+      const font = session.clientPrimaryFont || 'Inter';
+
+      return (
+        <div style={{ background: '#FAFAFA', minHeight: '100vh', fontFamily: `'${font}', Inter, sans-serif` }}>
+          <div className="max-w-5xl mx-auto px-10 py-10">
+            {/* Header */}
+            <div className="flex items-start justify-between pb-6 border-b" style={{ borderColor: primaryLight }}>
+              <div className="flex items-center gap-5">
+                {session.clientLogoUrl
+                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '80px', maxWidth: '200px', objectFit: 'contain' }} />
+                  : <div className="text-3xl font-bold" style={{ color: primary }}>{session.companyName.substring(0,2).toUpperCase()}</div>
+                }
+                <div>
+                  <h1 className="font-bold uppercase" style={{ color: primary, fontSize: '22px', letterSpacing: '0.02em' }}>{session.companyName}</h1>
+                  <p className="text-sm text-gray-500 mt-1">Audit personnalisé</p>
+                </div>
+              </div>
+              <div className="text-right text-sm text-gray-500">
+                <p>{session.dirigeantName}</p>
+                <p>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
+              </div>
+            </div>
+
+            {/* Inputs panel */}
+            <InputsPanel session={session} updateInputs={updateInputs} primary={primary} />
+
+            {/* Activité commerciale */}
+            <ActivityBlock
+              session={session}
+              losses={losses}
+              expanded={expanded}
+              setExpanded={setExpanded}
+              primary={primary}
+              primaryLight={primaryLight}
+            />
+
+            {/* Comparison expanded */}
+            {expanded && (
+              <div className="mt-8 fade-in">
+                <ComparisonBlock
+                  losses={losses}
+                  session={session}
+                  updateCauses={updateCauses}
+                  updateMarketOverride={updateMarketOverride}
+                  marketRates={marketRates}
+                  primary={primary}
+                />
+                <TotalsBlock losses={losses} primary={primary} primaryLight={primaryLight} />
+              </div>
+            )}
+
+            {/* 3 axes */}
+            {expanded && allFilled && <ThreeAxesBlock primary={primary} primaryLight={primaryLight} />}
+          </div>
+        </div>
+      );
+    };
+
+    const InputsPanel = ({ session, updateInputs, primary }) => {
+      const inputClass = "w-full bg-white border-2 rounded-md px-3 py-2 text-base font-semibold tabular focus:outline-none transition";
+      const labelClass = "block text-[11px] uppercase tracking-wider text-gray-500 mb-1";
+      const Input = ({ k, label, suffix = '' }) => (
+        <div>
+          <label className={labelClass}>{label}</label>
+          <div className="relative">
+            <input
+              type="number"
+              value={session.inputs[k] ?? ''}
+              onChange={e => updateInputs({ [k]: e.target.value })}
+              placeholder="0"
+              className={inputClass}
+              style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+              onFocus={e => e.target.style.borderColor = primary}
+              onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.08)'}
+            />
+            {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{suffix}</span>}
+          </div>
+        </div>
+      );
+      return (
+        <div className="mt-6 mb-8 grid grid-cols-7 gap-3">
+          <Input k="leadsRecus" label="Leads reçus/mois" />
+          <Input k="leadsTraites" label="Leads traités" />
+          <Input k="rdvPris" label="RDV pris" />
+          <Input k="rdvHonores" label="RDV honorés" />
+          <Input k="signatures" label="Signatures" />
+          <Input k="ticket" label="Ticket €" suffix="€" />
+          <Input k="devisDormants" label="Devis dormants" />
+        </div>
+      );
+    };
+
+    const ActivityBlock = ({ session, losses, expanded, setExpanded, primary, primaryLight }) => {
+      const i = session.inputs;
+      const Row = ({ label, value, isTotal = false }) => (
+        <div className="flex justify-between py-2.5" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+          <span className={isTotal ? 'font-semibold text-gray-900' : 'text-gray-600 text-sm'}>{label}</span>
+          <span className={`tabular ${isTotal ? 'text-2xl font-bold' : 'text-base font-semibold text-gray-900'}`} style={{ color: isTotal ? primary : undefined }}>{value}</span>
+        </div>
+      );
+      return (
+        <div className="bg-white rounded-lg shadow-sm border" style={{ borderColor: primaryLight, padding: '32px' }}>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-bold uppercase tracking-wider text-gray-900" style={{ fontSize: '15px', letterSpacing: '0.15em' }}>Votre activité commerciale</h2>
+            <button
+              onClick={() => setExpanded(e => !e)}
+              className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold transition hover:scale-105"
+              style={{ background: primary }}
+              title="Comparer au marché"
+            >
+              {expanded ? '↙' : '↗'}
+            </button>
+          </div>
+          <div>
+            <Row label="Leads reçus / mois" value={formatNumber(+i.leadsRecus)} />
+            <Row label="Leads traités" value={formatNumber(+i.leadsTraites)} />
+            <Row label="RDV pris" value={formatNumber(+i.rdvPris)} />
+            <Row label="RDV honorés" value={formatNumber(+i.rdvHonores)} />
+            <Row label="Signatures" value={formatNumber(+i.signatures)} />
+            <Row label="Ticket moyen" value={formatEUR(+i.ticket)} />
+            <Row label="Devis dormants" value={formatNumber(+i.devisDormants)} />
+          </div>
+          <div className="mt-4 pt-4" style={{ borderTop: `2px solid ${primaryLight}` }}>
+            <Row label="CA actuel" value={`${formatEUR(losses.caActuel)} /mois`} isTotal />
+          </div>
+        </div>
+      );
+    };
+
+    const ComparisonBlock = ({ losses, session, updateCauses, updateMarketOverride, marketRates, primary }) => {
+      const stepsOrder = ['leadTraite', 'leadRdv', 'rdvHonore', 'devisSignature'];
+      return (
+        <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 mt-6">
+          <h2 className="font-bold uppercase tracking-wider text-gray-900 mb-6" style={{ fontSize: '15px', letterSpacing: '0.15em' }}>Comparaison avec le marché</h2>
+          <div className="space-y-6">
+            {stepsOrder.map(key => (
+              <ComparisonRow
+                key={key}
+                stepKey={key}
+                step={losses.steps[key]}
+                cause={session.causes[key]}
+                updateCause={(v) => updateCauses({ [key]: v })}
+                updateMarketOverride={(v) => updateMarketOverride(key, v)}
+                primary={primary}
+              />
+            ))}
+          </div>
+          <div className="mt-8 pt-8 border-t border-gray-200">
+            <ComparisonRow
+              stepKey="devisDormants"
+              step={losses.steps.devisDormants}
+              cause={session.causes.devisDormants}
+              updateCause={(v) => updateCauses({ devisDormants: v })}
+              updateMarketOverride={(v) => updateMarketOverride('devisDormants', v)}
+              primary={primary}
+              isOneShot
+            />
+          </div>
+        </div>
+      );
+    };
+
+    const ComparisonRow = ({ stepKey, step, cause, updateCause, updateMarketOverride, primary, isOneShot }) => {
+      const [editingCause, setEditingCause] = useState(false);
+      const [editingMarket, setEditingMarket] = useState(false);
+      const [marketDraft, setMarketDraft] = useState(Math.round(step.marketRate * 100));
+      const source = SOURCES[stepKey];
+
+      return (
+        <div className="pl-4" style={{ borderLeft: `3px solid ${primary}` }}>
+          <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{STEP_LABELS[stepKey]}</p>
+          <p className="font-semibold text-gray-900 leading-relaxed" style={{ fontSize: '17px' }}>
+            Vous : <span className="tabular" style={{ color: primary }}>{formatPct(step.prospectRate)}</span>
+            <span className="text-gray-400 mx-2">→</span>
+            Marché : {editingMarket ? (
+              <input
+                type="number"
+                autoFocus
+                value={marketDraft}
+                onChange={e => setMarketDraft(e.target.value)}
+                onBlur={() => { updateMarketOverride(Math.max(0, Math.min(100, +marketDraft))/100); setEditingMarket(false); }}
+                onKeyDown={e => e.key === 'Enter' && e.target.blur()}
+                className="w-16 border-b-2 px-1 text-center tabular"
+                style={{ borderColor: primary }}
+              />
+            ) : (
+              <span className="tabular cursor-pointer hover:underline" onClick={() => { setMarketDraft(Math.round(step.marketRate*100)); setEditingMarket(true); }}>{formatPct(step.marketRate)} <span className="text-xs opacity-40">✎</span></span>
+            )}
+            {step.atMarket
+              ? <span className="ml-3 text-green-700 text-sm font-semibold">✓ Au niveau du marché</span>
+              : <>
+                  <span className="text-gray-400 mx-2">→</span>
+                  <span className="text-rouge tabular">-{formatPct(step.delta)}</span>
+                  <span className="text-gray-400 mx-2">→</span>
+                  <span className="text-gray-900 tabular font-bold">-{formatEUR(step.loss)}{!isOneShot && '/mois'}</span>
+                  {isOneShot && <span className="ml-2 text-sm text-gray-500 italic">(one-shot)</span>}
+                </>
+            }
+          </p>
+          <p className="text-xs text-gray-500 italic mt-2">
+            ↳ Source : {source.name} <a href={source.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-800 inline-flex items-center gap-1">[voir l'étude ↗]</a>
+          </p>
+          {editingCause ? (
+            <textarea
+              autoFocus
+              defaultValue={cause}
+              onBlur={(e) => { updateCause(e.target.value); setEditingCause(false); }}
+              className="w-full mt-1 px-2 py-1 text-sm italic text-rouge border border-rouge/30 rounded resize-none"
+              rows={2}
+            />
+          ) : (
+            <p className="text-sm italic mt-1 text-rouge cursor-pointer hover:bg-rouge/5 rounded px-1" onClick={() => setEditingCause(true)} title="Cliquer pour éditer">
+              ↳ Cause : {cause}
+            </p>
+          )}
+        </div>
+      );
+    };
+
+    const TotalsBlock = ({ losses, primary, primaryLight }) => {
+      const ratio = losses.caActuel > 0 ? losses.monthly / losses.caActuel : 0;
+      const actuelBarWidth = losses.caPotentielMensuel > 0 ? (losses.caActuel / losses.caPotentielMensuel) * 100 : 0;
+      const potentielBarWidth = 100;
+
+      return (
+        <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 mt-8">
+          <div className="grid grid-cols-2 gap-8 mb-8">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">Perte mensuelle récurrente</p>
+              <p className="font-bold tabular" style={{ fontSize: '36px', color: primary }}>{formatEUR(losses.monthly)}<span className="text-base text-gray-500"> /mois</span></p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">One-shot devis dormants</p>
+              <p className="font-bold tabular text-gray-900" style={{ fontSize: '28px' }}>{formatEUR(losses.oneShot)}</p>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-gray-200">
+            <p className="text-xs uppercase tracking-wider text-gray-500 mb-4" style={{ letterSpacing: '0.2em' }}>CA actuel vs CA potentiel</p>
+            <div className="space-y-3">
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-gray-600">Actuel</span>
+                  <span className="font-bold tabular text-gray-900">{formatEUR(losses.caActuel)}</span>
+                </div>
+                <div className="h-8 rounded" style={{ background: '#F0F0F0' }}>
+                  <div className="h-full rounded transition-all duration-700" style={{ width: actuelBarWidth + '%', background: primary, opacity: 0.45 }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-semibold" style={{ color: primary }}>Potentiel</span>
+                  <span className="font-bold tabular" style={{ color: primary }}>{formatEUR(losses.caPotentielMensuel)}</span>
+                </div>
+                <div className="h-8 rounded" style={{ background: '#F0F0F0' }}>
+                  <div className="h-full rounded transition-all duration-700" style={{ width: potentielBarWidth + '%', background: primary }} />
+                </div>
+              </div>
+            </div>
+            <div className="mt-8 text-center">
+              <p className="text-sm text-gray-500 uppercase tracking-wider mb-2">Vous laissez sur la table chaque mois</p>
+              <p className="font-bold tabular" style={{ fontSize: '56px', color: primary, lineHeight: 1 }}>{formatEUR(losses.monthly)}</p>
+              {ratio > 0 && <p className="text-base text-gray-600 mt-2">= {ratio.toFixed(2).replace('.', ',')}× votre CA actuel</p>}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const ThreeAxesBlock = ({ primary, primaryLight }) => {
+      const axes = [
+        { num: '01', title: 'Réveiller votre base\nde devis dormants', desc: 'Quick win — un stock d\'anciens leads que vous pouvez réveiller en 30 jours' },
+        { num: '02', title: 'Ne plus rien laisser fuir', desc: 'Capter chaque lead, traiter chaque devis, au bon moment' },
+        { num: '03', title: 'Reprendre le contrôle\npar la donnée', desc: 'Voir en temps réel ce qui marche, ce qui fuit, où agir' },
+      ];
+      return (
+        <div className="mt-12 pt-12 border-t border-gray-200">
+          <h2 className="text-center font-bold uppercase mb-10" style={{ fontSize: '17px', letterSpacing: '0.22em', color: primary }}>
+            Comment récupérer cet argent — 3 axes
+          </h2>
+          <div className="grid grid-cols-3 gap-5">
+            {axes.map((a, idx) => (
+              <div key={a.num} className="rounded-lg p-8 text-center fade-up" style={{ background: '#FAFAFA', border: `1px solid ${primary}33`, animationDelay: `${idx * 100}ms` }}>
+                <p className="font-bold tabular" style={{ fontSize: '56px', color: primary, letterSpacing: '-0.02em', lineHeight: 1 }}>{a.num}</p>
+                <div className="my-4 mx-auto" style={{ width: '40px', height: '2px', background: primary }} />
+                <p className="font-bold text-gray-900 uppercase whitespace-pre-line" style={{ fontSize: '13px', letterSpacing: '0.12em', lineHeight: 1.5 }}>{a.title}</p>
+                <p className="mt-4 text-sm text-gray-600 leading-relaxed">{a.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // ============================================================
+    // MODE GAINS
+    // ============================================================
+
+    const ModeGains = ({ session, scenario, setScenario, marketRates }) => {
+      const gains = useMemo(() => calcGains(session.inputs, scenario, marketRates), [session.inputs, scenario, marketRates]);
+
+      return (
+        <div className="bg-noir min-h-screen text-white" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <div className="max-w-5xl mx-auto px-10 py-12">
+            {/* Header */}
+            <div className="flex items-start justify-between pb-8 border-b border-or/20">
+              <div className="logo-scalia" style={{ fontSize: '36px' }}>
+                <span className="scalia">SCALIA</span>
+                <span className="rule"></span>
+                <span className="btp">BTP</span>
+              </div>
+              <div className="text-right">
+                <p className="font-serif uppercase text-or text-sm" style={{ letterSpacing: '0.18em' }}>Projection ROI Pilot</p>
+                <p className="text-or/70 text-sm mt-1">Pour {session.companyName}</p>
+              </div>
+            </div>
+
+            {/* Scenario buttons */}
+            <ScenarioButtons scenario={scenario} setScenario={setScenario} />
+
+            {/* Big number */}
+            <BigGainBlock gains={gains} />
+
+            {/* CA actuel vs potentiel */}
+            <CABlockGains gains={gains} />
+
+            {/* ROI block */}
+            <ROIBlock gains={gains} />
+
+            {/* Footer */}
+            <div className="mt-16 pt-8 border-t border-or/20 text-center">
+              <p className="font-serif text-or/70" style={{ fontSize: '14px', letterSpacing: '0.5em' }}>SCALIA · BTP</p>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const ScenarioButtons = ({ scenario, setScenario }) => {
+      const scenarios = [
+        { key: 'pessimiste', label: 'Pessimiste', sub: 'Hypothèse minimale garantie' },
+        { key: 'neutre', label: 'Neutre', sub: 'Vous atteignez la médiane du marché' },
+        { key: 'optimiste', label: 'Optimiste', sub: 'Vous atteignez le haut du marché' },
+      ];
+      return (
+        <div className="mt-10 flex gap-2 p-1.5 rounded-full border border-or/30 bg-white/[0.03] max-w-2xl mx-auto">
+          {scenarios.map(s => {
+            const active = s.key === scenario;
+            return (
+              <button
+                key={s.key}
+                onClick={() => setScenario(s.key)}
+                className={`flex-1 px-5 py-3 rounded-full transition ${active ? 'bg-or text-noir' : 'text-white/50 hover:text-white/85'}`}
+              >
+                <p className="font-semibold uppercase text-xs" style={{ letterSpacing: '0.18em' }}>{s.label}</p>
+                <p className={`text-[10px] mt-0.5 ${active ? 'text-noir/70' : 'text-white/50'} leading-tight`}>{s.sub}</p>
+              </button>
+            );
+          })}
+        </div>
+      );
+    };
+
+    const BigGainBlock = ({ gains }) => {
+      const animated = useCountUp(gains.total12mo);
+      return (
+        <div className="mt-16 text-center">
+          <p className="font-serif uppercase text-or" style={{ fontSize: '13px', letterSpacing: '0.3em' }}>Avec ROI Pilot, vous récupérez</p>
+          <div className="mt-6 flex items-baseline justify-center">
+            <span className="font-extrabold tabular text-or" style={{ fontSize: 'clamp(80px, 12vw, 140px)', letterSpacing: '-0.03em', lineHeight: 1 }}>{formatNumber(animated)}</span>
+            <span className="text-or/70 ml-2" style={{ fontSize: 'clamp(40px, 5vw, 60px)' }}>€</span>
+          </div>
+          <p className="mt-4 text-white/85" style={{ fontSize: '18px', letterSpacing: '0.1em' }}>sur 12 mois</p>
+        </div>
+      );
+    };
+
+    const CABlockGains = ({ gains }) => {
+      const diff = gains.caPotentielMensuel - gains.caActuel;
+      const ratio = gains.caActuel > 0 ? gains.caPotentielMensuel / gains.caActuel : 0;
+      return (
+        <div className="mt-16 pt-10 border-t border-or/20">
+          <p className="font-serif text-center text-or/70 uppercase" style={{ fontSize: '13px', letterSpacing: '0.25em' }}>Votre CA mensuel</p>
+          <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="text-center p-8 rounded border border-white/10 bg-white/[0.02]">
+              <p className="text-white/40 text-xs uppercase tracking-wider mb-3">Actuel</p>
+              <p className="font-bold tabular text-white/60" style={{ fontSize: '40px' }}>{formatEUR(gains.caActuel)}</p>
+              <p className="text-white/40 text-sm mt-1">/mois</p>
+            </div>
+            <div className="text-center p-8 rounded border border-or/40 bg-or/5">
+              <p className="font-serif uppercase text-or text-xs mb-3" style={{ letterSpacing: '0.2em' }}>Potentiel</p>
+              <p className="font-extrabold tabular text-or" style={{ fontSize: '56px', letterSpacing: '-0.02em' }}>{formatEUR(gains.caPotentielMensuel)}</p>
+              <p className="text-or/70 text-sm mt-1">/mois</p>
+            </div>
+          </div>
+          {diff > 0 && (
+            <p className="mt-6 text-center text-white/85" style={{ fontSize: '16px' }}>
+              → Différence : <span className="text-or font-semibold">+{formatEUR(diff)}/mois</span>
+              {ratio > 1 && <span> (×{ratio.toFixed(2).replace('.', ',')})</span>}
+            </p>
+          )}
+        </div>
+      );
+    };
+
+    const ROIBlock = ({ gains }) => {
+      const breakEven = gains.breakEvenMonth;
+      return (
+        <div className="mt-12 grid grid-cols-3 gap-4">
+          <div className="p-6 rounded border border-or/30 bg-white/[0.03]">
+            <p className="text-white/50 text-[11px] uppercase tracking-widest mb-2">Investissement</p>
+            <p className="font-extrabold tabular text-or" style={{ fontSize: '32px' }}>{formatEUR(INVESTMENT)}</p>
+            <p className="text-white/70 text-xs mt-1">Tout compris</p>
+          </div>
+          <div className="p-6 rounded border border-or/30 bg-white/[0.03]">
+            <p className="text-white/50 text-[11px] uppercase tracking-widest mb-2">Seuil rentabilité</p>
+            <p className="font-extrabold tabular text-or" style={{ fontSize: '32px' }}>{breakEven ? `Mois ${breakEven}` : '—'}</p>
+            <p className="text-white/70 text-xs mt-1">Quick win</p>
+          </div>
+          <div className="p-6 rounded border border-or/30 bg-white/[0.03]">
+            <p className="text-white/50 text-[11px] uppercase tracking-widest mb-2">ROI 12 mois</p>
+            <p className="font-extrabold tabular text-or" style={{ fontSize: '32px' }}>× {gains.roiMultiplier || 0}</p>
+            <p className="text-white/70 text-xs mt-1">Multiplicateur</p>
+          </div>
+        </div>
+      );
+    };
+
+    // Counter animation hook
+    const useCountUp = (target, duration = 700) => {
+      const [val, setVal] = useState(0);
+      const prev = useRef(0);
+      useEffect(() => {
+        const start = prev.current;
+        const end = target;
+        const startTime = performance.now();
+        let raf;
+        const tick = (now) => {
+          const t = Math.min(1, (now - startTime) / duration);
+          const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+          setVal(start + (end - start) * eased);
+          if (t < 1) raf = requestAnimationFrame(tick);
+          else prev.current = end;
+        };
+        raf = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(raf);
+      }, [target]);
+      return val;
+    };
+
+    // ============================================================
+    // HOME (redirect)
+    // ============================================================
+
+    const HomePage = () => {
+      useEffect(() => {
+        navigate('/admin');
+      }, []);
+      return null;
+    };
+
+    // ============================================================
+    // APP ROOT
+    // ============================================================
+
+    const App = () => {
+      const route = useHashRoute();
+      return (
+        <AppProvider>
+          {route.name === 'home' && <HomePage />}
+          {route.name === 'admin' && <AdminPage />}
+          {route.name === 'session' && <SessionPage slug={route.slug} />}
+        </AppProvider>
+      );
+    };
+
+      createRoot(document.getElementById('root')).render(<App />);
+    })();
+  </script>
+</body>
+</html>

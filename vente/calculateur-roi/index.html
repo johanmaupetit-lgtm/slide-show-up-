@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SCALIA BTP — Calculateur ROI PILOT</title>
 
+  <script>
+    (function(){
+      if(sessionStorage.getItem('scalia-auth')==='ok')return;
+      var p=prompt('Mot de passe SCALIA BTP :');
+      if(p==='scalia2026'){sessionStorage.setItem('scalia-auth','ok');}
+      else{document.documentElement.innerHTML='<body style="background:#0D0D0D;color:#C9A84C;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;letter-spacing:0.3em;text-transform:uppercase;font-size:12px;">Accès refusé</body>';throw new Error('denied');}
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap">
@@ -392,15 +401,22 @@
 
     const AppProvider = ({ children }) => {
       const [state, setState] = useState(loadState);
-      const [apiKey, setApiKey] = useState(() => localStorage.getItem('scalia-anthropic-key') || '');
+      const [apiKey, setApiKey] = useState(() => {
+        // Migration douce depuis l'ancien stockage Anthropic
+        const newKey = localStorage.getItem('scalia-gemini-key');
+        if (newKey) return newKey;
+        const oldKey = localStorage.getItem('scalia-anthropic-key');
+        if (oldKey) { localStorage.removeItem('scalia-anthropic-key'); }
+        return '';
+      });
       const saveTimer = useRef(null);
       useEffect(() => {
         clearTimeout(saveTimer.current);
         saveTimer.current = setTimeout(() => saveState(state), 400);
       }, [state]);
       useEffect(() => {
-        if (apiKey) localStorage.setItem('scalia-anthropic-key', apiKey);
-        else localStorage.removeItem('scalia-anthropic-key');
+        if (apiKey) localStorage.setItem('scalia-gemini-key', apiKey);
+        else localStorage.removeItem('scalia-gemini-key');
       }, [apiKey]);
 
       const createSession = (data) => {
@@ -508,10 +524,7 @@
     };
 
     const AdminPage = () => {
-      const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem('scalia-admin') === '1');
-      useEffect(() => { if (unlocked) sessionStorage.setItem('scalia-admin', '1'); }, [unlocked]);
-
-      if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
+      // L'accès est déjà gated par le script auth en <head>
       return <AdminDashboard />;
     };
 
@@ -548,11 +561,11 @@
             <SessionList sessions={state.sessions} onDelete={deleteSession} />
 
             <div className="mt-16 pt-8 border-t border-anthracite">
-              <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-4">Clé API Anthropic (analyse IA des screenshots)</h3>
+              <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-4">Clé API Google Gemini (analyse IA gratuite)</h3>
               <p className="text-gray-400 text-sm mb-3">
                 {apiKey
-                  ? <>✓ Clé configurée ({apiKey.slice(0,12)}…{apiKey.slice(-4)}). L'analyse IA est disponible quand tu uploades des captures.</>
-                  : <>Non configurée. L'extraction se fait uniquement par couleurs dominantes (Phase A). Configure une clé Anthropic pour activer l'analyse IA complète (couleurs + polices + style).</>
+                  ? <>✓ Clé configurée ({apiKey.slice(0,10)}…{apiKey.slice(-4)}). L'analyse IA est disponible quand tu uploades des captures.</>
+                  : <>Non configurée. L'extraction se fait uniquement par couleurs dominantes (Phase A). Configure une clé <strong>Google Gemini</strong> pour activer l'analyse IA complète (couleurs + polices + style + ambiance) — <strong>100% gratuit, aucune carte bancaire</strong>.</>
                 }
               </p>
               {showApiSettings ? (
@@ -561,7 +574,7 @@
                     type="password"
                     value={keyDraft}
                     onChange={e => setKeyDraft(e.target.value)}
-                    placeholder="sk-ant-api03-…"
+                    placeholder="AIzaSy…"
                     className="form-input font-mono text-sm"
                     autoFocus
                   />
@@ -570,13 +583,18 @@
                     <button onClick={() => { setShowApiSettings(false); setKeyDraft(apiKey); }} className="text-gray-400 px-3 py-1.5 text-xs hover:text-white">Annuler</button>
                     {apiKey && <button onClick={() => { setApiKey(''); setKeyDraft(''); setShowApiSettings(false); }} className="text-rouge px-3 py-1.5 text-xs hover:text-white ml-auto">Effacer la clé</button>}
                   </div>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Crée un compte sur <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="text-or underline">console.anthropic.com</a>, ajoute ~5€ de crédit, génère une clé. Stockée uniquement dans ce navigateur (localStorage). Coût ~0,03€ par analyse.
-                  </p>
+                  <div className="text-xs text-gray-400 leading-relaxed space-y-1">
+                    <p><strong className="text-or">Setup gratuit, 2 minutes :</strong></p>
+                    <p>1. Va sur <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-or underline">aistudio.google.com/app/apikey</a></p>
+                    <p>2. Connecte-toi avec un compte Google</p>
+                    <p>3. Clique <strong>"Create API key"</strong> → copie la clé</p>
+                    <p>4. Colle-la ici → Enregistrer</p>
+                    <p className="mt-2 text-gray-500">Quota gratuit Gemini 2.0 Flash : 1 500 analyses/jour. Stockée uniquement dans ce navigateur.</p>
+                  </div>
                 </div>
               ) : (
                 <button onClick={() => setShowApiSettings(true)} className="bg-noir-card border border-or/40 text-or px-4 py-2 rounded text-sm hover:border-or transition">
-                  {apiKey ? 'Modifier la clé' : '+ Configurer la clé API'}
+                  {apiKey ? 'Modifier la clé' : '+ Configurer la clé API Gemini (gratuit)'}
                 </button>
               )}
             </div>
@@ -878,11 +896,11 @@
               <div className="mt-5 pt-4 border-t border-anthracite/50">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wider text-or font-semibold">Analyse IA complète (Claude Sonnet 4.6)</p>
+                    <p className="text-[11px] uppercase tracking-wider text-or font-semibold">Analyse IA complète (Google Gemini · gratuit)</p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       {apiKey
-                        ? <>Couleurs + polices + style général · ~0,03€ par analyse</>
-                        : <>Clé API non configurée — voir paramètres en bas de page</>
+                        ? <>Couleurs + polices + style général + ambiance</>
+                        : <>Clé Gemini non configurée — voir paramètres en bas de /admin</>
                       }
                     </p>
                   </div>
@@ -1110,23 +1128,20 @@
       });
     };
 
-    // ===== ANALYSE IA VISION (Claude Sonnet 4.6) =====
+    // ===== ANALYSE IA VISION (Google Gemini 2.0 Flash — Free Tier) =====
     const analyzeCharteAI = async (apiKey, screenshotDataUrls) => {
-      if (!apiKey) throw new Error('Clé API Anthropic manquante.');
+      if (!apiKey) throw new Error('Clé API Google Gemini manquante.');
       if (!screenshotDataUrls || screenshotDataUrls.length === 0) throw new Error('Aucune capture à analyser.');
 
-      const imageBlocks = screenshotDataUrls.slice(0, 10).map(dataUrl => {
+      const imageParts = screenshotDataUrls.slice(0, 10).map(dataUrl => {
         const [meta, b64] = dataUrl.split(',');
-        const mediaType = meta.match(/data:([^;]+)/)?.[1] || 'image/png';
-        return {
-          type: 'image',
-          source: { type: 'base64', media_type: mediaType, data: b64 },
-        };
+        const mimeType = meta.match(/data:([^;]+)/)?.[1] || 'image/png';
+        return { inline_data: { mime_type: mimeType, data: b64 } };
       });
 
       const prompt = `Tu es un expert en branding et identité visuelle. Analyse ces captures d'écran du site web d'une entreprise (souvent une PME française du BTP / menuiserie).
 
-Retourne EXCLUSIVEMENT un objet JSON valide, sans aucun texte autour, au format suivant :
+Retourne un objet JSON valide au format suivant :
 
 {
   "couleurPrimaire": "#XXXXXX",
@@ -1138,30 +1153,27 @@ Retourne EXCLUSIVEMENT un objet JSON valide, sans aucun texte autour, au format 
   "ambiance": "phrase courte décrivant l'identité visuelle (max 15 mots)"
 }
 
-Règles :
+Règles strictes :
 - Couleurs en HEX 6 chiffres, fidèles aux captures
-- couleurPrimaire = celle qui domine la marque (souvent dans le logo, titres, CTA)
-- couleurSecondaire = couleur d'appui visible (boutons secondaires, bordures)
-- couleurAccent = touche complémentaire si présente, sinon répéter primaire
-- Polices : noms exacts Google Fonts si reconnaissables, sinon la famille la plus proche. Polices génériques : Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Raleway, Source Sans Pro, Oswald, Roboto Slab, Playfair Display, Merriweather, PT Sans, Nunito, Mulish, Work Sans, Manrope, Cinzel, Bebas Neue, Anton, Archivo
-- Sois précis, fidèle aux captures, jamais inventer.
-- JSON pur, aucun texte avant/après.`;
+- couleurPrimaire = celle qui domine la marque (logo, titres, CTA)
+- couleurSecondaire = couleur d'appui visible
+- couleurAccent = touche complémentaire, ou répéter primaire si absente
+- Polices : noms exacts Google Fonts si reconnaissables. Préfère : Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Raleway, Source Sans Pro, Oswald, Roboto Slab, Playfair Display, Merriweather, PT Sans, Nunito, Mulish, Work Sans, Manrope, Cinzel, Bebas Neue, Anton, Archivo, Barlow, DM Sans, Fira Sans
+- Sois précis et fidèle aux captures, jamais inventer.`;
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1024,
-          messages: [{
-            role: 'user',
-            content: [...imageBlocks, { type: 'text', text: prompt }],
+          contents: [{
+            parts: [...imageParts, { text: prompt }],
           }],
+          generationConfig: {
+            response_mime_type: 'application/json',
+            temperature: 0.2,
+            max_output_tokens: 1024,
+          },
         }),
       });
 
@@ -1176,14 +1188,18 @@ Règles :
       }
 
       const data = await response.json();
-      const text = data.content?.[0]?.text || '';
-      const match = text.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error('Réponse IA invalide (pas de JSON détecté).');
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (!text) throw new Error('Réponse IA vide.');
 
+      // JSON mode strict de Gemini : la sortie est déjà JSON pur
       try {
-        return JSON.parse(match[0]);
+        return JSON.parse(text);
       } catch {
-        throw new Error('JSON IA mal formé.');
+        // Fallback : extraire le JSON si Gemini ajoute du texte
+        const match = text.match(/\{[\s\S]*\}/);
+        if (!match) throw new Error('Réponse IA invalide (pas de JSON détecté).');
+        try { return JSON.parse(match[0]); }
+        catch { throw new Error('JSON IA mal formé.'); }
       }
     };
 

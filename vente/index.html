@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SCALIA BTP — Système ROI PILOT</title>
 
+  <script>
+    (function(){
+      if(sessionStorage.getItem('scalia-auth')==='ok')return;
+      var p=prompt('Mot de passe SCALIA BTP :');
+      if(p==='scalia2026'){sessionStorage.setItem('scalia-auth','ok');}
+      else{document.documentElement.innerHTML='<body style="background:#0D0D0D;color:#C9A84C;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;letter-spacing:0.3em;text-transform:uppercase;font-size:12px;">Accès refusé</body>';throw new Error('denied');}
+    })();
+  </script>
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">

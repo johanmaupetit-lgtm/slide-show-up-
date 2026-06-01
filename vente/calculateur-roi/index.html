@@ -252,6 +252,28 @@
       return '#' + [clamp(nr), clamp(ng), clamp(nb)].map(x => x.toString(16).padStart(2,'0')).join('');
     };
 
+    // Filtre le CSS généré par l'IA pour bloquer les patterns dangereux
+    // (expression, javascript:, url(http...), @import, etc.) avant injection.
+    const sanitizeCustomCSS = (raw) => {
+      if (!raw || typeof raw !== 'string') return '';
+      let css = raw;
+      // Bloque tout import / javascript / expression / url externe
+      const blockPatterns = [
+        /@import[^;]*;?/gi,
+        /javascript\s*:/gi,
+        /expression\s*\(/gi,
+        /behavior\s*:/gi,
+        /url\s*\(\s*['"]?\s*https?:/gi,
+        /url\s*\(\s*['"]?\s*\/\//gi,
+        /<\/?script[^>]*>/gi,
+        /<\/?style[^>]*>/gi,
+      ];
+      blockPatterns.forEach(p => { css = css.replace(p, ''); });
+      // Limite la taille pour éviter d'engorger localStorage
+      if (css.length > 20000) css = css.slice(0, 20000);
+      return css.trim();
+    };
+
     // ============================================================
     // STORAGE
     // ============================================================
@@ -479,6 +501,7 @@
           clientDecorative: data.clientDecorative || 'none',
           clientStyleGeneral: data.clientStyleGeneral || '',
           clientAmbiance: data.clientAmbiance || '',
+          clientCustomCSS: data.clientCustomCSS || '',
           meetingDate: data.meetingDate,
           inputs: { leadsRecus: '', leadsTraites: '', rdvPris: '', rdvHonores: '', signatures: '', ticket: '', devisDormants: '' },
           marketRatesOverrides: {},
@@ -716,6 +739,7 @@
       if (ai.presenceDecorative) patch.clientDecorative = ai.presenceDecorative;
       if (ai.styleGeneral) patch.clientStyleGeneral = ai.styleGeneral;
       if (ai.ambiance) patch.clientAmbiance = ai.ambiance;
+      if (ai.customCSS) patch.clientCustomCSS = ai.customCSS;
       return patch;
     };
 
@@ -1306,7 +1330,9 @@ Retourne UN SEUL objet JSON valide au format EXACT suivant (toutes les clés pr�
   "motsClesMetier": ["string", "string"],
 
   "styleGeneral": "phrase 3-5 mots ex: 'moderne industriel', 'premium classique haut-de-gamme', 'minimaliste artisanal'",
-  "ambiance": "phrase courte décrivant l'identité visuelle (max 15 mots, comme un brief créatif)"
+  "ambiance": "phrase courte décrivant l'identité visuelle (max 15 mots, comme un brief créatif)",
+
+  "customCSS": "string — CSS PURE qui sera injecté pour restyler la page d'audit afin qu'elle ressemble visuellement au site du prospect (voir détails ci-dessous)"
 }
 
 Règles strictes :
@@ -1341,7 +1367,88 @@ Règles strictes :
 - tagline : la phrase juste sous le logo ou en hero. Vide si rien d'évident.
 - ctaTexte : le bouton d'action principal vu sur le site.
 
-Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend.`;
+=====================================================================
+CONSIGNE CRITIQUE — customCSS
+=====================================================================
+
+La clé "customCSS" est la PLUS importante. Tu vas y écrire du CSS pur (300 à 600 lignes)
+qui sera INJECTÉ dans la page d'audit ROI. Le but : que cette page d'audit ait l'air
+d'avoir été designée par le studio qui a fait le site du prospect. PAS un clone du site
+mais une page qui PARLE LE MÊME LANGAGE VISUEL.
+
+Tu cibleras les classes suivantes (toutes scopées dans .scalia-rendered) :
+
+PAGE / HERO :
+- .scalia-rendered (racine — body bg, font)
+- .scalia-hero, .scalia-hero-bold, .scalia-hero-minimal (le hero du haut)
+- .scalia-hero-inner (le conteneur interne avec padding)
+- .scalia-hero-stripe (la bande colorée en haut)
+- .scalia-hero-stripe-bottom (la bande sous le hero)
+- .scalia-hero-pill (le badge 'Audit ROI personnalisé')
+- .scalia-hero-dirigeant (le bloc à droite du hero)
+- .scalia-hero-dirigeant-name (le nom du dirigeant)
+- .scalia-hero-main (le bloc principal du hero)
+- .scalia-hero-logo (l'image du logo prospect)
+- .scalia-hero-logo-fallback (le carré logo si pas d'image)
+- .scalia-hero-name (h1 nom de l'entreprise — TRÈS IMPORTANT)
+- .scalia-hero-tagline (la phrase tagline)
+- .scalia-hero-badges (les badges secteur/tonalite)
+- .scalia-badge, .scalia-badge-primary, .scalia-badge-outline
+
+CONTENT :
+- .scalia-body (conteneur du contenu sous le hero)
+- .scalia-section-rule, .scalia-section-label (la barre 'Vos chiffres ___ Saisissez les 7')
+- .scalia-inputs-grid (la grille des 7 inputs)
+- .scalia-input-group (chaque input + son label)
+- .scalia-input-label (les labels en majuscules)
+- .scalia-input (les champs de saisie)
+
+CARDS :
+- .scalia-card (chaque grande carte de section)
+- .scalia-card-activity (la carte Étape 01 spécifiquement)
+- .scalia-card-header (en-tête de la carte avec titre + bouton)
+- .scalia-card-step (le label 'Étape 01')
+- .scalia-card-title (le h2 'Votre activité commerciale')
+- .scalia-card-body (le corps de la carte)
+- .scalia-card-footer-ca (le footer de la carte avec 'CA actuel')
+- .scalia-expand-btn (le bouton ↗)
+- .scalia-row (chaque ligne label/valeur)
+- .scalia-row-total (la ligne du total)
+- .scalia-row-label (le label de gauche)
+- .scalia-row-value (la valeur de droite — chiffres, TRÈS IMPORTANT, mettre la fonte distinctive du prospect)
+
+RÈGLES OBLIGATOIRES POUR LE CSS :
+
+1. Utilise !important sur TOUTES les déclarations pour override nos styles inline par défaut.
+2. Scope EXCLUSIVEMENT sous .scalia-rendered (ex: ".scalia-rendered .scalia-card { ... }").
+3. INTERDIT : @import, javascript:, url() externe (http/https), expression(), behavior:.
+4. Importe les fonts via le mécanisme tokens (clé policePrimaire / policeSecondaire), PAS via @import dans le CSS.
+5. Utilise les couleurs EXACTES extraites du screenshot.
+6. Reproduis les bordures, ombres, arrondis, espacements, casse, graisses, espacements de lettres OBSERVÉS sur le screenshot.
+7. Le hero doit donner l'impression d'être un section du site du prospect : même style de header (couleurs, photo, gradient, fonts).
+8. Les cartes doivent matcher l'esthétique des sections du site du prospect (radius, ombre, bordure, fond).
+9. Les chiffres (.scalia-row-value) doivent être TRÈS GROS, gras, dans la fonte primaire du prospect, couleur primary.
+10. Les labels (.scalia-input-label, .scalia-row-label) doivent suivre la même casse/letter-spacing que les labels du site du prospect.
+11. Le bouton ↗ doit reprendre la forme/style des boutons CTA du site.
+12. AUCUN commentaire CSS (/* ... */) — gain de place pour le JSON.
+13. Pas de retours à la ligne inutiles — CSS compact mais lisible.
+
+EXEMPLE DE STRUCTURE DU customCSS (à adapter au prospect) :
+
+.scalia-rendered { background: #FAFAFA !important; font-family: 'Inter', sans-serif !important; }
+.scalia-rendered .scalia-hero { background: #1E5F8E !important; padding: 60px 80px !important; }
+.scalia-rendered .scalia-hero-name { font-family: 'Playfair Display', serif !important; font-size: 64px !important; color: #FFFFFF !important; letter-spacing: -0.03em !important; }
+.scalia-rendered .scalia-hero-tagline { font-style: italic !important; color: #C9A84C !important; }
+.scalia-rendered .scalia-card { background: #FFFFFF !important; border: 2px solid #1E5F8E !important; border-radius: 0 !important; box-shadow: 0 8px 24px rgba(0,0,0,0.06) !important; padding: 40px !important; }
+.scalia-rendered .scalia-card-step { color: #C9A84C !important; letter-spacing: 0.2em !important; }
+.scalia-rendered .scalia-row-value { font-family: 'Playfair Display', serif !important; font-weight: 800 !important; font-size: 28px !important; color: #1E5F8E !important; }
+.scalia-rendered .scalia-input { background: transparent !important; border: none !important; border-bottom: 2px solid #1E5F8E !important; border-radius: 0 !important; font-family: 'Playfair Display', serif !important; font-size: 24px !important; }
+.scalia-rendered .scalia-expand-btn { background: #C9A84C !important; border-radius: 0 !important; }
+... etc.
+
+Sois précis, sois rigoureux. Le résultat doit ÊTRE le site du prospect en termes de feel visuel. Pas de fade, pas de générique : un design avec une vraie identité.
+
+La carrière de quelqu'un en dépend.`;
 
       // Liste de modèles Gemini actuels (mi-2026). Les gemini-1.5-* ont été
       // dépréciés. On essaie chaque modèle, avec un retry après 2s sur
@@ -1358,7 +1465,7 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
         generationConfig: {
           response_mime_type: 'application/json',
           temperature: 0.15,
-          max_output_tokens: 4096,
+          max_output_tokens: 16384,
         },
       });
 
@@ -1715,38 +1822,38 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
 
     // === HERO BOLD : pour sites avec bandeau coloré/gradient/photo ===
     const HeroBold = ({ session, t, accent }) => (
-      <div style={{ position: 'relative', overflow: 'hidden', background: t.primary, color: '#FFFFFF' }}>
-        <div style={{ height: '6px', background: `linear-gradient(90deg, ${accent} 0%, ${accent} 40%, ${t.primary} 40%, ${t.primary} 100%)` }} />
+      <div className="scalia-hero scalia-hero-bold" style={{ position: 'relative', overflow: 'hidden', background: t.primary, color: '#FFFFFF' }}>
+        <div className="scalia-hero-stripe" style={{ height: '6px', background: `linear-gradient(90deg, ${accent} 0%, ${accent} 40%, ${t.primary} 40%, ${t.primary} 100%)` }} />
         <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '38%', background: `linear-gradient(105deg, transparent 0%, transparent 18%, ${lightenHex(t.primary, -0.18)} 18%, ${lightenHex(t.primary, -0.18)} 100%)`, opacity: 0.55, pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '12%', background: `linear-gradient(105deg, transparent 0%, transparent 60%, ${accent} 60%, ${accent} 100%)`, opacity: 0.85, pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', maxWidth: t.maxWidth, margin: '0 auto', padding: '36px 48px 44px', zIndex: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '48px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(0,0,0,0.18)', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, border: '1px solid rgba(255,255,255,0.22)' }}>
+        <div className="scalia-hero-inner" style={{ position: 'relative', maxWidth: t.maxWidth, margin: '0 auto', padding: '36px 48px 44px', zIndex: 1 }}>
+          <div className="scalia-hero-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '48px' }}>
+            <div className="scalia-hero-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '8px 14px', background: 'rgba(0,0,0,0.18)', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, border: '1px solid rgba(255,255,255,0.22)' }}>
               <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: accent }} />
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing, color: '#FFFFFF' }}>Audit ROI personnalisé</span>
             </div>
-            <div style={{ textAlign: 'right', color: '#FFFFFF', borderLeft: `2px solid ${accent}`, paddingLeft: '20px' }}>
+            <div className="scalia-hero-dirigeant" style={{ textAlign: 'right', color: '#FFFFFF', borderLeft: `2px solid ${accent}`, paddingLeft: '20px' }}>
               <p style={{ ...labelCSS(t), color: 'rgba(255,255,255,0.7)', margin: 0, fontSize: '10px' }}>Préparé pour</p>
-              <p style={{ margin: '4px 0 0', fontWeight: 800, fontSize: '20px', fontFamily: `'${t.headingFont}', sans-serif`, lineHeight: 1.1 }}>{session.dirigeantName}</p>
+              <p className="scalia-hero-dirigeant-name" style={{ margin: '4px 0 0', fontWeight: 800, fontSize: '20px', fontFamily: `'${t.headingFont}', sans-serif`, lineHeight: 1.1 }}>{session.dirigeantName}</p>
               <p style={{ margin: '4px 0 0', fontSize: '12px', opacity: 0.85 }}>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <div className="scalia-hero-main" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
             {session.clientLogoUrl
-              ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '88px', maxWidth: '240px', objectFit: 'contain', filter: 'brightness(0) invert(1)', flexShrink: 0 }} />
-              : <div style={{ width: '88px', height: '88px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: accent, color: lightenHex(accent, -0.55), borderRadius: t.radius, fontFamily: `'${t.headingFont}', sans-serif`, fontWeight: 900, fontSize: '34px', letterSpacing: '-0.02em', flexShrink: 0 }}>{session.companyName.substring(0,2).toUpperCase()}</div>
+              ? <img className="scalia-hero-logo" src={session.clientLogoUrl} alt={session.companyName} style={{ height: '88px', maxWidth: '240px', objectFit: 'contain', filter: 'brightness(0) invert(1)', flexShrink: 0 }} />
+              : <div className="scalia-hero-logo-fallback" style={{ width: '88px', height: '88px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: accent, color: lightenHex(accent, -0.55), borderRadius: t.radius, fontFamily: `'${t.headingFont}', sans-serif`, fontWeight: 900, fontSize: '34px', letterSpacing: '-0.02em', flexShrink: 0 }}>{session.companyName.substring(0,2).toUpperCase()}</div>
             }
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 style={{ ...titleCSS(t, 'h1'), color: '#FFFFFF', margin: 0, lineHeight: 1.0, fontSize: 'clamp(34px, 4.5vw, 56px)', letterSpacing: '-0.02em' }}>{session.companyName}</h1>
-              {t.tagline && <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: '18px', marginTop: '10px', fontStyle: 'italic', fontWeight: 500, lineHeight: 1.3 }}>{t.tagline}</p>}
-              <div style={{ display: 'flex', gap: '8px', marginTop: '18px', flexWrap: 'wrap' }}>
-                {t.secteur && <span style={{ background: accent, color: lightenHex(accent, -0.6), padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{t.secteur.replace(/-/g, ' ')}</span>}
-                {session.clientTonalite && <span style={{ background: 'transparent', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.5)', padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{session.clientTonalite}</span>}
+              <h1 className="scalia-hero-name" style={{ ...titleCSS(t, 'h1'), color: '#FFFFFF', margin: 0, lineHeight: 1.0, fontSize: 'clamp(34px, 4.5vw, 56px)', letterSpacing: '-0.02em' }}>{session.companyName}</h1>
+              {t.tagline && <p className="scalia-hero-tagline" style={{ color: 'rgba(255,255,255,0.92)', fontSize: '18px', marginTop: '10px', fontStyle: 'italic', fontWeight: 500, lineHeight: 1.3 }}>{t.tagline}</p>}
+              <div className="scalia-hero-badges" style={{ display: 'flex', gap: '8px', marginTop: '18px', flexWrap: 'wrap' }}>
+                {t.secteur && <span className="scalia-badge scalia-badge-primary" style={{ background: accent, color: lightenHex(accent, -0.6), padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{t.secteur.replace(/-/g, ' ')}</span>}
+                {session.clientTonalite && <span className="scalia-badge scalia-badge-outline" style={{ background: 'transparent', color: '#FFFFFF', border: '1px solid rgba(255,255,255,0.5)', padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{session.clientTonalite}</span>}
               </div>
             </div>
           </div>
         </div>
-        <div style={{ height: '3px', background: accent }} />
+        <div className="scalia-hero-stripe-bottom" style={{ height: '3px', background: accent }} />
       </div>
     );
 
@@ -1754,36 +1861,36 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
     // Reproduit l'esthétique d'un header de site classique : fond bgAlt blanc,
     // titre dans la police prospect, accent line primary, layout aéré.
     const HeroMinimal = ({ session, t, accent }) => (
-      <div style={{ position: 'relative', background: t.bgAlt, color: t.text, borderBottom: `1px solid ${t.primaryLight}` }}>
+      <div className="scalia-hero scalia-hero-minimal" style={{ position: 'relative', background: t.bgAlt, color: t.text, borderBottom: `1px solid ${t.primaryLight}` }}>
         {/* Top accent stripe — fin, en couleur primary */}
-        <div style={{ height: '4px', background: t.primary }} />
+        <div className="scalia-hero-stripe" style={{ height: '4px', background: t.primary }} />
 
-        <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: '36px 48px 40px' }}>
+        <div className="scalia-hero-inner" style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: '36px 48px 40px' }}>
           {/* Top row — méta : badge audit + dirigeant */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '40px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '6px 14px', background: t.primaryFaint, borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, border: `1px solid ${t.primaryLight}` }}>
+          <div className="scalia-hero-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px', marginBottom: '40px' }}>
+            <div className="scalia-hero-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', padding: '6px 14px', background: t.primaryFaint, borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, border: `1px solid ${t.primaryLight}` }}>
               <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: t.primary }} />
               <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing, color: t.primary }}>Audit ROI personnalisé</span>
             </div>
-            <div style={{ textAlign: 'right', borderLeft: `2px solid ${t.primary}`, paddingLeft: '20px' }}>
+            <div className="scalia-hero-dirigeant" style={{ textAlign: 'right', borderLeft: `2px solid ${t.primary}`, paddingLeft: '20px' }}>
               <p style={{ ...labelCSS(t), margin: 0, fontSize: '10px' }}>Préparé pour</p>
-              <p style={{ margin: '4px 0 0', fontWeight: 800, fontSize: '20px', fontFamily: `'${t.headingFont}', sans-serif`, color: t.primary, lineHeight: 1.1 }}>{session.dirigeantName}</p>
+              <p className="scalia-hero-dirigeant-name" style={{ margin: '4px 0 0', fontWeight: 800, fontSize: '20px', fontFamily: `'${t.headingFont}', sans-serif`, color: t.primary, lineHeight: 1.1 }}>{session.dirigeantName}</p>
               <p style={{ margin: '4px 0 0', fontSize: '12px', color: t.mutedText }}>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
             </div>
           </div>
 
           {/* Bloc principal : logo + nom + tagline */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <div className="scalia-hero-main" style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
             {session.clientLogoUrl
-              ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '80px', maxWidth: '220px', objectFit: 'contain', flexShrink: 0 }} />
-              : <div style={{ width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: t.primary, color: t.bgAlt, borderRadius: t.radius, fontFamily: `'${t.headingFont}', sans-serif`, fontWeight: 900, fontSize: '30px', letterSpacing: '-0.02em', flexShrink: 0 }}>{session.companyName.substring(0,2).toUpperCase()}</div>
+              ? <img className="scalia-hero-logo" src={session.clientLogoUrl} alt={session.companyName} style={{ height: '80px', maxWidth: '220px', objectFit: 'contain', flexShrink: 0 }} />
+              : <div className="scalia-hero-logo-fallback" style={{ width: '80px', height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: t.primary, color: t.bgAlt, borderRadius: t.radius, fontFamily: `'${t.headingFont}', sans-serif`, fontWeight: 900, fontSize: '30px', letterSpacing: '-0.02em', flexShrink: 0 }}>{session.companyName.substring(0,2).toUpperCase()}</div>
             }
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 style={{ ...titleCSS(t, 'h1'), color: t.primary, margin: 0, lineHeight: 1.0, fontSize: 'clamp(30px, 4vw, 50px)', letterSpacing: '-0.02em' }}>{session.companyName}</h1>
-              {t.tagline && <p style={{ color: t.text, fontSize: '18px', marginTop: '10px', fontStyle: 'italic', fontWeight: 500, lineHeight: 1.3 }}>{t.tagline}</p>}
-              <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
-                {t.secteur && <span style={{ background: t.primary, color: t.bgAlt, padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{t.secteur.replace(/-/g, ' ')}</span>}
-                {session.clientTonalite && <span style={{ background: 'transparent', color: t.text, border: `1px solid ${t.border}`, padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{session.clientTonalite}</span>}
+              <h1 className="scalia-hero-name" style={{ ...titleCSS(t, 'h1'), color: t.primary, margin: 0, lineHeight: 1.0, fontSize: 'clamp(30px, 4vw, 50px)', letterSpacing: '-0.02em' }}>{session.companyName}</h1>
+              {t.tagline && <p className="scalia-hero-tagline" style={{ color: t.text, fontSize: '18px', marginTop: '10px', fontStyle: 'italic', fontWeight: 500, lineHeight: 1.3 }}>{t.tagline}</p>}
+              <div className="scalia-hero-badges" style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
+                {t.secteur && <span className="scalia-badge scalia-badge-primary" style={{ background: t.primary, color: t.bgAlt, padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{t.secteur.replace(/-/g, ' ')}</span>}
+                {session.clientTonalite && <span className="scalia-badge scalia-badge-outline" style={{ background: 'transparent', color: t.text, border: `1px solid ${t.border}`, padding: '6px 14px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>{session.clientTonalite}</span>}
               </div>
             </div>
           </div>
@@ -1805,14 +1912,19 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
         ? 'bold'
         : 'minimal';
 
+      // CSS sur mesure généré par l'IA pour matcher l'identité du prospect.
+      // Scopé à .scalia-rendered pour éviter de polluer le reste de l'app.
+      const customCSS = sanitizeCustomCSS(session.clientCustomCSS || '');
+
       return (
-        <div style={{ background: t.bg, color: t.text, minHeight: '100vh', fontFamily: `'${t.font}', Inter, sans-serif` }}>
+        <div className="scalia-rendered" style={{ background: t.bg, color: t.text, minHeight: '100vh', fontFamily: `'${t.font}', Inter, sans-serif` }}>
+          {customCSS && <style dangerouslySetInnerHTML={{ __html: customCSS }} />}
           {heroMode === 'bold'
             ? <HeroBold session={session} t={t} accent={accent} />
             : <HeroMinimal session={session} t={t} accent={accent} />
           }
 
-          <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `${t.sectionGap} ${parseInt(t.cardPadding)*1.2}px` }}>
+          <div className="scalia-body" style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `${t.sectionGap} ${parseInt(t.cardPadding)*1.2}px` }}>
             {/* Inputs panel */}
             <InputsPanel session={session} updateInputs={updateInputs} t={t} />
 
@@ -1837,10 +1949,11 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
     const InputsPanel = ({ session, updateInputs, t }) => {
       const baseInputStyle = inputCSS(t);
       const Input = ({ k, label, suffix = '' }) => (
-        <div>
-          <label style={{ ...labelCSS(t), display: 'block', marginBottom: '4px' }}>{label}</label>
+        <div className="scalia-input-group">
+          <label className="scalia-input-label" style={{ ...labelCSS(t), display: 'block', marginBottom: '4px' }}>{label}</label>
           <div style={{ position: 'relative' }}>
             <input
+              className="scalia-input"
               type="number"
               value={session.inputs[k] ?? ''}
               onChange={e => updateInputs({ [k]: e.target.value })}
@@ -1854,13 +1967,13 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
         </div>
       );
       return (
-        <div style={{ marginBottom: t.sectionGap }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '20px' }}>
-            <span style={{ ...labelCSS(t), color: t.primary, fontWeight: 700 }}>Vos chiffres</span>
+        <div className="scalia-inputs-section" style={{ marginBottom: t.sectionGap }}>
+          <div className="scalia-section-rule" style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '20px' }}>
+            <span className="scalia-section-label" style={{ ...labelCSS(t), color: t.primary, fontWeight: 700 }}>Vos chiffres</span>
             <span style={{ flex: 1, height: '1px', background: t.primaryLight }} />
             <span style={{ ...labelCSS(t), color: t.mutedText, fontSize: '10px' }}>Saisissez les 7 valeurs</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
+          <div className="scalia-inputs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
           <Input k="leadsRecus" label="Leads reçus/mois" />
           <Input k="leadsTraites" label="Leads traités" />
           <Input k="rdvPris" label="RDV pris" />
@@ -1876,19 +1989,20 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
     const ActivityBlock = ({ session, losses, expanded, setExpanded, t }) => {
       const i = session.inputs;
       const Row = ({ label, value, isTotal = false }) => (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: isTotal ? '0' : '12px 0', borderTop: isTotal ? 'none' : `1px solid ${t.primaryLight}` }}>
-          <span style={{ color: isTotal ? t.text : t.mutedText, fontSize: isTotal ? '15px' : '14px', fontWeight: isTotal ? 700 : 500, textTransform: isTotal ? 'uppercase' : 'none', letterSpacing: isTotal ? t.labelLetterSpacing : 'normal' }}>{label}</span>
-          <span style={{ color: isTotal ? t.primary : t.text, fontSize: isTotal ? t.sizes.big : '20px', fontWeight: isTotal ? 800 : 700, fontVariantNumeric: 'tabular-nums', fontFamily: `'${t.headingFont}', '${t.font}', sans-serif`, letterSpacing: isTotal ? '-0.02em' : '-0.01em' }}>{value}</span>
+        <div className={isTotal ? 'scalia-row scalia-row-total' : 'scalia-row'} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: isTotal ? '0' : '12px 0', borderTop: isTotal ? 'none' : `1px solid ${t.primaryLight}` }}>
+          <span className="scalia-row-label" style={{ color: isTotal ? t.text : t.mutedText, fontSize: isTotal ? '15px' : '14px', fontWeight: isTotal ? 700 : 500, textTransform: isTotal ? 'uppercase' : 'none', letterSpacing: isTotal ? t.labelLetterSpacing : 'normal' }}>{label}</span>
+          <span className="scalia-row-value" style={{ color: isTotal ? t.primary : t.text, fontSize: isTotal ? t.sizes.big : '20px', fontWeight: isTotal ? 800 : 700, fontVariantNumeric: 'tabular-nums', fontFamily: `'${t.headingFont}', '${t.font}', sans-serif`, letterSpacing: isTotal ? '-0.02em' : '-0.01em' }}>{value}</span>
         </div>
       );
       return (
-        <div style={{ ...cardCSS(t), borderTop: `4px solid ${t.primary}`, borderTopLeftRadius: t.radius, borderTopRightRadius: t.radius, position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', paddingBottom: '16px', borderBottom: `2px solid ${t.primaryLight}` }}>
+        <div className="scalia-card scalia-card-activity" style={{ ...cardCSS(t), borderTop: `4px solid ${t.primary}`, borderTopLeftRadius: t.radius, borderTopRightRadius: t.radius, position: 'relative' }}>
+          <div className="scalia-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', paddingBottom: '16px', borderBottom: `2px solid ${t.primaryLight}` }}>
             <div>
-              <p style={{ ...labelCSS(t), color: t.primary, margin: '0 0 4px 0' }}>Étape 01</p>
-              <h2 style={{ ...titleCSS(t, 'h2'), margin: 0 }}>Votre activité commerciale</h2>
+              <p className="scalia-card-step" style={{ ...labelCSS(t), color: t.primary, margin: '0 0 4px 0' }}>Étape 01</p>
+              <h2 className="scalia-card-title" style={{ ...titleCSS(t, 'h2'), margin: 0 }}>Votre activité commerciale</h2>
             </div>
             <button
+              className="scalia-expand-btn"
               onClick={() => setExpanded(e => !e)}
               style={{ width: '52px', height: '52px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.bgAlt, fontWeight: 'bold', background: t.primary, border: 'none', cursor: 'pointer', fontSize: '22px', transition: 'transform 0.15s', boxShadow: t.shadows.float }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
@@ -1898,7 +2012,7 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
               {expanded ? '↙' : '↗'}
             </button>
           </div>
-          <div>
+          <div className="scalia-card-body">
             <Row label="Leads reçus / mois" value={formatNumber(+i.leadsRecus)} />
             <Row label="Leads traités" value={formatNumber(+i.leadsTraites)} />
             <Row label="RDV pris" value={formatNumber(+i.rdvPris)} />
@@ -1907,7 +2021,7 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
             <Row label="Ticket moyen" value={formatEUR(+i.ticket)} />
             <Row label="Devis dormants" value={formatNumber(+i.devisDormants)} />
           </div>
-          <div style={{ marginTop: '28px', paddingTop: '24px', background: t.primaryFaint, margin: `28px ${'-'+t.cardPadding} ${'-'+t.cardPadding}`, padding: `24px ${t.cardPadding}`, borderBottomLeftRadius: t.radius, borderBottomRightRadius: t.radius, borderTop: `3px solid ${t.primary}` }}>
+          <div className="scalia-card-footer scalia-card-footer-ca" style={{ marginTop: '28px', paddingTop: '24px', background: t.primaryFaint, margin: `28px ${'-'+t.cardPadding} ${'-'+t.cardPadding}`, padding: `24px ${t.cardPadding}`, borderBottomLeftRadius: t.radius, borderBottomRightRadius: t.radius, borderTop: `3px solid ${t.primary}` }}>
             <Row label="CA actuel" value={`${formatEUR(losses.caActuel)} /mois`} isTotal />
           </div>
         </div>

@@ -188,6 +188,10 @@
       'Inter', 'Roboto', 'Open Sans', 'Lato', 'Montserrat', 'Poppins',
       'Raleway', 'Source Sans Pro', 'Oswald', 'Roboto Slab', 'Playfair Display',
       'Merriweather', 'PT Sans', 'Nunito', 'Mulish', 'Work Sans', 'Manrope',
+      'Cinzel', 'Bebas Neue', 'Anton', 'Archivo', 'Barlow', 'DM Sans',
+      'Fira Sans', 'Hind', 'Karla', 'Libre Baskerville', 'Libre Franklin',
+      'Noto Sans', 'PT Serif', 'Quicksand', 'Rubik', 'Source Serif Pro',
+      'Tinos', 'Ubuntu', 'Roboto Condensed', 'Crimson Text', 'Lora',
     ];
 
     const ADMIN_PASSWORD = 'scalia2026';
@@ -388,11 +392,16 @@
 
     const AppProvider = ({ children }) => {
       const [state, setState] = useState(loadState);
+      const [apiKey, setApiKey] = useState(() => localStorage.getItem('scalia-anthropic-key') || '');
       const saveTimer = useRef(null);
       useEffect(() => {
         clearTimeout(saveTimer.current);
         saveTimer.current = setTimeout(() => saveState(state), 400);
       }, [state]);
+      useEffect(() => {
+        if (apiKey) localStorage.setItem('scalia-anthropic-key', apiKey);
+        else localStorage.removeItem('scalia-anthropic-key');
+      }, [apiKey]);
 
       const createSession = (data) => {
         const baseSlug = slugify(data.companyName);
@@ -405,7 +414,11 @@
           clientLogoUrl: data.clientLogoUrl || '',
           clientPrimaryColor: data.clientPrimaryColor || '#1E5F8E',
           clientSecondaryColor: data.clientSecondaryColor || '#888888',
+          clientAccentColor: data.clientAccentColor || '',
           clientPrimaryFont: data.clientPrimaryFont || 'Inter',
+          clientSecondaryFont: data.clientSecondaryFont || '',
+          clientStyleGeneral: data.clientStyleGeneral || '',
+          clientAmbiance: data.clientAmbiance || '',
           meetingDate: data.meetingDate,
           inputs: { leadsRecus: '', leadsTraites: '', rdvPris: '', rdvHonores: '', signatures: '', ticket: '', devisDormants: '' },
           marketRatesOverrides: {},
@@ -449,7 +462,7 @@
       };
 
       return (
-        <AppContext.Provider value={{ state, createSession, updateSession, deleteSession, getSession, exportAll, importAll }}>
+        <AppContext.Provider value={{ state, apiKey, setApiKey, createSession, updateSession, deleteSession, getSession, exportAll, importAll }}>
           {children}
         </AppContext.Provider>
       );
@@ -503,8 +516,10 @@
     };
 
     const AdminDashboard = () => {
-      const { state, createSession, deleteSession, exportAll, importAll } = useApp();
+      const { state, apiKey, setApiKey, createSession, deleteSession, exportAll, importAll } = useApp();
       const [showForm, setShowForm] = useState(false);
+      const [showApiSettings, setShowApiSettings] = useState(false);
+      const [keyDraft, setKeyDraft] = useState(apiKey);
 
       return (
         <div className="min-h-screen bg-noir text-white">
@@ -533,6 +548,40 @@
             <SessionList sessions={state.sessions} onDelete={deleteSession} />
 
             <div className="mt-16 pt-8 border-t border-anthracite">
+              <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-4">Clé API Anthropic (analyse IA des screenshots)</h3>
+              <p className="text-gray-400 text-sm mb-3">
+                {apiKey
+                  ? <>✓ Clé configurée ({apiKey.slice(0,12)}…{apiKey.slice(-4)}). L'analyse IA est disponible quand tu uploades des captures.</>
+                  : <>Non configurée. L'extraction se fait uniquement par couleurs dominantes (Phase A). Configure une clé Anthropic pour activer l'analyse IA complète (couleurs + polices + style).</>
+                }
+              </p>
+              {showApiSettings ? (
+                <div className="bg-noir-card border border-anthracite rounded p-4 space-y-3">
+                  <input
+                    type="password"
+                    value={keyDraft}
+                    onChange={e => setKeyDraft(e.target.value)}
+                    placeholder="sk-ant-api03-…"
+                    className="form-input font-mono text-sm"
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <button onClick={() => { setApiKey(keyDraft.trim()); setShowApiSettings(false); }} className="bg-or text-noir px-4 py-1.5 rounded text-xs font-semibold uppercase tracking-wider hover:bg-or-fonce transition">Enregistrer</button>
+                    <button onClick={() => { setShowApiSettings(false); setKeyDraft(apiKey); }} className="text-gray-400 px-3 py-1.5 text-xs hover:text-white">Annuler</button>
+                    {apiKey && <button onClick={() => { setApiKey(''); setKeyDraft(''); setShowApiSettings(false); }} className="text-rouge px-3 py-1.5 text-xs hover:text-white ml-auto">Effacer la clé</button>}
+                  </div>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Crée un compte sur <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="text-or underline">console.anthropic.com</a>, ajoute ~5€ de crédit, génère une clé. Stockée uniquement dans ce navigateur (localStorage). Coût ~0,03€ par analyse.
+                  </p>
+                </div>
+              ) : (
+                <button onClick={() => setShowApiSettings(true)} className="bg-noir-card border border-or/40 text-or px-4 py-2 rounded text-sm hover:border-or transition">
+                  {apiKey ? 'Modifier la clé' : '+ Configurer la clé API'}
+                </button>
+              )}
+            </div>
+
+            <div className="mt-12 pt-8 border-t border-anthracite">
               <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-4">Sauvegarde</h3>
               <p className="text-gray-400 text-sm mb-4">
                 Les sessions sont stockées dans ce navigateur (localStorage). Exportez régulièrement le JSON pour ne rien perdre lors d'un changement de PC.
@@ -560,13 +609,18 @@
     };
 
     const SessionForm = ({ onCreate, onCancel }) => {
+      const { apiKey } = useApp();
       const [data, setData] = useState({
         dirigeantName: '',
         companyName: '',
         meetingDate: new Date().toISOString().slice(0, 10),
         clientPrimaryColor: '#1E5F8E',
         clientSecondaryColor: '#888888',
+        clientAccentColor: '',
         clientPrimaryFont: 'Inter',
+        clientSecondaryFont: '',
+        clientStyleGeneral: '',
+        clientAmbiance: '',
         clientLogoUrl: '',
       });
       const [analysisText, setAnalysisText] = useState('');
@@ -574,7 +628,41 @@
       const [screenshots, setScreenshots] = useState([]); // dataUrls
       const [palette, setPalette] = useState([]); // hex colors
       const [extracting, setExtracting] = useState(false);
+      const [aiAnalyzing, setAiAnalyzing] = useState(false);
+      const [aiResult, setAiResult] = useState(null);
       const dropZoneRef = useRef(null);
+
+      const runAIAnalysis = async () => {
+        if (!apiKey) { alert('Configure d\'abord ta clé API Anthropic dans /admin (en bas de page).'); return; }
+        if (screenshots.length === 0) { alert('Upload au moins une capture d\'abord.'); return; }
+        setAiAnalyzing(true);
+        setNotice('');
+        try {
+          const result = await analyzeCharteAI(apiKey, screenshots);
+          setAiResult(result);
+          // Apply to form
+          const patch = {};
+          if (result.couleurPrimaire) patch.clientPrimaryColor = result.couleurPrimaire;
+          if (result.couleurSecondaire) patch.clientSecondaryColor = result.couleurSecondaire;
+          if (result.couleurAccent) patch.clientAccentColor = result.couleurAccent;
+          if (result.policePrimaire) {
+            patch.clientPrimaryFont = result.policePrimaire;
+            loadGoogleFont(result.policePrimaire);
+          }
+          if (result.policeSecondaire) {
+            patch.clientSecondaryFont = result.policeSecondaire;
+            loadGoogleFont(result.policeSecondaire);
+          }
+          if (result.styleGeneral) patch.clientStyleGeneral = result.styleGeneral;
+          if (result.ambiance) patch.clientAmbiance = result.ambiance;
+          setData(d => ({ ...d, ...patch }));
+          setNotice('✓ Analyse IA appliquée — vérifiez les champs ci-dessous.');
+        } catch (e) {
+          alert('Erreur analyse IA : ' + e.message);
+        } finally {
+          setAiAnalyzing(false);
+        }
+      };
 
       const handleLogo = async (e) => {
         const file = e.target.files?.[0];
@@ -784,6 +872,47 @@
                 </div>
               </div>
             )}
+
+            {/* Analyse IA complète */}
+            {screenshots.length > 0 && (
+              <div className="mt-5 pt-4 border-t border-anthracite/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wider text-or font-semibold">Analyse IA complète (Claude Sonnet 4.6)</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {apiKey
+                        ? <>Couleurs + polices + style général · ~0,03€ par analyse</>
+                        : <>Clé API non configurée — voir paramètres en bas de page</>
+                      }
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={runAIAnalysis}
+                    disabled={!apiKey || aiAnalyzing}
+                    className="bg-or text-noir px-5 py-2.5 rounded text-sm font-semibold uppercase tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    {aiAnalyzing ? 'Analyse en cours…' : '✦ Analyser avec IA'}
+                  </button>
+                </div>
+                {aiResult && (
+                  <div className="mt-4 p-4 bg-noir border border-or/20 rounded text-xs space-y-1.5 fade-in">
+                    {aiResult.styleGeneral && <p><span className="text-or uppercase tracking-wider text-[10px] mr-2">Style</span> <span className="text-gray-200">{aiResult.styleGeneral}</span></p>}
+                    {aiResult.ambiance && <p><span className="text-or uppercase tracking-wider text-[10px] mr-2">Ambiance</span> <span className="text-gray-200 italic">{aiResult.ambiance}</span></p>}
+                    {aiResult.policePrimaire && <p><span className="text-or uppercase tracking-wider text-[10px] mr-2">Police</span> <span className="text-gray-200">{aiResult.policePrimaire}{aiResult.policeSecondaire && ` · ${aiResult.policeSecondaire}`}</span></p>}
+                    <p className="flex items-center gap-2 mt-2">
+                      <span className="text-or uppercase tracking-wider text-[10px]">Couleurs</span>
+                      {[aiResult.couleurPrimaire, aiResult.couleurSecondaire, aiResult.couleurAccent].filter(Boolean).map((c, i) => (
+                        <span key={i} className="inline-flex items-center gap-1">
+                          <span className="w-4 h-4 rounded border border-white/20" style={{ background: c }} />
+                          <span className="text-gray-300 font-mono">{c}</span>
+                        </span>
+                      ))}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="mb-6">
@@ -817,9 +946,17 @@
               </div>
             </Field>
             <Field label="Police principale">
-              <select value={data.clientPrimaryFont} onChange={e => setData(d => ({...d, clientPrimaryFont: e.target.value}))} className="form-input">
-                {GOOGLE_FONTS.map(f => <option key={f} value={f}>{f}</option>)}
-              </select>
+              <input
+                list="google-fonts-list"
+                value={data.clientPrimaryFont}
+                onChange={e => setData(d => ({...d, clientPrimaryFont: e.target.value}))}
+                onBlur={e => loadGoogleFont(e.target.value)}
+                placeholder="Ex: Inter, Roboto, Montserrat…"
+                className="form-input"
+              />
+              <datalist id="google-fonts-list">
+                {GOOGLE_FONTS.map(f => <option key={f} value={f} />)}
+              </datalist>
             </Field>
           </div>
 
@@ -971,6 +1108,94 @@
         const [r,g,b] = s.key.split(',').map(Number);
         return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
       });
+    };
+
+    // ===== ANALYSE IA VISION (Claude Sonnet 4.6) =====
+    const analyzeCharteAI = async (apiKey, screenshotDataUrls) => {
+      if (!apiKey) throw new Error('Clé API Anthropic manquante.');
+      if (!screenshotDataUrls || screenshotDataUrls.length === 0) throw new Error('Aucune capture à analyser.');
+
+      const imageBlocks = screenshotDataUrls.slice(0, 10).map(dataUrl => {
+        const [meta, b64] = dataUrl.split(',');
+        const mediaType = meta.match(/data:([^;]+)/)?.[1] || 'image/png';
+        return {
+          type: 'image',
+          source: { type: 'base64', media_type: mediaType, data: b64 },
+        };
+      });
+
+      const prompt = `Tu es un expert en branding et identité visuelle. Analyse ces captures d'écran du site web d'une entreprise (souvent une PME française du BTP / menuiserie).
+
+Retourne EXCLUSIVEMENT un objet JSON valide, sans aucun texte autour, au format suivant :
+
+{
+  "couleurPrimaire": "#XXXXXX",
+  "couleurSecondaire": "#XXXXXX",
+  "couleurAccent": "#XXXXXX",
+  "policePrimaire": "Nom Google Fonts exact",
+  "policeSecondaire": "Nom Google Fonts exact",
+  "styleGeneral": "modèle court (ex: moderne industriel, premium classique, minimaliste, traditionnel artisanal)",
+  "ambiance": "phrase courte décrivant l'identité visuelle (max 15 mots)"
+}
+
+Règles :
+- Couleurs en HEX 6 chiffres, fidèles aux captures
+- couleurPrimaire = celle qui domine la marque (souvent dans le logo, titres, CTA)
+- couleurSecondaire = couleur d'appui visible (boutons secondaires, bordures)
+- couleurAccent = touche complémentaire si présente, sinon répéter primaire
+- Polices : noms exacts Google Fonts si reconnaissables, sinon la famille la plus proche. Polices génériques : Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Raleway, Source Sans Pro, Oswald, Roboto Slab, Playfair Display, Merriweather, PT Sans, Nunito, Mulish, Work Sans, Manrope, Cinzel, Bebas Neue, Anton, Archivo
+- Sois précis, fidèle aux captures, jamais inventer.
+- JSON pur, aucun texte avant/après.`;
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1024,
+          messages: [{
+            role: 'user',
+            content: [...imageBlocks, { type: 'text', text: prompt }],
+          }],
+        }),
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        let errMsg = `Erreur API (${response.status})`;
+        try {
+          const errJson = JSON.parse(errText);
+          errMsg = errJson.error?.message || errMsg;
+        } catch {}
+        throw new Error(errMsg);
+      }
+
+      const data = await response.json();
+      const text = data.content?.[0]?.text || '';
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('Réponse IA invalide (pas de JSON détecté).');
+
+      try {
+        return JSON.parse(match[0]);
+      } catch {
+        throw new Error('JSON IA mal formé.');
+      }
+    };
+
+    const loadGoogleFont = (fontName) => {
+      if (!fontName || fontName === 'Inter') return;
+      const id = 'font-' + fontName.replace(/\s+/g,'-');
+      if (document.getElementById(id)) return;
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g,'+')}:wght@400;500;600;700&display=swap`;
+      document.head.appendChild(link);
     };
 
     const extractFromMultiple = async (files, maxColors = 6) => {

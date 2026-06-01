@@ -1354,11 +1354,14 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
         let errMsg = `HTTP ${response.status}`;
         try { errMsg = JSON.parse(errText).error?.message || errMsg; } catch {}
         lastError = { status: response.status, message: errMsg, model };
-        // Si quota:0 ou 429 ou 404 modèle → essayer le suivant.
-        // Sinon (401, 403 clé invalide…), inutile de continuer.
-        const isQuota = response.status === 429 || /limit:\s*0|quota|rate/i.test(errMsg);
+        // Triggers de fallback : on essaie le modèle suivant si...
+        // - 429 (rate limit) ou message de quota
+        // - 404 ou modèle indisponible
+        // - 5xx (overload, "high demand", "experiencing", "try again later", "unavailable")
+        const isQuota       = response.status === 429 || /limit:\s*0|quota|rate limit/i.test(errMsg);
         const isModelMissing = response.status === 404 || /not found|not supported/i.test(errMsg);
-        if (!isQuota && !isModelMissing) break;
+        const isOverload    = response.status >= 500 || /high demand|overload|unavailable|try again|experiencing|temporar/i.test(errMsg);
+        if (!isQuota && !isModelMissing && !isOverload) break;
       }
 
       if (lastError) {
@@ -1369,6 +1372,8 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
           hint = '\n\nCause probable : clé API invalide ou expirée. Régénère-la sur https://aistudio.google.com/app/apikey';
         } else if (lastError.status === 429) {
           hint = '\n\nQuota du jour atteint sur tous les modèles testés. Réessaie demain ou utilise une autre clé.';
+        } else if (lastError.status >= 500 || /high demand|overload|unavailable|try again|experiencing/i.test(lastError.message)) {
+          hint = '\n\nTous les modèles Gemini sont en surcharge temporaire. Réessaie dans 30-60 secondes — c\'est un pic de demande côté Google, pas un problème de ta clé.';
         }
         throw new Error(`${lastError.message} (modèle: ${lastError.model})${hint}`);
       }

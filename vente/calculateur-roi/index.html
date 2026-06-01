@@ -438,6 +438,7 @@
           companyName: data.companyName,
           clientWebsite: data.clientWebsite || '',
           clientLogoUrl: data.clientLogoUrl || '',
+          clientScreenshot: data.clientScreenshot || '',
           // Méta extraites
           clientTagline: data.clientTagline || '',
           clientSecteur: data.clientSecteur || '',
@@ -766,7 +767,7 @@
         }
       };
 
-      const confirmCreation = () => {
+      const confirmCreation = async () => {
         if (!dirigeantName.trim()) {
           alert('Entre au moins le nom du dirigeant pour personnaliser l\'accueil.');
           return;
@@ -778,11 +779,19 @@
           return;
         }
         const finalLogo = overrideLogo || meta?.logo || '';
+        // Compresse le screenshot pour le stocker dans la session (utilisé comme
+        // hero banner sur Mode Pertes — c'est CE qui fait l'identité visuelle).
+        let storedScreenshot = '';
+        if (screenshot) {
+          try { storedScreenshot = await compressDataUrl(screenshot, 1000, 0.72); }
+          catch { storedScreenshot = ''; }
+        }
         onCreate({
           dirigeantName: dirigeantName.trim(),
           meetingDate,
           clientWebsite: url.trim(),
           clientLogoUrl: finalLogo,
+          clientScreenshot: storedScreenshot,
           ...aiPatch,
           companyName,
         });
@@ -1120,6 +1129,25 @@
         </div>
       );
     };
+
+    // Compresse un dataURL existant (utile pour stocker le screenshot Microlink
+    // sans saturer localStorage). Convertit en JPEG.
+    const compressDataUrl = (dataUrl, maxWidth = 1000, quality = 0.75) => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ratio = Math.min(1, maxWidth / img.width);
+        canvas.width = Math.round(img.width * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
 
     // Compression Canvas
     const compressImage = (file) => new Promise((resolve, reject) => {
@@ -1647,75 +1675,114 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
       const losses = useMemo(() => calcLosses(session.inputs, marketRates), [session.inputs, marketRates]);
       const allFilled = ['leadsRecus','rdvPris','signatures','ticket'].every(k => +session.inputs[k] > 0);
       const t = computeTokens(session);
-      const bandeau = bandeauCSS(t);
-      const isBandeauColored = !!bandeau.isColored;
-      delete bandeau.isColored;
-      const stripHeight = t.bandeauStyle === 'gradient' ? 0 : 6;
+      const hasShot = !!session.clientScreenshot;
+      const primaryR = parseInt((t.primary || '#1E5F8E').slice(1,3), 16);
+      const primaryG = parseInt((t.primary || '#1E5F8E').slice(3,5), 16);
+      const primaryB = parseInt((t.primary || '#1E5F8E').slice(5,7), 16);
+      const primaryRGB = `${primaryR}, ${primaryG}, ${primaryB}`;
 
       return (
         <div style={{ background: t.bg, color: t.text, minHeight: '100vh', fontFamily: `'${t.font}', Inter, sans-serif` }}>
-          {/* === BAND TOP COLORÉ (toujours visible, signature visuelle forte) === */}
-          {stripHeight > 0 && (
-            <div style={{ height: `${stripHeight}px`, background: `linear-gradient(90deg, ${t.primary} 0%, ${t.primary} 70%, ${t.accent} 100%)` }} />
-          )}
+          {/* ============================================================ */}
+          {/* === HERO BANNER : LE SITE DU PROSPECT EN BACKGROUND ======= */}
+          {/* ============================================================ */}
+          <div style={{ position: 'relative', minHeight: '440px', overflow: 'hidden', background: t.primary }}>
+            {/* Background : screenshot du site OU dégradé fallback */}
+            {hasShot && (
+              <div style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: `url(${session.clientScreenshot})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'top center',
+                filter: 'blur(0px)',
+              }} />
+            )}
+            {/* Overlay : dégradé du transparent (haut, on voit le site) vers
+                primary opaque (bas, lisibilité). */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: hasShot
+                ? `linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 35%, rgba(${primaryRGB}, 0.78) 70%, rgba(${primaryRGB}, 0.96) 100%)`
+                : (t.bandeauGradient || `linear-gradient(135deg, ${t.primary} 0%, ${lightenHex(t.primary, -0.25)} 100%)`),
+            }} />
 
-          {/* === BANDEAU PROSPECT === */}
-          <div style={{ ...bandeau, padding: `${parseInt(t.cardPadding)*1.1}px ${parseInt(t.cardPadding)*1.2}px ${parseInt(t.cardPadding)}px`, borderBottom: isBandeauColored ? 'none' : `1px solid ${t.border}` }}>
-            <div style={{ maxWidth: t.maxWidth, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+            {/* Top stripe accent */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '5px', background: `linear-gradient(90deg, ${t.accent || t.primary} 0%, ${t.primary} 50%, ${t.accent || t.primary} 100%)`, zIndex: 2 }} />
+
+            {/* Contenu en surimpression */}
+            <div style={{ position: 'relative', maxWidth: t.maxWidth, margin: '0 auto', padding: '32px 40px 40px', color: '#FFFFFF', zIndex: 1, display: 'flex', flexDirection: 'column', height: '100%', minHeight: '440px', boxSizing: 'border-box' }}>
+              {/* Ligne du haut : badge audit + date dirigeant */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 12px', background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(8px)', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, border: '1px solid rgba(255,255,255,0.3)' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: t.accent || '#FFFFFF' }} />
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing, color: '#FFFFFF' }}>Audit ROI personnalisé</span>
+                </div>
+                <div style={{ textAlign: 'right', color: '#FFFFFF' }}>
+                  <p style={{ ...labelCSS(t), color: 'rgba(255,255,255,0.75)', margin: 0, fontSize: '10px' }}>Préparé pour</p>
+                  <p style={{ margin: '4px 0 0', fontWeight: 800, fontSize: '20px', fontFamily: `'${t.headingFont}', sans-serif` }}>{session.dirigeantName}</p>
+                  <p style={{ margin: '2px 0 0', fontSize: '12px', opacity: 0.85 }}>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
+                </div>
+              </div>
+
+              {/* Bloc principal : logo + nom + tagline, alignés en bas du hero */}
+              <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'flex-end', gap: '28px' }}>
                 {session.clientLogoUrl
-                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '84px', maxWidth: '240px', objectFit: 'contain', filter: isBandeauColored ? 'brightness(0) invert(1)' : 'none' }} />
+                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '96px', maxWidth: '260px', objectFit: 'contain', filter: 'brightness(0) invert(1)', flexShrink: 0 }} />
                   : <div style={{
-                      width: '84px', height: '84px',
+                      width: '96px', height: '96px',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: t.primary, color: t.bgAlt,
+                      background: 'rgba(255,255,255,0.15)', color: '#FFFFFF',
                       borderRadius: t.radius,
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      backdropFilter: 'blur(8px)',
                       fontFamily: `'${t.headingFont}', sans-serif`,
-                      fontWeight: 800, fontSize: '32px',
+                      fontWeight: 800, fontSize: '36px',
                       letterSpacing: '-0.02em',
-                      boxShadow: t.shadows.float,
+                      flexShrink: 0,
                     }}>{session.companyName.substring(0,2).toUpperCase()}</div>
                 }
-                <div>
-                  <h1 style={{ ...titleCSS(t, 'h1'), color: isBandeauColored ? t.bgAlt : t.primary, margin: 0, lineHeight: 1.05, fontSize: `calc(${t.sizes.h1} * 1.3)` }}>{session.companyName}</h1>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h1 style={{
+                    ...titleCSS(t, 'h1'),
+                    color: '#FFFFFF',
+                    margin: 0,
+                    lineHeight: 1.0,
+                    fontSize: 'clamp(36px, 5vw, 60px)',
+                    letterSpacing: '-0.02em',
+                    textShadow: '0 2px 16px rgba(0,0,0,0.3)',
+                  }}>{session.companyName}</h1>
                   {t.tagline && (
-                    <p style={{ color: isBandeauColored ? 'rgba(255,255,255,0.9)' : t.text, fontSize: '17px', marginTop: '8px', fontStyle: 'italic', fontWeight: 500, lineHeight: 1.3 }}>{t.tagline}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '20px', marginTop: '10px', fontStyle: 'italic', fontWeight: 500, lineHeight: 1.3, textShadow: '0 1px 6px rgba(0,0,0,0.4)' }}>{t.tagline}</p>
                   )}
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
                     {t.secteur && (
                       <span style={{
-                        background: isBandeauColored ? 'rgba(255,255,255,0.18)' : t.primary,
-                        color: isBandeauColored ? t.bgAlt : t.bgAlt,
-                        padding: '4px 10px',
+                        background: t.accent || 'rgba(255,255,255,0.2)',
+                        color: t.accent ? (lightenHex(t.accent, -0.6)) : '#FFFFFF',
+                        padding: '6px 12px',
+                        borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius,
+                        fontSize: '11px', fontWeight: 700,
+                        textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      }}>{t.secteur.replace(/-/g, ' ')}</span>
+                    )}
+                    {session.clientTonalite && (
+                      <span style={{
+                        background: 'rgba(255,255,255,0.18)',
+                        color: '#FFFFFF',
+                        border: '1px solid rgba(255,255,255,0.35)',
+                        padding: '6px 12px',
                         borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius,
                         fontSize: '11px', fontWeight: 600,
                         textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing,
-                      }}>{t.secteur.replace(/-/g, ' ')}</span>
+                        backdropFilter: 'blur(8px)',
+                      }}>{session.clientTonalite}</span>
                     )}
-                    <span style={{
-                      background: 'transparent',
-                      color: isBandeauColored ? 'rgba(255,255,255,0.85)' : t.mutedText,
-                      border: `1px solid ${isBandeauColored ? 'rgba(255,255,255,0.4)' : t.border}`,
-                      padding: '4px 10px',
-                      borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius,
-                      fontSize: '11px', fontWeight: 600,
-                      textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing,
-                    }}>Audit personnalisé · Système ROI</span>
                   </div>
                 </div>
               </div>
-              <div style={{ textAlign: 'right', color: isBandeauColored ? 'rgba(255,255,255,0.95)' : t.text, fontSize: '14px' }}>
-                <p style={{ ...labelCSS(t), color: isBandeauColored ? 'rgba(255,255,255,0.7)' : t.mutedText, margin: 0 }}>Préparé pour</p>
-                <p style={{ margin: '4px 0 0', fontWeight: 700, fontSize: '18px', color: isBandeauColored ? t.bgAlt : t.primary, fontFamily: `'${t.headingFont}', sans-serif` }}>{session.dirigeantName}</p>
-                <p style={{ margin: '4px 0 0', fontSize: '12px', opacity: 0.85 }}>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
-              </div>
             </div>
           </div>
-
-          {/* === Décor sous le bandeau === */}
-          {!isBandeauColored && (
-            <div style={{ height: '2px', background: `linear-gradient(90deg, transparent 0%, ${t.primary} 50%, transparent 100%)`, opacity: 0.5 }} />
-          )}
 
           <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `${t.sectionGap} ${parseInt(t.cardPadding)*1.2}px` }}>
             {/* Inputs panel */}

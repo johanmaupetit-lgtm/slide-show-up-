@@ -92,7 +92,17 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0D0D0D;color:#C9A84C;font-family:'Cinzel',Georgia,serif;letter-spacing:0.3em;font-size:13px;text-transform:uppercase;">
+      Chargement<span class="dot1">.</span><span class="dot2">.</span><span class="dot3">.</span>
+    </div>
+  </div>
+  <style>
+    @keyframes blink { 0%, 60%, 100% { opacity: 0; } 30% { opacity: 1; } }
+    .dot1 { animation: blink 1.4s infinite 0s; }
+    .dot2 { animation: blink 1.4s infinite 0.2s; }
+    .dot3 { animation: blink 1.4s infinite 0.4s; }
+  </style>
 
   <script type="importmap">
   {

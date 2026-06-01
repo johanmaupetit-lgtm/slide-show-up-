@@ -1151,6 +1151,8 @@
 
     // ===== SCREENSHOT URL VIA MICROLINK (gratuit, 50/jour sans clé) =====
     // Retourne { screenshot: dataUrl, title, description, logo, publisher, author }
+    // Note : on n'utilise PAS meta=true (provoque 400 sur le tier gratuit en combiné
+    // avec screenshot). L'IA extrait nomEntreprise + tagline depuis le screenshot.
     const fetchUrlScreenshot = async (url) => {
       let target = url.trim();
       if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
@@ -1158,18 +1160,26 @@
       const params = new URLSearchParams({
         url: target,
         screenshot: 'true',
-        meta: 'true',
-        'viewport.width': '1440',
-        'viewport.height': '1024',
+        meta: 'false',
+        'viewport.width': '1280',
+        'viewport.height': '900',
         'viewport.deviceScaleFactor': '1',
         waitUntil: 'load',
         'screenshot.type': 'png',
-        'screenshot.fullPage': 'false',
       });
       const apiUrl = `https://api.microlink.io/?${params.toString()}`;
 
       const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error(`Microlink HTTP ${response.status}`);
+      if (!response.ok) {
+        let detail = '';
+        try {
+          const errBody = await response.json();
+          detail = ' — ' + (errBody?.message || errBody?.data?.message || JSON.stringify(errBody).slice(0, 200));
+        } catch {
+          try { detail = ' — ' + (await response.text()).slice(0, 200); } catch {}
+        }
+        throw new Error(`Microlink HTTP ${response.status}${detail}`);
+      }
       const data = await response.json();
       if (data.status !== 'success') throw new Error('Microlink : ' + (data.message || 'erreur inconnue'));
       const screenshotUrl = data?.data?.screenshot?.url;
@@ -1185,29 +1195,11 @@
         reader.readAsDataURL(blob);
       });
 
-      // Récupérer aussi le logo extrait par Microlink en dataURL si dispo
-      let logoDataUrl = '';
-      const logoUrl = data?.data?.logo?.url;
-      if (logoUrl) {
-        try {
-          const logoResp = await fetch(logoUrl);
-          if (logoResp.ok) {
-            const logoBlob = await logoResp.blob();
-            logoDataUrl = await new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = () => resolve(reader.result);
-              reader.onerror = reject;
-              reader.readAsDataURL(logoBlob);
-            });
-          }
-        } catch (e) { /* ignore logo errors */ }
-      }
-
       return {
         screenshot: dataUrl,
         title: data?.data?.title || '',
         description: data?.data?.description || '',
-        logo: logoDataUrl,
+        logo: '',
         publisher: data?.data?.publisher || '',
         author: data?.data?.author || '',
       };

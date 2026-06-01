@@ -628,11 +628,12 @@
                   </div>
                   <div className="text-xs text-gray-400 leading-relaxed space-y-1">
                     <p><strong className="text-or">Setup gratuit, 2 minutes :</strong></p>
-                    <p>1. Va sur <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-or underline">aistudio.google.com/app/apikey</a></p>
-                    <p>2. Connecte-toi avec un compte Google</p>
-                    <p>3. Clique <strong>"Create API key"</strong> → copie la clé</p>
+                    <p>1. Va sur <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-or underline">aistudio.google.com/app/apikey</a> <strong className="text-or">(IMPORTANT : aistudio.google.com, PAS Google Cloud Console)</strong></p>
+                    <p>2. Connecte-toi avec un compte Google personnel (Gmail)</p>
+                    <p>3. Clique <strong>"Create API key"</strong> → choisis "Create API key in new project" → copie la clé</p>
                     <p>4. Colle-la ici → Enregistrer</p>
-                    <p className="mt-2 text-gray-500">Quota gratuit Gemini 2.0 Flash : 1 500 analyses/jour. Stockée uniquement dans ce navigateur.</p>
+                    <p className="mt-2 text-rouge"><strong>Si tu as l'erreur "quota limit:0"</strong> : ta clé vient de Google Cloud Console (mauvais setup). Recrée-la depuis aistudio.google.com avec un compte Google personnel — le free-tier sera automatique.</p>
+                    <p className="mt-2 text-gray-500">Quota gratuit : 1 500 analyses/jour. L'app teste automatiquement gemini-2.5-flash, gemini-2.0-flash, puis gemini-1.5-flash en fallback. Clé stockée uniquement dans ce navigateur.</p>
                   </div>
                 </div>
               ) : (
@@ -1314,30 +1315,62 @@ Règles strictes :
 
 Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend.`;
 
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [...imageParts, { text: prompt }],
-          }],
-          generationConfig: {
-            response_mime_type: 'application/json',
-            temperature: 0.15,
-            max_output_tokens: 4096,
-          },
-        }),
+      // Liste de modèles à essayer dans l'ordre. Si la clé n'a pas de quota
+      // free-tier sur le premier (limit:0), on bascule automatiquement sur
+      // les suivants. Certains projets Google Cloud n'ont free-tier que sur
+      // gemini-1.5-flash (toujours dispo depuis aistudio.google.com).
+      const MODELS_TO_TRY = [
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash-latest',
+        'gemini-1.5-flash',
+        'gemini-1.5-flash-8b',
+      ];
+      const body = JSON.stringify({
+        contents: [{ parts: [...imageParts, { text: prompt }] }],
+        generationConfig: {
+          response_mime_type: 'application/json',
+          temperature: 0.15,
+          max_output_tokens: 4096,
+        },
       });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        let errMsg = `Erreur API (${response.status})`;
+      let lastError = null;
+      let response = null;
+      for (const model of MODELS_TO_TRY) {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
         try {
-          const errJson = JSON.parse(errText);
-          errMsg = errJson.error?.message || errMsg;
-        } catch {}
-        throw new Error(errMsg);
+          response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+          });
+        } catch (netErr) {
+          lastError = { status: 0, message: 'Réseau : ' + netErr.message, model };
+          continue;
+        }
+        if (response.ok) { lastError = null; break; }
+        const errText = await response.text();
+        let errMsg = `HTTP ${response.status}`;
+        try { errMsg = JSON.parse(errText).error?.message || errMsg; } catch {}
+        lastError = { status: response.status, message: errMsg, model };
+        // Si quota:0 ou 429 ou 404 modèle → essayer le suivant.
+        // Sinon (401, 403 clé invalide…), inutile de continuer.
+        const isQuota = response.status === 429 || /limit:\s*0|quota|rate/i.test(errMsg);
+        const isModelMissing = response.status === 404 || /not found|not supported/i.test(errMsg);
+        if (!isQuota && !isModelMissing) break;
+      }
+
+      if (lastError) {
+        let hint = '';
+        if (/limit:\s*0/i.test(lastError.message)) {
+          hint = '\n\nCause probable : la clé API a été créée depuis Google Cloud Console au lieu de aistudio.google.com — le free-tier n\'est pas activé. Solution : recrée la clé sur https://aistudio.google.com/app/apikey (avec un compte Google personnel).';
+        } else if (lastError.status === 401 || lastError.status === 403) {
+          hint = '\n\nCause probable : clé API invalide ou expirée. Régénère-la sur https://aistudio.google.com/app/apikey';
+        } else if (lastError.status === 429) {
+          hint = '\n\nQuota du jour atteint sur tous les modèles testés. Réessaie demain ou utilise une autre clé.';
+        }
+        throw new Error(`${lastError.message} (modèle: ${lastError.model})${hint}`);
       }
 
       const data = await response.json();

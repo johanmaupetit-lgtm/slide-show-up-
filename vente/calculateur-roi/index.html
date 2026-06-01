@@ -232,15 +232,24 @@
       return date.getDate() + months[date.getMonth()];
     };
     const lightenHex = (hex, amount = 0.85) => {
-      // Mix hex with white to create a light version
-      const h = hex.replace('#','');
+      // amount > 0 : mix with white (lighten). amount < 0 : mix with black (darken).
+      const h = (hex || '#000000').replace('#','');
       const r = parseInt(h.substring(0,2),16);
       const g = parseInt(h.substring(2,4),16);
       const b = parseInt(h.substring(4,6),16);
-      const nr = Math.round(r + (255-r)*amount);
-      const ng = Math.round(g + (255-g)*amount);
-      const nb = Math.round(b + (255-b)*amount);
-      return '#' + [nr,ng,nb].map(x => x.toString(16).padStart(2,'0')).join('');
+      let nr, ng, nb;
+      if (amount >= 0) {
+        nr = Math.round(r + (255-r)*amount);
+        ng = Math.round(g + (255-g)*amount);
+        nb = Math.round(b + (255-b)*amount);
+      } else {
+        const k = 1 + amount; // amount in [-1,0] → k in [0,1]
+        nr = Math.round(r * k);
+        ng = Math.round(g * k);
+        nb = Math.round(b * k);
+      }
+      const clamp = (x) => Math.max(0, Math.min(255, x));
+      return '#' + [clamp(nr), clamp(ng), clamp(nb)].map(x => x.toString(16).padStart(2,'0')).join('');
     };
 
     // ============================================================
@@ -429,7 +438,13 @@
           companyName: data.companyName,
           clientWebsite: data.clientWebsite || '',
           clientLogoUrl: data.clientLogoUrl || '',
-          // Design tokens charte
+          // Méta extraites
+          clientTagline: data.clientTagline || '',
+          clientSecteur: data.clientSecteur || '',
+          clientTonalite: data.clientTonalite || '',
+          clientCtaTexte: data.clientCtaTexte || '',
+          clientMotsClesMetier: data.clientMotsClesMetier || [],
+          // Couleurs
           clientPrimaryColor: data.clientPrimaryColor || '#1E5F8E',
           clientSecondaryColor: data.clientSecondaryColor || '#888888',
           clientAccentColor: data.clientAccentColor || '',
@@ -437,15 +452,30 @@
           clientBgAltColor: data.clientBgAltColor || '#FFFFFF',
           clientTextColor: data.clientTextColor || '#1A1A1A',
           clientMutedTextColor: data.clientMutedTextColor || '#666666',
+          clientSuccessColor: data.clientSuccessColor || '#3A8A3A',
+          clientDangerColor: data.clientDangerColor || '#B91C1C',
+          clientBorderColor: data.clientBorderColor || '',
+          // Typographie
           clientPrimaryFont: data.clientPrimaryFont || 'Inter',
           clientSecondaryFont: data.clientSecondaryFont || '',
+          clientTitleScale: data.clientTitleScale || 'normal',
+          // Styles
           clientBorderRadius: data.clientBorderRadius || '4px',
           clientCardStyle: data.clientCardStyle || 'flat',
           clientButtonStyle: data.clientButtonStyle || 'filled',
+          clientShadowStyle: data.clientShadowStyle || 'soft',
+          clientSeparatorStyle: data.clientSeparatorStyle || 'thin',
+          clientInputStyle: data.clientInputStyle || 'bordered',
+          clientIconStyle: data.clientIconStyle || 'minimal',
           clientSpacing: data.clientSpacing || 'balanced',
           clientTitleCase: data.clientTitleCase || 'none',
           clientTitleWeight: data.clientTitleWeight || '700',
           clientTitleLetterSpacing: data.clientTitleLetterSpacing || 'normal',
+          clientLabelLetterSpacing: data.clientLabelLetterSpacing || 'wide',
+          clientBandeauStyle: data.clientBandeauStyle || 'flat',
+          clientBandeauGradient: data.clientBandeauGradient || '',
+          clientHoverEffect: data.clientHoverEffect || 'color',
+          clientDecorative: data.clientDecorative || 'none',
           clientStyleGeneral: data.clientStyleGeneral || '',
           clientAmbiance: data.clientAmbiance || '',
           meetingDate: data.meetingDate,
@@ -639,443 +669,414 @@
       );
     };
 
+    // Mappe la réponse AI (clés FR) vers le schema session (clés EN clientXxx)
+    const mapAITokensToSession = (ai) => {
+      if (!ai) return {};
+      const patch = {};
+      // Métadonnées
+      if (ai.nomEntreprise) patch.companyName = ai.nomEntreprise;
+      if (ai.tagline) patch.clientTagline = ai.tagline;
+      if (ai.secteur) patch.clientSecteur = ai.secteur;
+      if (ai.tonalite) patch.clientTonalite = ai.tonalite;
+      if (ai.ctaTexte) patch.clientCtaTexte = ai.ctaTexte;
+      if (Array.isArray(ai.motsClesMetier)) patch.clientMotsClesMetier = ai.motsClesMetier;
+      // Couleurs
+      if (ai.couleurPrimaire) patch.clientPrimaryColor = ai.couleurPrimaire;
+      if (ai.couleurSecondaire) patch.clientSecondaryColor = ai.couleurSecondaire;
+      if (ai.couleurAccent) patch.clientAccentColor = ai.couleurAccent;
+      if (ai.couleurFond) patch.clientBgColor = ai.couleurFond;
+      if (ai.couleurFondAlt) patch.clientBgAltColor = ai.couleurFondAlt;
+      if (ai.couleurTexte) patch.clientTextColor = ai.couleurTexte;
+      if (ai.couleurTexteSubtil) patch.clientMutedTextColor = ai.couleurTexteSubtil;
+      if (ai.couleurSucces) patch.clientSuccessColor = ai.couleurSucces;
+      if (ai.couleurDanger) patch.clientDangerColor = ai.couleurDanger;
+      if (ai.couleurBordure) patch.clientBorderColor = ai.couleurBordure;
+      // Typographie
+      if (ai.policePrimaire) patch.clientPrimaryFont = ai.policePrimaire;
+      if (ai.policeSecondaire) patch.clientSecondaryFont = ai.policeSecondaire;
+      if (ai.echelleTitres) patch.clientTitleScale = ai.echelleTitres;
+      // Styles
+      if (ai.borderRadius) patch.clientBorderRadius = ai.borderRadius;
+      if (ai.styleCartes) patch.clientCardStyle = ai.styleCartes;
+      if (ai.styleBoutons) patch.clientButtonStyle = ai.styleBoutons;
+      if (ai.styleOmbre) patch.clientShadowStyle = ai.styleOmbre;
+      if (ai.styleSeparateur) patch.clientSeparatorStyle = ai.styleSeparateur;
+      if (ai.styleInputs) patch.clientInputStyle = ai.styleInputs;
+      if (ai.styleIcones) patch.clientIconStyle = ai.styleIcones;
+      if (ai.espacement) patch.clientSpacing = ai.espacement;
+      if (ai.casseTitres) patch.clientTitleCase = ai.casseTitres;
+      if (ai.graisseTitres) patch.clientTitleWeight = ai.graisseTitres;
+      if (ai.letterSpacingTitres) patch.clientTitleLetterSpacing = ai.letterSpacingTitres;
+      if (ai.letterSpacingLabels) patch.clientLabelLetterSpacing = ai.letterSpacingLabels;
+      if (ai.bandeauStyle) patch.clientBandeauStyle = ai.bandeauStyle;
+      if (ai.bandeauGradient) patch.clientBandeauGradient = ai.bandeauGradient;
+      if (ai.hoverEffect) patch.clientHoverEffect = ai.hoverEffect;
+      if (ai.presenceDecorative) patch.clientDecorative = ai.presenceDecorative;
+      if (ai.styleGeneral) patch.clientStyleGeneral = ai.styleGeneral;
+      if (ai.ambiance) patch.clientAmbiance = ai.ambiance;
+      return patch;
+    };
+
     const SessionForm = ({ onCreate, onCancel }) => {
       const { apiKey } = useApp();
-      const [data, setData] = useState({
-        dirigeantName: '',
-        companyName: '',
-        clientWebsite: '',
-        meetingDate: new Date().toISOString().slice(0, 10),
-        clientPrimaryColor: '#1E5F8E',
-        clientSecondaryColor: '#888888',
-        clientAccentColor: '',
-        clientBgColor: '#FAFAFA',
-        clientBgAltColor: '#FFFFFF',
-        clientTextColor: '#1A1A1A',
-        clientMutedTextColor: '#666666',
-        clientPrimaryFont: 'Inter',
-        clientSecondaryFont: '',
-        clientBorderRadius: '4px',
-        clientCardStyle: 'flat',
-        clientButtonStyle: 'filled',
-        clientSpacing: 'balanced',
-        clientTitleCase: 'none',
-        clientTitleWeight: '700',
-        clientTitleLetterSpacing: 'normal',
-        clientStyleGeneral: '',
-        clientAmbiance: '',
-        clientLogoUrl: '',
-      });
-      const [analysisText, setAnalysisText] = useState('');
-      const [notice, setNotice] = useState('');
-      const [screenshots, setScreenshots] = useState([]); // dataUrls
-      const [palette, setPalette] = useState([]); // hex colors
-      const [extracting, setExtracting] = useState(false);
-      const [aiAnalyzing, setAiAnalyzing] = useState(false);
-      const [aiResult, setAiResult] = useState(null);
-      const [urlFetching, setUrlFetching] = useState(false);
-      const dropZoneRef = useRef(null);
+      // step: 'input' | 'fetching' | 'analyzing' | 'preview' | 'error'
+      const [step, setStep] = useState('input');
+      const [url, setUrl] = useState('');
+      const [dirigeantName, setDirigeantName] = useState('');
+      const [meetingDate, setMeetingDate] = useState(new Date().toISOString().slice(0, 10));
+      const [showAdvanced, setShowAdvanced] = useState(false);
+      const [overrideCompany, setOverrideCompany] = useState('');
+      const [overrideLogo, setOverrideLogo] = useState('');
+      const [screenshot, setScreenshot] = useState('');
+      const [meta, setMeta] = useState(null);
+      const [aiTokens, setAiTokens] = useState(null);
+      const [error, setError] = useState('');
 
-      const fetchFromUrl = async () => {
-        const url = data.clientWebsite.trim();
-        if (!url) { alert('Saisis une URL d\'abord.'); return; }
-        setUrlFetching(true);
-        setNotice('');
-        try {
-          const screenshotDataUrl = await fetchUrlScreenshot(url);
-          // Ajouter le screenshot aux screenshots existants
-          const newShots = [...screenshots, screenshotDataUrl];
-          setScreenshots(newShots);
-          // Lancer extraction couleurs locale
-          const blob = await (await fetch(screenshotDataUrl)).blob();
-          const colors = await extractFromMultiple([blob], 6);
-          if (colors.length > 0) setPalette(colors);
-          setNotice(`✓ Screenshot du site récupéré. ${apiKey ? 'Clique "Analyser avec IA" pour la charte complète.' : 'Configure une clé Gemini pour l\'analyse complète.'}`);
-          // Si clé API → lancer auto
-          if (apiKey) {
-            await runAIAnalysisOn(newShots);
-          }
-        } catch (e) {
-          alert('Erreur récupération URL : ' + e.message + '\n\nAstuce : si Microlink bloque le site, fais un screenshot manuel.');
-        } finally {
-          setUrlFetching(false);
-        }
-      };
-
-      const runAIAnalysisOn = async (shotsToUse) => {
-        const shots = shotsToUse || screenshots;
-        if (!apiKey) { alert('Configure d\'abord ta clé API Gemini dans /admin (en bas de page).'); return; }
-        if (shots.length === 0) { alert('Upload ou récupère au moins un screenshot.'); return; }
-        setAiAnalyzing(true);
-        setNotice('');
-        try {
-          const result = await analyzeCharteAI(apiKey, shots);
-          setAiResult(result);
-          const patch = {};
-          // Couleurs
-          if (result.couleurPrimaire) patch.clientPrimaryColor = result.couleurPrimaire;
-          if (result.couleurSecondaire) patch.clientSecondaryColor = result.couleurSecondaire;
-          if (result.couleurAccent) patch.clientAccentColor = result.couleurAccent;
-          if (result.couleurFond) patch.clientBgColor = result.couleurFond;
-          if (result.couleurFondAlt) patch.clientBgAltColor = result.couleurFondAlt;
-          if (result.couleurTexte) patch.clientTextColor = result.couleurTexte;
-          if (result.couleurTexteSubtil) patch.clientMutedTextColor = result.couleurTexteSubtil;
-          // Polices
-          if (result.policePrimaire) { patch.clientPrimaryFont = result.policePrimaire; loadGoogleFont(result.policePrimaire); }
-          if (result.policeSecondaire) { patch.clientSecondaryFont = result.policeSecondaire; loadGoogleFont(result.policeSecondaire); }
-          // Tokens design
-          if (result.borderRadius) patch.clientBorderRadius = result.borderRadius;
-          if (result.styleCartes) patch.clientCardStyle = result.styleCartes;
-          if (result.styleBoutons) patch.clientButtonStyle = result.styleBoutons;
-          if (result.espacement) patch.clientSpacing = result.espacement;
-          if (result.casseTitres) patch.clientTitleCase = result.casseTitres;
-          if (result.graisseTitres) patch.clientTitleWeight = result.graisseTitres;
-          if (result.letterSpacingTitres) patch.clientTitleLetterSpacing = result.letterSpacingTitres;
-          // Méta
-          if (result.styleGeneral) patch.clientStyleGeneral = result.styleGeneral;
-          if (result.ambiance) patch.clientAmbiance = result.ambiance;
-          setData(d => ({ ...d, ...patch }));
-          setNotice('✓ Charte complète appliquée — couleurs, polices, espacements, styles cartes/boutons.');
-        } catch (e) {
-          alert('Erreur analyse IA : ' + e.message);
-        } finally {
-          setAiAnalyzing(false);
-        }
-      };
-
-      const runAIAnalysis = () => runAIAnalysisOn(screenshots);
-
-      const handleLogo = async (e) => {
+      const handleLogoUpload = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
         try {
           const compressed = await compressImage(file);
-          setData(d => ({ ...d, clientLogoUrl: compressed }));
+          setOverrideLogo(compressed);
         } catch (err) {
           alert('Erreur compression : ' + err.message);
         }
       };
 
-      const handleScreenshots = async (files) => {
-        if (!files || files.length === 0) return;
-        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-        if (imageFiles.length === 0) return;
-        setExtracting(true);
+      const runFullPipeline = async () => {
+        if (!url.trim()) { alert('Entre une URL d\'abord.'); return; }
+        if (!apiKey) { alert('Configure d\'abord ta clé API Gemini en bas de cette page (gratuit, 2 minutes).'); return; }
+        setError('');
+        setStep('fetching');
         try {
-          // Compress and store thumbnails
-          const compressed = await Promise.all(imageFiles.map(f => compressImage(f)));
-          const newShots = [...screenshots, ...compressed];
-          setScreenshots(newShots);
-          // Extract palette from ALL screenshots (including previous)
-          const allFiles = [...imageFiles];
-          // For previous shots, convert dataUrl back to blob/file for re-extraction
-          for (const dataUrl of screenshots) {
-            const blob = await (await fetch(dataUrl)).blob();
-            allFiles.push(blob);
-          }
-          const colors = await extractFromMultiple(allFiles, 6);
-          setPalette(colors);
-          // Auto-set first 2 colors as primary/secondary
-          if (colors[0]) setData(d => ({ ...d, clientPrimaryColor: colors[0] }));
-          if (colors[1]) setData(d => ({ ...d, clientSecondaryColor: colors[1] }));
-          setNotice(`${colors.length} couleur(s) détectée(s) — ajustez en cliquant ci-dessous si besoin.`);
+          const result = await fetchUrlScreenshot(url);
+          setScreenshot(result.screenshot);
+          setMeta(result);
+          // Précharger la police si disponible avant l'analyse
+          setStep('analyzing');
+          const tokens = await analyzeCharteAI(apiKey, [result.screenshot]);
+          if (tokens.policePrimaire) loadGoogleFont(tokens.policePrimaire);
+          if (tokens.policeSecondaire) loadGoogleFont(tokens.policeSecondaire);
+          setAiTokens(tokens);
+          setStep('preview');
         } catch (e) {
-          alert('Erreur extraction : ' + e.message);
-        } finally {
-          setExtracting(false);
+          setError(e.message || String(e));
+          setStep('error');
         }
       };
 
-      const removeScreenshot = (idx) => {
-        const newShots = screenshots.filter((_, i) => i !== idx);
-        setScreenshots(newShots);
-        if (newShots.length === 0) setPalette([]);
-      };
-
-      // Drop zone events
-      useEffect(() => {
-        const zone = dropZoneRef.current;
-        if (!zone) return;
-        const onDragOver = (e) => { e.preventDefault(); zone.classList.add('drop-active'); };
-        const onDragLeave = () => zone.classList.remove('drop-active');
-        const onDrop = (e) => {
-          e.preventDefault();
-          zone.classList.remove('drop-active');
-          handleScreenshots(e.dataTransfer.files);
-        };
-        zone.addEventListener('dragover', onDragOver);
-        zone.addEventListener('dragleave', onDragLeave);
-        zone.addEventListener('drop', onDrop);
-        return () => {
-          zone.removeEventListener('dragover', onDragOver);
-          zone.removeEventListener('dragleave', onDragLeave);
-          zone.removeEventListener('drop', onDrop);
-        };
-      });
-
-      // Paste from clipboard
-      useEffect(() => {
-        const onPaste = (e) => {
-          const items = e.clipboardData?.items;
-          if (!items) return;
-          const files = [];
-          for (const item of items) {
-            if (item.type.startsWith('image/')) {
-              const f = item.getAsFile();
-              if (f) files.push(f);
-            }
-          }
-          if (files.length > 0) {
-            e.preventDefault();
-            handleScreenshots(files);
-          }
-        };
-        window.addEventListener('paste', onPaste);
-        return () => window.removeEventListener('paste', onPaste);
-      });
-
-      const analyzeCharte = () => {
-        const text = analysisText;
-        const hexMatches = text.match(/#[0-9A-Fa-f]{6}/g) || [];
-        const fonts = [];
-        const fontLineMatch = text.match(/[Pp]olice[^:]*:\s*([A-Za-zÀ-ÿ\s]+)/g) || [];
-        fontLineMatch.forEach(line => {
-          const m = line.match(/:\s*([A-Za-zÀ-ÿ\s]+)/);
-          if (m) fonts.push(m[1].trim());
-        });
-        const patch = {};
-        if (hexMatches[0]) patch.clientPrimaryColor = hexMatches[0];
-        if (hexMatches[1]) patch.clientSecondaryColor = hexMatches[1];
-        let foundFont = null;
-        for (const f of fonts) {
-          const exact = GOOGLE_FONTS.find(g => g.toLowerCase() === f.toLowerCase());
-          if (exact) { foundFont = exact; break; }
-        }
-        if (foundFont) {
-          patch.clientPrimaryFont = foundFont;
-          setNotice(`Charte appliquée : ${patch.clientPrimaryColor || ''} · ${foundFont}`);
-        } else if (fonts[0]) {
-          patch.clientPrimaryFont = 'Inter';
-          setNotice(`Police "${fonts[0]}" non disponible — Inter utilisée par défaut.`);
-        } else {
-          setNotice('Couleurs appliquées (aucune police détectée).');
-        }
-        setData(d => ({ ...d, ...patch }));
-      };
-
-      const submit = (e) => {
-        e.preventDefault();
-        if (!data.dirigeantName.trim() || !data.companyName.trim()) {
-          alert('Nom du dirigeant et de l\'entreprise requis.');
+      const confirmCreation = () => {
+        if (!dirigeantName.trim()) {
+          alert('Entre au moins le nom du dirigeant pour personnaliser l\'accueil.');
           return;
         }
-        onCreate(data);
+        const aiPatch = mapAITokensToSession(aiTokens);
+        const companyName = (overrideCompany.trim() || aiPatch.companyName || meta?.title || domainNameFromUrl(url)).trim();
+        if (!companyName) {
+          alert('Impossible de déterminer le nom de l\'entreprise — entre-le manuellement (Avancé).');
+          return;
+        }
+        const finalLogo = overrideLogo || meta?.logo || '';
+        onCreate({
+          dirigeantName: dirigeantName.trim(),
+          meetingDate,
+          clientWebsite: url.trim(),
+          clientLogoUrl: finalLogo,
+          ...aiPatch,
+          companyName,
+        });
+      };
+
+      const resetAndRetry = () => {
+        setStep('input');
+        setError('');
+        setScreenshot('');
+        setMeta(null);
+        setAiTokens(null);
       };
 
       return (
-        <form onSubmit={submit} className="bg-noir-card border border-anthracite rounded-lg p-8 mb-8 fade-in">
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            <Field label="Nom du dirigeant *">
-              <input required value={data.dirigeantName} onChange={e => setData(d => ({...d, dirigeantName: e.target.value}))} className="form-input" />
-            </Field>
-            <Field label="Nom de l'entreprise *">
-              <input required value={data.companyName} onChange={e => setData(d => ({...d, companyName: e.target.value}))} className="form-input" />
-            </Field>
-            <Field label="Date du rendez-vous">
-              <input type="date" value={data.meetingDate} onChange={e => setData(d => ({...d, meetingDate: e.target.value}))} className="form-input" />
-            </Field>
-            <Field label="Logo client (PNG, JPG, SVG)">
-              <input type="file" accept="image/*" onChange={handleLogo} className="form-input" />
-              {data.clientLogoUrl && <img src={data.clientLogoUrl} alt="Logo preview" className="mt-2 max-h-12 bg-white p-1 rounded" />}
-            </Field>
+        <div className="bg-noir-card border border-anthracite rounded-lg p-8 mb-8 fade-in">
+          {step === 'input' && (
+            <FormStepInput
+              url={url} setUrl={setUrl}
+              dirigeantName={dirigeantName} setDirigeantName={setDirigeantName}
+              meetingDate={meetingDate} setMeetingDate={setMeetingDate}
+              showAdvanced={showAdvanced} setShowAdvanced={setShowAdvanced}
+              overrideCompany={overrideCompany} setOverrideCompany={setOverrideCompany}
+              overrideLogo={overrideLogo} handleLogoUpload={handleLogoUpload}
+              apiKey={apiKey}
+              onSubmit={runFullPipeline}
+              onCancel={onCancel}
+            />
+          )}
+          {(step === 'fetching' || step === 'analyzing') && (
+            <FormStepProgress step={step} screenshot={screenshot} url={url} />
+          )}
+          {step === 'preview' && (
+            <FormStepPreview
+              screenshot={screenshot}
+              meta={meta}
+              aiTokens={aiTokens}
+              url={url}
+              dirigeantName={dirigeantName} setDirigeantName={setDirigeantName}
+              meetingDate={meetingDate} setMeetingDate={setMeetingDate}
+              overrideCompany={overrideCompany} setOverrideCompany={setOverrideCompany}
+              overrideLogo={overrideLogo} handleLogoUpload={handleLogoUpload}
+              onConfirm={confirmCreation}
+              onRetry={resetAndRetry}
+              onCancel={onCancel}
+            />
+          )}
+          {step === 'error' && (
+            <div className="text-center py-8">
+              <p className="text-rouge text-lg mb-3">⚠ Erreur</p>
+              <p className="text-gray-300 mb-6 text-sm">{error}</p>
+              <button onClick={resetAndRetry} className="bg-or text-noir px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+                Recommencer
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // ===== ÉTAPE 1 : SAISIE URL =====
+    const FormStepInput = ({ url, setUrl, dirigeantName, setDirigeantName, meetingDate, setMeetingDate, showAdvanced, setShowAdvanced, overrideCompany, setOverrideCompany, overrideLogo, handleLogoUpload, apiKey, onSubmit, onCancel }) => {
+      const submit = (e) => { e.preventDefault(); onSubmit(); };
+      return (
+        <form onSubmit={submit}>
+          <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-2">Nouvelle session</h3>
+          <p className="text-gray-400 text-sm mb-8">Colle l'URL du site prospect — l'IA extrait automatiquement la charte (couleurs, polices, style, ambiance, secteur, tagline) et personnalise entièrement la page d'audit.</p>
+
+          <div className="mb-6">
+            <label className="block text-xs uppercase tracking-wider text-or mb-2">URL du site prospect *</label>
+            <input
+              type="text"
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              placeholder="ex: www.lapeyre.fr"
+              className="form-input text-lg"
+              autoFocus
+              required
+            />
           </div>
 
-          {/* ===== URL DU SITE CLIENT (RACCOURCI) ===== */}
-          <div className="mb-6 pt-6 border-t border-anthracite">
-            <label className="block text-xs uppercase tracking-wider text-or mb-2">URL du site prospect (raccourci · screenshot auto)</label>
-            <div className="flex gap-2">
+          <div className="mb-6 grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-or mb-2">Nom du dirigeant *</label>
               <input
                 type="text"
-                value={data.clientWebsite}
-                onChange={e => setData(d => ({ ...d, clientWebsite: e.target.value }))}
-                placeholder="ex: www.lapeyre.fr"
-                className="form-input flex-1"
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); fetchFromUrl(); } }}
+                value={dirigeantName}
+                onChange={e => setDirigeantName(e.target.value)}
+                placeholder="ex: Pierre Martin"
+                className="form-input"
+                required
               />
-              <button
-                type="button"
-                onClick={fetchFromUrl}
-                disabled={urlFetching || !data.clientWebsite.trim()}
-                className="bg-or text-noir px-5 py-2.5 rounded text-xs font-semibold uppercase tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
-              >
-                {urlFetching ? 'Récupération…' : apiKey ? '🌐 Récupérer + Analyser IA' : '🌐 Screenshot URL'}
-              </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              Screenshot via Microlink (50/jour gratuit). {apiKey && <>Analyse IA enchaînée automatiquement après récupération.</>}
-            </p>
-          </div>
-
-          {/* ===== CAPTURES DU SITE CLIENT (UPLOAD MANUEL) ===== */}
-          <div className="mb-6">
-            <label className="block text-xs uppercase tracking-wider text-or mb-2">Ou screenshots manuels — extraction auto de la palette</label>
-            <p className="text-xs text-gray-500 mb-3">Glisse-dépose des screenshots (ou colle depuis le presse-papier · Ctrl+V). Les couleurs dominantes seront détectées automatiquement.</p>
-
-            <div
-              ref={dropZoneRef}
-              className="drop-zone border-2 border-dashed border-anthracite rounded-lg p-6 text-center cursor-pointer hover:border-or/50"
-              onClick={() => document.getElementById('shots-input').click()}
-            >
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-or mb-2">Date du rendez-vous</label>
               <input
-                id="shots-input"
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={e => { handleScreenshots(e.target.files); e.target.value = ''; }}
-              />
-              {extracting
-                ? <p className="text-or text-sm">Analyse en cours…</p>
-                : screenshots.length === 0
-                  ? <p className="text-gray-400 text-sm">Glissez les captures ici · ou cliquez pour parcourir · ou collez (Ctrl+V)</p>
-                  : <p className="text-gray-300 text-sm">{screenshots.length} capture(s) chargée(s) — ajoutez-en d'autres ou cliquez pour remplacer</p>
-              }
-            </div>
-
-            {screenshots.length > 0 && (
-              <div className="mt-3 flex gap-2 flex-wrap">
-                {screenshots.map((s, i) => (
-                  <div key={i} className="relative group">
-                    <img src={s} alt="" className="h-16 w-24 object-cover rounded border border-anthracite" />
-                    <button
-                      type="button"
-                      onClick={() => removeScreenshot(i)}
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rouge text-white text-xs opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
-                      title="Retirer"
-                    >×</button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {palette.length > 0 && (
-              <div className="mt-4 fade-in">
-                <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-2">Palette détectée — cliquez pour définir</p>
-                <div className="flex gap-2 flex-wrap">
-                  {palette.map((color, i) => (
-                    <div key={i} className="flex flex-col gap-1.5 items-center">
-                      <div
-                        className="palette-swatch w-12 h-12 rounded cursor-pointer border border-white/10"
-                        style={{ background: color }}
-                        title={color}
-                      />
-                      <span className="text-[10px] text-gray-400 font-mono">{color}</span>
-                      <div className="flex gap-1">
-                        <button type="button" onClick={() => setData(d => ({ ...d, clientPrimaryColor: color }))} className={`text-[9px] px-1.5 py-0.5 rounded transition ${data.clientPrimaryColor === color ? 'bg-or text-noir' : 'bg-noir border border-anthracite text-gray-400 hover:border-or'}`}>1aire</button>
-                        <button type="button" onClick={() => setData(d => ({ ...d, clientSecondaryColor: color }))} className={`text-[9px] px-1.5 py-0.5 rounded transition ${data.clientSecondaryColor === color ? 'bg-or text-noir' : 'bg-noir border border-anthracite text-gray-400 hover:border-or'}`}>2aire</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Analyse IA complète */}
-            {screenshots.length > 0 && (
-              <div className="mt-5 pt-4 border-t border-anthracite/50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wider text-or font-semibold">Analyse IA complète (Google Gemini · gratuit)</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {apiKey
-                        ? <>Couleurs + polices + style général + ambiance</>
-                        : <>Clé Gemini non configurée — voir paramètres en bas de /admin</>
-                      }
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={runAIAnalysis}
-                    disabled={!apiKey || aiAnalyzing}
-                    className="bg-or text-noir px-5 py-2.5 rounded text-sm font-semibold uppercase tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    {aiAnalyzing ? 'Analyse en cours…' : '✦ Analyser avec IA'}
-                  </button>
-                </div>
-                {aiResult && (
-                  <div className="mt-4 p-4 bg-noir border border-or/20 rounded text-xs space-y-1.5 fade-in">
-                    {aiResult.styleGeneral && <p><span className="text-or uppercase tracking-wider text-[10px] mr-2">Style</span> <span className="text-gray-200">{aiResult.styleGeneral}</span></p>}
-                    {aiResult.ambiance && <p><span className="text-or uppercase tracking-wider text-[10px] mr-2">Ambiance</span> <span className="text-gray-200 italic">{aiResult.ambiance}</span></p>}
-                    {aiResult.policePrimaire && <p><span className="text-or uppercase tracking-wider text-[10px] mr-2">Police</span> <span className="text-gray-200">{aiResult.policePrimaire}{aiResult.policeSecondaire && ` · ${aiResult.policeSecondaire}`}</span></p>}
-                    <p className="flex items-center gap-2 mt-2">
-                      <span className="text-or uppercase tracking-wider text-[10px]">Couleurs</span>
-                      {[aiResult.couleurPrimaire, aiResult.couleurSecondaire, aiResult.couleurAccent].filter(Boolean).map((c, i) => (
-                        <span key={i} className="inline-flex items-center gap-1">
-                          <span className="w-4 h-4 rounded border border-white/20" style={{ background: c }} />
-                          <span className="text-gray-300 font-mono">{c}</span>
-                        </span>
-                      ))}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-xs uppercase tracking-wider text-or mb-2">Méthode alternative : analyse texte (collez la réponse d'une IA)</label>
-            <textarea
-              value={analysisText}
-              onChange={e => setAnalysisText(e.target.value)}
-              rows={5}
-              placeholder={"Couleur principale : #1E5F8E\nCouleur secondaire : #F5A623\nPolice principale : Roboto\nStyle général : Modern, industrial"}
-              className="form-input font-mono text-sm"
-            />
-            <div className="flex gap-3 mt-3">
-              <button type="button" onClick={analyzeCharte} className="bg-or text-noir px-4 py-2 rounded text-sm font-semibold uppercase tracking-wider hover:bg-or-fonce transition">
-                Analyser et appliquer la charte
-              </button>
-              {notice && <p className="text-xs text-or self-center">{notice}</p>}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4 mb-6 pt-6 border-t border-anthracite">
-            <Field label="Couleur principale">
-              <div className="flex gap-2">
-                <input type="color" value={data.clientPrimaryColor} onChange={e => setData(d => ({...d, clientPrimaryColor: e.target.value}))} className="h-10 w-12 rounded border border-anthracite bg-noir cursor-pointer" />
-                <input type="text" value={data.clientPrimaryColor} onChange={e => setData(d => ({...d, clientPrimaryColor: e.target.value}))} className="form-input flex-1" />
-              </div>
-            </Field>
-            <Field label="Couleur secondaire">
-              <div className="flex gap-2">
-                <input type="color" value={data.clientSecondaryColor} onChange={e => setData(d => ({...d, clientSecondaryColor: e.target.value}))} className="h-10 w-12 rounded border border-anthracite bg-noir cursor-pointer" />
-                <input type="text" value={data.clientSecondaryColor} onChange={e => setData(d => ({...d, clientSecondaryColor: e.target.value}))} className="form-input flex-1" />
-              </div>
-            </Field>
-            <Field label="Police principale">
-              <input
-                list="google-fonts-list"
-                value={data.clientPrimaryFont}
-                onChange={e => setData(d => ({...d, clientPrimaryFont: e.target.value}))}
-                onBlur={e => loadGoogleFont(e.target.value)}
-                placeholder="Ex: Inter, Roboto, Montserrat…"
+                type="date"
+                value={meetingDate}
+                onChange={e => setMeetingDate(e.target.value)}
                 className="form-input"
               />
-              <datalist id="google-fonts-list">
-                {GOOGLE_FONTS.map(f => <option key={f} value={f} />)}
-              </datalist>
-            </Field>
+            </div>
           </div>
+
+          <button type="button" onClick={() => setShowAdvanced(s => !s)} className="text-xs text-gray-500 hover:text-or mb-4 transition">
+            {showAdvanced ? '− Masquer les options avancées' : '+ Options avancées (forcer nom entreprise ou logo)'}
+          </button>
+
+          {showAdvanced && (
+            <div className="mb-6 p-4 bg-noir rounded border border-anthracite fade-in space-y-4">
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Forcer le nom de l'entreprise</label>
+                <input
+                  type="text"
+                  value={overrideCompany}
+                  onChange={e => setOverrideCompany(e.target.value)}
+                  placeholder="Vide = utilise celui détecté par l'IA"
+                  className="form-input"
+                />
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-gray-400 mb-2">Forcer un logo (PNG/JPG/SVG)</label>
+                <input type="file" accept="image/*" onChange={handleLogoUpload} className="form-input" />
+                {overrideLogo && <img src={overrideLogo} alt="" className="mt-2 max-h-12 bg-white p-1 rounded" />}
+                <p className="text-[11px] text-gray-500 mt-1">Vide = utilise le logo extrait automatiquement du site.</p>
+              </div>
+            </div>
+          )}
+
+          {!apiKey && (
+            <div className="mb-6 p-3 bg-rouge/10 border border-rouge/30 rounded text-sm text-rouge">
+              ⚠ Clé API Gemini non configurée. Configure-la d'abord en bas de la page (gratuit, 2 minutes).
+            </div>
+          )}
 
           <div className="flex gap-3 justify-end">
             <button type="button" onClick={onCancel} className="px-5 py-2.5 text-gray-400 hover:text-white transition text-sm">Annuler</button>
-            <button type="submit" className="bg-or text-noir px-6 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
-              Générer la session
+            <button type="submit" disabled={!apiKey || !url.trim() || !dirigeantName.trim()} className="bg-or text-noir px-7 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed">
+              ✦ Générer la session
             </button>
           </div>
         </form>
       );
     };
+
+    // ===== ÉTAPE 2 : PROGRESSION =====
+    const FormStepProgress = ({ step, screenshot, url }) => {
+      const messages = {
+        fetching: { title: 'Récupération du site…', sub: 'Capture d\'écran via Microlink en cours.' },
+        analyzing: { title: 'Analyse de la charte par IA…', sub: 'Gemini extrait les couleurs, polices, style général, ambiance.' },
+      };
+      const m = messages[step];
+      return (
+        <div className="text-center py-12">
+          <div className="inline-flex flex-col items-center">
+            <div className="mb-6 relative">
+              {screenshot
+                ? <img src={screenshot} alt="" className="max-w-md max-h-64 rounded border border-or/30 opacity-80" />
+                : <div className="w-72 h-48 rounded border border-anthracite bg-noir flex items-center justify-center text-gray-500 text-sm">{url || 'www.…'}</div>
+              }
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-noir/60 backdrop-blur px-4 py-2 rounded">
+                  <div className="flex items-center gap-2 text-or text-sm">
+                    <span className="inline-block w-2 h-2 rounded-full bg-or animate-pulse" />
+                    <span className="font-serif uppercase tracking-wider text-xs">{step === 'fetching' ? 'Capture…' : 'IA…'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="text-or font-serif uppercase tracking-[0.18em] text-sm mb-2">{m.title}</p>
+            <p className="text-gray-400 text-sm">{m.sub}</p>
+          </div>
+        </div>
+      );
+    };
+
+    // ===== ÉTAPE 3 : APERÇU DES TOKENS DÉTECTÉS =====
+    const FormStepPreview = ({ screenshot, meta, aiTokens, url, dirigeantName, setDirigeantName, meetingDate, setMeetingDate, overrideCompany, setOverrideCompany, overrideLogo, handleLogoUpload, onConfirm, onRetry, onCancel }) => {
+      const t = aiTokens || {};
+      const detectedLogo = overrideLogo || meta?.logo || '';
+      const detectedName = overrideCompany || t.nomEntreprise || meta?.title || domainNameFromUrl(url);
+      const swatches = [t.couleurPrimaire, t.couleurSecondaire, t.couleurAccent, t.couleurFond, t.couleurFondAlt, t.couleurTexte, t.couleurSucces, t.couleurDanger].filter(Boolean);
+      return (
+        <div className="fade-in">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-1">✓ Charte extraite</h3>
+              <p className="text-gray-400 text-sm">Vérifie le résultat et lance la session — tu pourras saisir les chiffres ensuite.</p>
+            </div>
+            <button onClick={onRetry} className="text-xs text-gray-500 hover:text-or transition">↻ Recommencer</button>
+          </div>
+
+          {/* Aperçu visuel : screenshot + nom détecté */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              {screenshot && <img src={screenshot} alt="" className="rounded border border-anthracite w-full" />}
+              <p className="text-[11px] text-gray-500 mt-1 font-mono truncate">{url}</p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Entreprise détectée</p>
+                <p className="text-white text-xl font-semibold" style={{ fontFamily: t.policePrimaire ? `'${t.policePrimaire}', sans-serif` : 'inherit' }}>{detectedName}</p>
+                {t.tagline && <p className="text-gray-400 text-sm italic mt-1">"{t.tagline}"</p>}
+                {detectedLogo && <img src={detectedLogo} alt="" className="mt-2 max-h-10 bg-white/5 p-1 rounded" />}
+              </div>
+              {(t.secteur || t.tonalite) && (
+                <div className="flex gap-2 flex-wrap">
+                  {t.secteur && <span className="px-2 py-1 bg-noir border border-or/40 rounded text-[11px] text-or uppercase tracking-wider">{t.secteur}</span>}
+                  {t.tonalite && <span className="px-2 py-1 bg-noir border border-anthracite rounded text-[11px] text-gray-300 uppercase tracking-wider">{t.tonalite}</span>}
+                </div>
+              )}
+              {t.styleGeneral && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Style</p>
+                  <p className="text-gray-200 text-sm">{t.styleGeneral}</p>
+                </div>
+              )}
+              {t.ambiance && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Ambiance</p>
+                  <p className="text-gray-300 text-sm italic">{t.ambiance}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Couleurs détectées */}
+          {swatches.length > 0 && (
+            <div className="mb-6 p-4 bg-noir rounded border border-anthracite">
+              <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-3">Palette extraite</p>
+              <div className="flex gap-3 flex-wrap">
+                {swatches.map((c, i) => (
+                  <div key={i} className="flex flex-col items-center gap-1">
+                    <div className="w-12 h-12 rounded border border-white/10" style={{ background: c }} />
+                    <span className="text-[10px] text-gray-400 font-mono">{c}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Métadonnées techniques */}
+          <div className="mb-6 p-4 bg-noir rounded border border-anthracite grid grid-cols-3 gap-4 text-xs">
+            {t.policePrimaire && <Meta label="Police" value={t.policePrimaire + (t.policeSecondaire ? ' · ' + t.policeSecondaire : '')} />}
+            {t.borderRadius && <Meta label="Radius" value={t.borderRadius} />}
+            {t.styleCartes && <Meta label="Cartes" value={t.styleCartes} />}
+            {t.styleBoutons && <Meta label="Boutons" value={t.styleBoutons} />}
+            {t.styleOmbre && <Meta label="Ombre" value={t.styleOmbre} />}
+            {t.espacement && <Meta label="Espacement" value={t.espacement} />}
+            {t.casseTitres && <Meta label="Casse titres" value={t.casseTitres} />}
+            {t.graisseTitres && <Meta label="Graisse" value={t.graisseTitres} />}
+            {t.letterSpacingTitres && <Meta label="Tracking" value={t.letterSpacingTitres} />}
+          </div>
+
+          {/* Champs finaux */}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-or mb-2">Nom du dirigeant *</label>
+              <input type="text" value={dirigeantName} onChange={e => setDirigeantName(e.target.value)} placeholder="ex: Pierre Martin" className="form-input" required />
+            </div>
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-or mb-2">Date du rendez-vous</label>
+              <input type="date" value={meetingDate} onChange={e => setMeetingDate(e.target.value)} className="form-input" />
+            </div>
+          </div>
+
+          <details className="mb-6">
+            <summary className="text-xs text-gray-500 hover:text-or cursor-pointer mb-3">Forcer un autre nom d'entreprise ou logo</summary>
+            <div className="grid grid-cols-2 gap-4 p-3 bg-noir rounded border border-anthracite">
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider text-gray-400 mb-1">Nom entreprise (override)</label>
+                <input type="text" value={overrideCompany} onChange={e => setOverrideCompany(e.target.value)} placeholder={t.nomEntreprise || domainNameFromUrl(url)} className="form-input" />
+              </div>
+              <div>
+                <label className="block text-[11px] uppercase tracking-wider text-gray-400 mb-1">Logo (override)</label>
+                <input type="file" accept="image/*" onChange={handleLogoUpload} className="form-input" />
+              </div>
+            </div>
+          </details>
+
+          <div className="flex gap-3 justify-end">
+            <button type="button" onClick={onCancel} className="px-5 py-2.5 text-gray-400 hover:text-white transition text-sm">Annuler</button>
+            <button type="button" onClick={onConfirm} disabled={!dirigeantName.trim()} className="bg-or text-noir px-7 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed">
+              ✓ Créer la session
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    const Meta = ({ label, value }) => (
+      <div>
+        <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-0.5">{label}</p>
+        <p className="text-gray-200 truncate">{value}</p>
+      </div>
+    );
 
     const Field = ({ label, children }) => (
       <div>
@@ -1148,90 +1149,22 @@
       reader.readAsDataURL(file);
     });
 
-    // ===== EXTRACTION COULEURS DOMINANTES =====
-    // Algo : quantification 5-bit + bucket count, filtrage blanc/noir/gris,
-    // groupe les couleurs proches, retourne top N classées par fréquence × saturation.
-    const fileToImage = (file) => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => resolve({ img, dataUrl: e.target.result });
-        img.onerror = reject;
-        img.src = e.target.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-    const extractDominantColors = async (file, maxColors = 6) => {
-      const { img } = await fileToImage(file);
-      const canvas = document.createElement('canvas');
-      const targetW = 200;
-      const ratio = targetW / img.width;
-      canvas.width = targetW;
-      canvas.height = Math.round(img.height * ratio);
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-      const buckets = {};
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
-        if (a < 200) continue;
-        // Quantize 5-bit per channel
-        const qr = (r >> 3) << 3, qg = (g >> 3) << 3, qb = (b >> 3) << 3;
-        const max = Math.max(qr, qg, qb), min = Math.min(qr, qg, qb);
-        const lum = 0.299*qr + 0.587*qg + 0.114*qb;
-        // Skip near-white, near-black, near-gray
-        if (lum > 245) continue;
-        if (lum < 15) continue;
-        if (max - min < 25) continue;
-        const key = `${qr},${qg},${qb}`;
-        buckets[key] = (buckets[key] || 0) + 1;
-      }
-
-      // Score : frequency × (1 + saturation)
-      const scored = Object.entries(buckets).map(([key, count]) => {
-        const [r,g,b] = key.split(',').map(Number);
-        const max = Math.max(r,g,b), min = Math.min(r,g,b);
-        const sat = max === 0 ? 0 : (max - min) / max;
-        return { key, count, sat, score: count * (1 + sat * 0.5) };
-      });
-      scored.sort((a,b) => b.score - a.score);
-
-      // Merge near-duplicates (distance < 30 in RGB)
-      const final = [];
-      for (const s of scored) {
-        const [r,g,b] = s.key.split(',').map(Number);
-        const close = final.find(f => {
-          const [fr,fg,fb] = f.key.split(',').map(Number);
-          return Math.abs(fr-r) + Math.abs(fg-g) + Math.abs(fb-b) < 60;
-        });
-        if (!close) final.push(s);
-        if (final.length >= maxColors) break;
-      }
-
-      return final.map(s => {
-        const [r,g,b] = s.key.split(',').map(Number);
-        return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
-      });
-    };
-
     // ===== SCREENSHOT URL VIA MICROLINK (gratuit, 50/jour sans clé) =====
+    // Retourne { screenshot: dataUrl, title, description, logo, publisher, author }
     const fetchUrlScreenshot = async (url) => {
-      // Normaliser l'URL
       let target = url.trim();
       if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
 
       const params = new URLSearchParams({
         url: target,
         screenshot: 'true',
-        meta: 'false',
-        'viewport.width': '1280',
-        'viewport.height': '900',
+        meta: 'true',
+        'viewport.width': '1440',
+        'viewport.height': '1024',
         'viewport.deviceScaleFactor': '1',
         waitUntil: 'load',
         'screenshot.type': 'png',
+        'screenshot.fullPage': 'false',
       });
       const apiUrl = `https://api.microlink.io/?${params.toString()}`;
 
@@ -1242,16 +1175,53 @@
       const screenshotUrl = data?.data?.screenshot?.url;
       if (!screenshotUrl) throw new Error('Aucun screenshot retourné par Microlink.');
 
-      // Récupérer l'image et la convertir en dataURL
       const imgResp = await fetch(screenshotUrl);
       if (!imgResp.ok) throw new Error('Impossible de récupérer le screenshot.');
       const blob = await imgResp.blob();
-      return await new Promise((resolve, reject) => {
+      const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
+
+      // Récupérer aussi le logo extrait par Microlink en dataURL si dispo
+      let logoDataUrl = '';
+      const logoUrl = data?.data?.logo?.url;
+      if (logoUrl) {
+        try {
+          const logoResp = await fetch(logoUrl);
+          if (logoResp.ok) {
+            const logoBlob = await logoResp.blob();
+            logoDataUrl = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(logoBlob);
+            });
+          }
+        } catch (e) { /* ignore logo errors */ }
+      }
+
+      return {
+        screenshot: dataUrl,
+        title: data?.data?.title || '',
+        description: data?.data?.description || '',
+        logo: logoDataUrl,
+        publisher: data?.data?.publisher || '',
+        author: data?.data?.author || '',
+      };
+    };
+
+    // Extrait le nom de domaine racine pour fallback companyName
+    const domainNameFromUrl = (url) => {
+      try {
+        let u = url.trim();
+        if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+        const host = new URL(u).hostname.replace(/^www\./, '');
+        const root = host.split('.')[0];
+        return root.charAt(0).toUpperCase() + root.slice(1);
+      } catch { return ''; }
     };
 
     // ===== ANALYSE IA VISION (Google Gemini 2.0 Flash — Free Tier) =====
@@ -1265,13 +1235,18 @@
         return { inline_data: { mime_type: mimeType, data: b64 } };
       });
 
-      const prompt = `Tu es un expert en branding et design system. Analyse précisément ces captures d'écran d'un site d'entreprise (PME française du BTP / menuiserie souvent).
+      const prompt = `Tu es un directeur artistique expert en branding pour PME du BTP / menuiserie françaises. On te donne une ou plusieurs captures d'écran d'un site d'entreprise. Ton job : extraire avec une précision chirurgicale TOUS les tokens visuels du site pour qu'on puisse recréer une page qui ait l'air d'avoir été designée par le même studio que ce site.
 
-Ton objectif : extraire TOUS les tokens de design pour qu'on puisse recréer une page qui ressemble à ce site.
+Le but final : un dirigeant de PME doit voir notre page d'audit et penser "c'est exactement ma boîte, ils ont reconstitué mon site". Donc sois ULTRA fidèle aux captures, ne jamais inventer.
 
-Retourne UN SEUL objet JSON valide au format exact suivant :
+Retourne UN SEUL objet JSON valide au format EXACT suivant (toutes les clés présentes, valeurs typées comme indiqué) :
 
 {
+  "nomEntreprise": "string — nom exact tel qu'écrit dans le logo / header",
+  "tagline": "string — phrase d'accroche visible (max 12 mots, vide si rien)",
+  "secteur": "menuisier | charpentier | cuisiniste | fenetrier | constructeur | renovateur | paysagiste | maconnerie | electricien | plombier | toiture | autre-btp",
+  "tonalite": "haut-de-gamme | artisanal | familial | technique | moderne | corporate | chaleureux",
+
   "couleurPrimaire": "#XXXXXX",
   "couleurSecondaire": "#XXXXXX",
   "couleurAccent": "#XXXXXX",
@@ -1279,34 +1254,73 @@ Retourne UN SEUL objet JSON valide au format exact suivant :
   "couleurFondAlt": "#XXXXXX",
   "couleurTexte": "#XXXXXX",
   "couleurTexteSubtil": "#XXXXXX",
+  "couleurSucces": "#XXXXXX",
+  "couleurDanger": "#XXXXXX",
+  "couleurBordure": "#XXXXXX",
+
   "policePrimaire": "Nom Google Fonts",
   "policeSecondaire": "Nom Google Fonts",
-  "borderRadius": "0px" | "2px" | "4px" | "8px" | "12px" | "16px" | "24px" | "9999px",
-  "styleCartes": "flat" | "shadow" | "bordered" | "elevated",
-  "styleBoutons": "filled" | "outlined" | "pill" | "ghost",
-  "espacement": "tight" | "balanced" | "airy",
-  "casseTitres": "uppercase" | "capitalize" | "none",
-  "graisseTitres": "400" | "500" | "600" | "700" | "800" | "900",
-  "letterSpacingTitres": "normal" | "tight" | "wide" | "extra-wide",
-  "styleGeneral": "modèle court ex: moderne industriel, premium classique, minimaliste, traditionnel artisanal",
-  "ambiance": "phrase courte décrivant l'identité visuelle (max 15 mots)"
+  "echelleTitres": "compact | normal | large | massive",
+
+  "borderRadius": "0px | 2px | 4px | 6px | 8px | 12px | 16px | 24px | 9999px",
+  "styleCartes": "flat | shadow | bordered | elevated",
+  "styleBoutons": "filled | outlined | pill | ghost",
+  "styleOmbre": "none | soft | medium | strong",
+  "styleSeparateur": "none | thin | medium | thick | double | gradient",
+  "styleInputs": "underline | filled | bordered | rounded",
+  "styleIcones": "rounded | square | arrow | minimal | ornament",
+
+  "espacement": "tight | balanced | airy",
+  "casseTitres": "uppercase | capitalize | none",
+  "graisseTitres": "400 | 500 | 600 | 700 | 800 | 900",
+  "letterSpacingTitres": "tight | normal | wide | extra-wide",
+  "letterSpacingLabels": "normal | wide | extra-wide",
+
+  "bandeauStyle": "flat | gradient | photo | pattern",
+  "bandeauGradient": "string CSS gradient (vide si pas de gradient observé)",
+  "hoverEffect": "underline | lift | color | opacity | scale",
+  "presenceDecorative": "none | lines | ornaments | shapes",
+
+  "ctaTexte": "string — texte exact d'un CTA observé (ex: 'Demander un devis', 'Nous contacter')",
+  "motsClesMetier": ["string", "string"],
+
+  "styleGeneral": "phrase 3-5 mots ex: 'moderne industriel', 'premium classique haut-de-gamme', 'minimaliste artisanal'",
+  "ambiance": "phrase courte décrivant l'identité visuelle (max 15 mots, comme un brief créatif)"
 }
 
 Règles strictes :
-- Couleurs en HEX 6 chiffres, fidèles aux captures
-- couleurFond = couleur dominante de fond de page (souvent blanc / blanc cassé / gris très clair)
-- couleurFondAlt = couleur de fond secondaire (sections alternées)
-- couleurTexte = couleur principale du corps de texte (souvent gris foncé / noir)
-- couleurTexteSubtil = couleur des métadonnées (souvent gris moyen)
-- Polices : noms Google Fonts exacts, sinon le plus proche
-- borderRadius : observe les angles des boutons et cartes
-- styleCartes : flat (sans ombre), shadow (ombre douce), bordered (bordure fine), elevated (ombre forte)
-- styleBoutons : filled (fond plein), outlined (bordure + texte), pill (très arrondi), ghost (texte seul)
-- espacement : tight (compact), balanced (standard), airy (généreux, beaucoup de blanc)
-- casseTitres : observe les titres principaux (CAPITALES, Capitalisé Normal, ou pas)
-- graisseTitres : observe l'épaisseur des titres
-- letterSpacingTitres : tight (lettres serrées), normal, wide (légèrement espacé), extra-wide (très espacé)
-- Sois précis et fidèle aux captures, jamais inventer.`;
+- TOUTES les clés doivent être présentes. Si une info manque, mets une valeur cohérente déduite (ex: couleurSucces déduite de la palette : un vert qui s'harmonise).
+- Couleurs en HEX 6 chiffres FIDÈLES aux pixels du screenshot.
+- couleurFond = couleur réelle du fond de page principal (souvent blanc / blanc cassé / gris très clair / parfois sombre).
+- couleurFondAlt = couleur de fond secondaire visible (sections alternées, cartes).
+- couleurTexte = couleur RÉELLE du corps de texte (souvent gris foncé / noir / parfois beige sur fond sombre).
+- couleurTexteSubtil = couleur des métadonnées et labels secondaires.
+- couleurSucces = si on observe un vert sur le site, l'utiliser. Sinon, choisir un vert qui s'harmonise avec la primaire.
+- couleurDanger = si on observe un rouge/orange d'alerte, l'utiliser. Sinon un rouge qui s'harmonise (souvent #B91C1C ou un rouge brique).
+- couleurBordure = couleur des bordures fines observées (souvent gris clair ou teinte primaire diluée).
+- Polices : noms Google Fonts EXACTS si reconnaissable. Sinon la plus proche (Inter pour sans-serif neutre, Playfair Display pour serif élégant, Cinzel pour serif majuscule, Montserrat pour sans-serif moderne).
+- borderRadius : observe les angles des boutons ET des cartes. Si le site est très anguleux → 0px ou 2px. Très arrondi → 12px+. Pill → 9999px.
+- styleCartes : flat (sans ombre ni bordure), shadow (ombre douce diffuse), bordered (bordure fine visible), elevated (ombre marquée comme un float).
+- styleBoutons : filled (fond plein coloré), outlined (juste bordure + texte coloré), pill (très arrondi), ghost (texte seul sans fond ni bordure).
+- styleOmbre : intensité globale des ombres (none/soft/medium/strong).
+- styleSeparateur : style des lignes de séparation entre sections (none/thin 1px/medium 2px/thick 3-4px/double/gradient).
+- styleInputs : style des champs de formulaire observés.
+- styleIcones : forme des icônes et puces (rounded/square/arrow flèches/minimal/ornament décoratif).
+- espacement : tight (compact, dense), balanced (standard), airy (beaucoup de blanc respiration).
+- casseTitres : CAPITALES partout, Capitalize chaque mot, ou casse normale.
+- graisseTitres : épaisseur réelle des titres.
+- letterSpacingTitres : tight (serré), normal, wide, extra-wide (très espacé style luxe).
+- letterSpacingLabels : pour les petits labels en majuscules.
+- bandeauStyle : style du bandeau header (flat uni, gradient, avec photo de fond, pattern).
+- bandeauGradient : CSS valide ex: 'linear-gradient(135deg, #1E5F8E 0%, #0D3C5A 100%)' SI on observe un gradient. Sinon chaîne vide.
+- hoverEffect : effet observé au survol des liens (underline, lift élévation, color change, opacity, scale).
+- presenceDecorative : ornements visibles (none, lines fines, ornaments serif, shapes géométriques).
+- motsClesMetier : 2-4 mots-clés métier vus sur le site (ex: ["fenêtres PVC", "rénovation", "sur mesure"]).
+- nomEntreprise : exactement comme écrit dans le logo (respecte la casse).
+- tagline : la phrase juste sous le logo ou en hero. Vide si rien d'évident.
+- ctaTexte : le bouton d'action principal vu sur le site.
+
+Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend.`;
 
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
       const response = await fetch(endpoint, {
@@ -1318,8 +1332,8 @@ Règles strictes :
           }],
           generationConfig: {
             response_mime_type: 'application/json',
-            temperature: 0.2,
-            max_output_tokens: 2048,
+            temperature: 0.15,
+            max_output_tokens: 4096,
           },
         }),
       });
@@ -1359,32 +1373,6 @@ Règles strictes :
       document.head.appendChild(link);
     };
 
-    const extractFromMultiple = async (files, maxColors = 6) => {
-      const allColors = [];
-      for (const f of files) {
-        try {
-          const cols = await extractDominantColors(f, maxColors);
-          allColors.push(...cols);
-        } catch (e) { console.warn('Color extraction failed', e); }
-      }
-      // Aggregate : count occurrences across screenshots
-      const counts = {};
-      allColors.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
-      // Merge near-duplicates again across screenshots
-      const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
-      const final = [];
-      for (const [hex] of sorted) {
-        const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
-        const close = final.find(f => {
-          const fr = parseInt(f.slice(1,3),16), fg = parseInt(f.slice(3,5),16), fb = parseInt(f.slice(5,7),16);
-          return Math.abs(fr-r) + Math.abs(fg-g) + Math.abs(fb-b) < 60;
-        });
-        if (!close) final.push(hex);
-        if (final.length >= maxColors) break;
-      }
-      return final;
-    };
-
     // ============================================================
     // SESSION PAGE
     // ============================================================
@@ -1399,10 +1387,13 @@ Règles strictes :
 
       // Apply client font dynamically
       useEffect(() => {
-        if (session?.clientPrimaryFont && session.clientPrimaryFont !== 'Inter') {
+        if (session?.clientPrimaryFont) {
+          loadGoogleFont(session.clientPrimaryFont);
           const link = document.getElementById('client-fonts');
-          link.href = `https://fonts.googleapis.com/css2?family=${session.clientPrimaryFont.replace(/\s+/g,'+')}:wght@400;500;600;700&display=swap`;
+          const fams = [session.clientPrimaryFont, session.clientSecondaryFont].filter(Boolean).filter((f, i, a) => a.indexOf(f) === i);
+          link.href = 'https://fonts.googleapis.com/css2?' + fams.map(f => `family=${f.replace(/\s+/g,'+')}:wght@400;500;600;700;800`).join('&') + '&display=swap';
         }
+        if (session?.clientSecondaryFont) loadGoogleFont(session.clientSecondaryFont);
         if (session) {
           document.documentElement.style.setProperty('--client-primary', session.clientPrimaryColor);
           document.documentElement.style.setProperty('--client-secondary', session.clientSecondaryColor);
@@ -1485,36 +1476,83 @@ Règles strictes :
     // ===== DESIGN TOKENS depuis session =====
     const computeTokens = (session) => {
       const lsMap = { tight: '-0.01em', normal: '0', wide: '0.05em', 'extra-wide': '0.15em' };
-      const spacingMap = { tight: { sectionGap: '24px', cardPadding: '20px', maxWidth: '1000px' }, balanced: { sectionGap: '40px', cardPadding: '32px', maxWidth: '1100px' }, airy: { sectionGap: '64px', cardPadding: '48px', maxWidth: '1200px' } };
+      const lsLabelMap = { normal: '0.06em', wide: '0.1em', 'extra-wide': '0.2em' };
+      const spacingMap = {
+        tight:    { sectionGap: '24px', cardPadding: '20px', maxWidth: '1000px', rowGap: '8px' },
+        balanced: { sectionGap: '40px', cardPadding: '32px', maxWidth: '1100px', rowGap: '12px' },
+        airy:     { sectionGap: '64px', cardPadding: '48px', maxWidth: '1200px', rowGap: '20px' },
+      };
+      const titleScaleMap = {
+        compact: { h1: '24px', h2: '14px', big: '36px', huge: '52px' },
+        normal:  { h1: '28px', h2: '16px', big: '40px', huge: '64px' },
+        large:   { h1: '34px', h2: '18px', big: '48px', huge: '76px' },
+        massive: { h1: '42px', h2: '22px', big: '60px', huge: '92px' },
+      };
+      const shadowMap = {
+        none:   { card: 'none', cardElev: '0 1px 3px rgba(0,0,0,0.04)', float: '0 2px 6px rgba(0,0,0,0.06)' },
+        soft:   { card: '0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04)', cardElev: '0 4px 12px rgba(0,0,0,0.08)', float: '0 6px 20px rgba(0,0,0,0.10)' },
+        medium: { card: '0 2px 6px rgba(0,0,0,0.10), 0 6px 16px rgba(0,0,0,0.06)', cardElev: '0 8px 24px rgba(0,0,0,0.10)', float: '0 12px 32px rgba(0,0,0,0.14)' },
+        strong: { card: '0 4px 12px rgba(0,0,0,0.14), 0 12px 28px rgba(0,0,0,0.10)', cardElev: '0 16px 40px rgba(0,0,0,0.16)', float: '0 24px 56px rgba(0,0,0,0.22)' },
+      };
+      const separatorMap = {
+        none:     { width: 0, style: 'none' },
+        thin:     { width: 1, style: 'solid' },
+        medium:   { width: 2, style: 'solid' },
+        thick:    { width: 3, style: 'solid' },
+        double:   { width: 3, style: 'double' },
+        gradient: { width: 1, style: 'solid' },
+      };
       const sp = spacingMap[session.clientSpacing] || spacingMap.balanced;
+      const ts = titleScaleMap[session.clientTitleScale] || titleScaleMap.normal;
+      const shadows = shadowMap[session.clientShadowStyle] || shadowMap.soft;
+      const sep = separatorMap[session.clientSeparatorStyle] || separatorMap.thin;
+      const primary = session.clientPrimaryColor || '#1E5F8E';
+      const border = session.clientBorderColor || lightenHex(primary, 0.85);
       return {
-        primary: session.clientPrimaryColor || '#1E5F8E',
+        primary,
         secondary: session.clientSecondaryColor || '#888888',
-        accent: session.clientAccentColor || session.clientPrimaryColor || '#1E5F8E',
+        accent: session.clientAccentColor || primary,
         bg: session.clientBgColor || '#FAFAFA',
         bgAlt: session.clientBgAltColor || '#FFFFFF',
         text: session.clientTextColor || '#1A1A1A',
         mutedText: session.clientMutedTextColor || '#666666',
+        success: session.clientSuccessColor || '#3A8A3A',
+        danger: session.clientDangerColor || '#B91C1C',
+        border,
         font: session.clientPrimaryFont || 'Inter',
         headingFont: session.clientSecondaryFont || session.clientPrimaryFont || 'Inter',
         radius: session.clientBorderRadius || '4px',
         cardStyle: session.clientCardStyle || 'flat',
         buttonStyle: session.clientButtonStyle || 'filled',
+        inputStyle: session.clientInputStyle || 'bordered',
+        iconStyle: session.clientIconStyle || 'minimal',
+        shadows,
+        sep,
         titleCase: session.clientTitleCase || 'none',
         titleWeight: session.clientTitleWeight || '700',
         titleLetterSpacing: lsMap[session.clientTitleLetterSpacing] || '0',
+        labelLetterSpacing: lsLabelMap[session.clientLabelLetterSpacing] || '0.1em',
+        bandeauStyle: session.clientBandeauStyle || 'flat',
+        bandeauGradient: session.clientBandeauGradient || '',
+        decorative: session.clientDecorative || 'none',
+        sizes: ts,
         sectionGap: sp.sectionGap,
         cardPadding: sp.cardPadding,
         maxWidth: sp.maxWidth,
-        primaryLight: lightenHex(session.clientPrimaryColor || '#1E5F8E', 0.92),
+        rowGap: sp.rowGap,
+        primaryLight: lightenHex(primary, 0.92),
+        primaryFaint: lightenHex(primary, 0.96),
+        tagline: session.clientTagline || '',
+        secteur: session.clientSecteur || '',
+        cta: session.clientCtaTexte || '',
       };
     };
 
     const cardCSS = (tokens) => {
       const base = { background: tokens.bgAlt, borderRadius: tokens.radius, padding: tokens.cardPadding };
-      if (tokens.cardStyle === 'shadow') return { ...base, boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)' };
-      if (tokens.cardStyle === 'bordered') return { ...base, border: `1px solid ${tokens.primaryLight}` };
-      if (tokens.cardStyle === 'elevated') return { ...base, boxShadow: '0 4px 16px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06)' };
+      if (tokens.cardStyle === 'shadow') return { ...base, boxShadow: tokens.shadows.card };
+      if (tokens.cardStyle === 'bordered') return { ...base, border: `1px solid ${tokens.border}` };
+      if (tokens.cardStyle === 'elevated') return { ...base, boxShadow: tokens.shadows.cardElev };
       return base; // flat
     };
 
@@ -1527,41 +1565,88 @@ Règles strictes :
       return base;
     };
 
-    const titleCSS = (tokens) => ({
+    const titleCSS = (tokens, sizeKey) => ({
       fontFamily: `'${tokens.headingFont}', sans-serif`,
       fontWeight: tokens.titleWeight,
       letterSpacing: tokens.titleLetterSpacing,
       textTransform: tokens.titleCase === 'uppercase' ? 'uppercase' : tokens.titleCase === 'capitalize' ? 'capitalize' : 'none',
       color: tokens.text,
+      ...(sizeKey ? { fontSize: tokens.sizes[sizeKey] } : {}),
     });
+
+    const labelCSS = (tokens) => ({
+      fontSize: '11px',
+      textTransform: 'uppercase',
+      letterSpacing: tokens.labelLetterSpacing,
+      color: tokens.mutedText,
+      fontFamily: `'${tokens.font}', sans-serif`,
+    });
+
+    const separatorCSS = (tokens, color) => {
+      const c = color || tokens.border;
+      if (tokens.sep.style === 'none') return { borderTop: 'none' };
+      return { borderTop: `${tokens.sep.width}px ${tokens.sep.style} ${c}` };
+    };
+
+    const bandeauCSS = (tokens) => {
+      if (tokens.bandeauStyle === 'gradient') {
+        return { background: tokens.bandeauGradient || `linear-gradient(135deg, ${tokens.primary} 0%, ${lightenHex(tokens.primary, -0.2)} 100%)`, color: tokens.bgAlt };
+      }
+      if (tokens.bandeauStyle === 'pattern') {
+        return { background: tokens.bgAlt, backgroundImage: `radial-gradient(${tokens.primaryLight} 1px, transparent 1px)`, backgroundSize: '24px 24px' };
+      }
+      return { background: tokens.bgAlt };
+    };
+
+    const inputCSS = (tokens) => {
+      const common = { width: '100%', fontSize: '16px', fontWeight: 600, color: tokens.text, fontVariantNumeric: 'tabular-nums', fontFamily: `'${tokens.font}', sans-serif`, outline: 'none', transition: 'border-color 0.15s, background 0.15s', padding: '10px 12px' };
+      if (tokens.inputStyle === 'underline') return { ...common, background: 'transparent', border: 'none', borderBottom: `2px solid ${tokens.border}`, borderRadius: 0, padding: '8px 4px' };
+      if (tokens.inputStyle === 'filled')    return { ...common, background: tokens.primaryFaint, border: `1px solid transparent`, borderRadius: tokens.radius };
+      if (tokens.inputStyle === 'rounded')   return { ...common, background: tokens.bgAlt, border: `1.5px solid ${tokens.border}`, borderRadius: '9999px', padding: '10px 18px' };
+      return { ...common, background: tokens.bgAlt, border: `1.5px solid ${tokens.border}`, borderRadius: tokens.radius };
+    };
 
     const ModePertes = ({ session, updateInputs, updateCauses, updateMarketOverride, marketRates }) => {
       const [expanded, setExpanded] = useState(false);
       const losses = useMemo(() => calcLosses(session.inputs, marketRates), [session.inputs, marketRates]);
       const allFilled = ['leadsRecus','rdvPris','signatures','ticket'].every(k => +session.inputs[k] > 0);
       const t = computeTokens(session);
+      const bandeau = bandeauCSS(t);
+      const isBandeauColored = t.bandeauStyle === 'gradient';
 
       return (
         <div style={{ background: t.bg, color: t.text, minHeight: '100vh', fontFamily: `'${t.font}', Inter, sans-serif` }}>
-          <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `40px ${parseInt(t.cardPadding)*1.2}px` }}>
-            {/* Header */}
-            <div className="flex items-start justify-between pb-6" style={{ borderBottom: `1px solid ${t.primaryLight}`, marginBottom: t.sectionGap }}>
-              <div className="flex items-center gap-5">
+          {/* === BANDEAU PROSPECT === */}
+          <div style={{ ...bandeau, padding: `${parseInt(t.cardPadding)}px ${parseInt(t.cardPadding)*1.2}px ${parseInt(t.cardPadding)*0.8}px` }}>
+            <div style={{ maxWidth: t.maxWidth, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 {session.clientLogoUrl
-                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '80px', maxWidth: '220px', objectFit: 'contain' }} />
-                  : <div style={{ fontSize: '32px', fontWeight: t.titleWeight, color: t.primary, ...titleCSS(t) }}>{session.companyName.substring(0,2).toUpperCase()}</div>
+                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '72px', maxWidth: '220px', objectFit: 'contain', filter: isBandeauColored ? 'brightness(0) invert(1)' : 'none' }} />
+                  : <div style={{ ...titleCSS(t, 'h1'), fontSize: '40px', color: isBandeauColored ? t.bgAlt : t.primary }}>{session.companyName.substring(0,2).toUpperCase()}</div>
                 }
                 <div>
-                  <h1 style={{ ...titleCSS(t), color: t.primary, fontSize: '24px', margin: 0 }}>{session.companyName}</h1>
-                  <p style={{ color: t.mutedText, fontSize: '13px', marginTop: '4px' }}>Audit personnalisé</p>
+                  <h1 style={{ ...titleCSS(t, 'h1'), color: isBandeauColored ? t.bgAlt : t.primary, margin: 0, lineHeight: 1.1 }}>{session.companyName}</h1>
+                  {t.tagline
+                    ? <p style={{ color: isBandeauColored ? 'rgba(255,255,255,0.85)' : t.mutedText, fontSize: '14px', marginTop: '6px', fontStyle: 'italic' }}>{t.tagline}</p>
+                    : <p style={{ ...labelCSS(t), color: isBandeauColored ? 'rgba(255,255,255,0.7)' : t.mutedText, marginTop: '6px' }}>Audit personnalisé — Système ROI</p>
+                  }
                 </div>
               </div>
-              <div style={{ textAlign: 'right', color: t.mutedText, fontSize: '13px' }}>
-                <p>{session.dirigeantName}</p>
-                <p>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
+              <div style={{ textAlign: 'right', color: isBandeauColored ? 'rgba(255,255,255,0.9)' : t.mutedText, fontSize: '13px' }}>
+                <p style={{ margin: 0, fontWeight: 600 }}>{session.dirigeantName}</p>
+                <p style={{ margin: '2px 0 0', fontSize: '12px', opacity: 0.85 }}>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
               </div>
             </div>
+          </div>
 
+          {/* === Décor sous le bandeau === */}
+          {t.decorative !== 'none' && (
+            <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `0 ${parseInt(t.cardPadding)*1.2}px` }}>
+              <div style={{ marginTop: '8px', height: '4px', background: `linear-gradient(90deg, ${t.primary} 0%, ${t.accent} 100%)`, borderRadius: '2px', opacity: 0.6 }} />
+            </div>
+          )}
+
+          <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `${t.sectionGap} ${parseInt(t.cardPadding)*1.2}px` }}>
             {/* Inputs panel */}
             <InputsPanel session={session} updateInputs={updateInputs} t={t} />
 
@@ -1584,31 +1669,19 @@ Règles strictes :
     };
 
     const InputsPanel = ({ session, updateInputs, t }) => {
+      const baseInputStyle = inputCSS(t);
       const Input = ({ k, label, suffix = '' }) => (
         <div>
-          <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: t.mutedText, marginBottom: '4px' }}>{label}</label>
+          <label style={{ ...labelCSS(t), display: 'block', marginBottom: '4px' }}>{label}</label>
           <div style={{ position: 'relative' }}>
             <input
               type="number"
               value={session.inputs[k] ?? ''}
               onChange={e => updateInputs({ [k]: e.target.value })}
               placeholder="0"
-              style={{
-                width: '100%',
-                background: t.bgAlt,
-                border: `1.5px solid ${t.primaryLight}`,
-                borderRadius: t.radius,
-                padding: '10px 12px',
-                fontSize: '16px',
-                fontWeight: 600,
-                color: t.text,
-                fontVariantNumeric: 'tabular-nums',
-                fontFamily: `'${t.font}', sans-serif`,
-                outline: 'none',
-                transition: 'border-color 0.15s',
-              }}
-              onFocus={e => e.target.style.borderColor = t.primary}
-              onBlur={e => e.target.style.borderColor = t.primaryLight}
+              style={baseInputStyle}
+              onFocus={e => { if (t.inputStyle !== 'underline') e.target.style.borderColor = t.primary; else e.target.style.borderBottomColor = t.primary; }}
+              onBlur={e => { if (t.inputStyle !== 'underline') e.target.style.borderColor = t.border; else e.target.style.borderBottomColor = t.border; }}
             />
             {suffix && <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: t.mutedText, fontSize: '13px' }}>{suffix}</span>}
           </div>
@@ -1630,18 +1703,18 @@ Règles strictes :
     const ActivityBlock = ({ session, losses, expanded, setExpanded, t }) => {
       const i = session.inputs;
       const Row = ({ label, value, isTotal = false }) => (
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', ...separatorCSS(t, t.border), borderBottomWidth: 0, borderTopWidth: '1px' }}>
           <span style={{ color: isTotal ? t.text : t.mutedText, fontSize: isTotal ? '15px' : '14px', fontWeight: isTotal ? 600 : 400 }}>{label}</span>
-          <span style={{ color: isTotal ? t.primary : t.text, fontSize: isTotal ? '24px' : '16px', fontWeight: isTotal ? 700 : 600, fontVariantNumeric: 'tabular-nums', fontFamily: `'${t.font}', sans-serif` }}>{value}</span>
+          <span style={{ color: isTotal ? t.primary : t.text, fontSize: isTotal ? t.sizes.h1 : '16px', fontWeight: isTotal ? 700 : 600, fontVariantNumeric: 'tabular-nums', fontFamily: `'${t.font}', sans-serif` }}>{value}</span>
         </div>
       );
       return (
         <div style={cardCSS(t)}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <h2 style={{ ...titleCSS(t), fontSize: '16px', margin: 0 }}>Votre activité commerciale</h2>
+            <h2 style={{ ...titleCSS(t, 'h2'), margin: 0 }}>Votre activité commerciale</h2>
             <button
               onClick={() => setExpanded(e => !e)}
-              style={{ width: '44px', height: '44px', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.bgAlt, fontWeight: 'bold', background: t.primary, border: 'none', cursor: 'pointer', fontSize: '18px', transition: 'transform 0.15s' }}
+              style={{ width: '44px', height: '44px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.bgAlt, fontWeight: 'bold', background: t.primary, border: 'none', cursor: 'pointer', fontSize: '18px', transition: 'transform 0.15s', boxShadow: t.shadows.float }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
               title="Comparer au marché"
@@ -1658,7 +1731,7 @@ Règles strictes :
             <Row label="Ticket moyen" value={formatEUR(+i.ticket)} />
             <Row label="Devis dormants" value={formatNumber(+i.devisDormants)} />
           </div>
-          <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: `2px solid ${t.primaryLight}` }}>
+          <div style={{ marginTop: '20px', paddingTop: '20px', ...separatorCSS(t, t.primary), borderTopWidth: Math.max(2, t.sep.width) + 'px' }}>
             <Row label="CA actuel" value={`${formatEUR(losses.caActuel)} /mois`} isTotal />
           </div>
         </div>
@@ -1669,13 +1742,13 @@ Règles strictes :
       const stepsOrder = ['leadTraite', 'leadRdv', 'rdvHonore', 'devisSignature'];
       return (
         <div style={{ ...cardCSS(t), marginTop: '24px' }}>
-          <h2 style={{ ...titleCSS(t), fontSize: '16px', margin: '0 0 24px 0' }}>Comparaison avec le marché</h2>
+          <h2 style={{ ...titleCSS(t, 'h2'), margin: '0 0 24px 0' }}>Comparaison avec le marché</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {stepsOrder.map(key => (
               <ComparisonRow key={key} stepKey={key} step={losses.steps[key]} cause={session.causes[key]} updateCause={(v) => updateCauses({ [key]: v })} updateMarketOverride={(v) => updateMarketOverride(key, v)} t={t} />
             ))}
           </div>
-          <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: `1px solid ${t.primaryLight}` }}>
+          <div style={{ marginTop: '32px', paddingTop: '32px', ...separatorCSS(t, t.border) }}>
             <ComparisonRow stepKey="devisDormants" step={losses.steps.devisDormants} cause={session.causes.devisDormants} updateCause={(v) => updateCauses({ devisDormants: v })} updateMarketOverride={(v) => updateMarketOverride('devisDormants', v)} t={t} isOneShot />
           </div>
         </div>
@@ -1687,23 +1760,24 @@ Règles strictes :
       const [editingMarket, setEditingMarket] = useState(false);
       const [marketDraft, setMarketDraft] = useState(Math.round(step.marketRate * 100));
       const source = SOURCES[stepKey];
+      const dangerLight = lightenHex(t.danger, 0.85);
 
       return (
         <div style={{ paddingLeft: '16px', borderLeft: `3px solid ${t.primary}` }}>
-          <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: t.mutedText, marginBottom: '4px' }}>{STEP_LABELS[stepKey]}</p>
+          <p style={{ ...labelCSS(t), marginBottom: '4px' }}>{STEP_LABELS[stepKey]}</p>
           <p style={{ color: t.text, fontSize: '17px', fontWeight: 600, lineHeight: 1.5, fontFamily: `'${t.font}', sans-serif` }}>
             Vous : <span style={{ color: t.primary, fontVariantNumeric: 'tabular-nums' }}>{formatPct(step.prospectRate)}</span>
             <span style={{ color: t.mutedText, margin: '0 8px' }}>→</span>
             Marché : {editingMarket ? (
-              <input type="number" autoFocus value={marketDraft} onChange={e => setMarketDraft(e.target.value)} onBlur={() => { updateMarketOverride(Math.max(0, Math.min(100, +marketDraft))/100); setEditingMarket(false); }} onKeyDown={e => e.key === 'Enter' && e.target.blur()} style={{ width: '64px', borderBottom: `2px solid ${t.primary}`, padding: '0 4px', textAlign: 'center', fontVariantNumeric: 'tabular-nums', background: 'transparent', color: t.text, border: 'none', borderBottom: `2px solid ${t.primary}`, outline: 'none' }} />
+              <input type="number" autoFocus value={marketDraft} onChange={e => setMarketDraft(e.target.value)} onBlur={() => { updateMarketOverride(Math.max(0, Math.min(100, +marketDraft))/100); setEditingMarket(false); }} onKeyDown={e => e.key === 'Enter' && e.target.blur()} style={{ width: '64px', padding: '0 4px', textAlign: 'center', fontVariantNumeric: 'tabular-nums', background: 'transparent', color: t.text, border: 'none', borderBottom: `2px solid ${t.primary}`, outline: 'none' }} />
             ) : (
               <span style={{ fontVariantNumeric: 'tabular-nums', cursor: 'pointer' }} onClick={() => { setMarketDraft(Math.round(step.marketRate*100)); setEditingMarket(true); }}>{formatPct(step.marketRate)} <span style={{ fontSize: '12px', opacity: 0.4 }}>✎</span></span>
             )}
             {step.atMarket
-              ? <span style={{ marginLeft: '12px', color: '#3A8A3A', fontSize: '14px', fontWeight: 600 }}>✓ Au niveau du marché</span>
+              ? <span style={{ marginLeft: '12px', color: t.success, fontSize: '14px', fontWeight: 600 }}>✓ Au niveau du marché</span>
               : <>
                   <span style={{ color: t.mutedText, margin: '0 8px' }}>→</span>
-                  <span style={{ color: '#8B1A1A', fontVariantNumeric: 'tabular-nums' }}>-{formatPct(step.delta)}</span>
+                  <span style={{ color: t.danger, fontVariantNumeric: 'tabular-nums' }}>-{formatPct(step.delta)}</span>
                   <span style={{ color: t.mutedText, margin: '0 8px' }}>→</span>
                   <span style={{ color: t.text, fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>-{formatEUR(step.loss)}{!isOneShot && '/mois'}</span>
                   {isOneShot && <span style={{ marginLeft: '8px', fontSize: '14px', color: t.mutedText, fontStyle: 'italic' }}>(one-shot)</span>}
@@ -1714,9 +1788,9 @@ Règles strictes :
             ↳ Source : {source.name} <a href={source.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: t.mutedText }}>[voir l'étude ↗]</a>
           </p>
           {editingCause ? (
-            <textarea autoFocus defaultValue={cause} onBlur={(e) => { updateCause(e.target.value); setEditingCause(false); }} style={{ width: '100%', marginTop: '4px', padding: '4px 8px', fontSize: '13px', fontStyle: 'italic', color: '#8B1A1A', border: '1px solid rgba(139,26,26,0.3)', borderRadius: t.radius, resize: 'none', background: t.bgAlt, fontFamily: `'${t.font}', sans-serif` }} rows={2} />
+            <textarea autoFocus defaultValue={cause} onBlur={(e) => { updateCause(e.target.value); setEditingCause(false); }} style={{ width: '100%', marginTop: '4px', padding: '4px 8px', fontSize: '13px', fontStyle: 'italic', color: t.danger, border: `1px solid ${dangerLight}`, borderRadius: t.radius, resize: 'none', background: t.bgAlt, fontFamily: `'${t.font}', sans-serif` }} rows={2} />
           ) : (
-            <p style={{ fontSize: '13px', fontStyle: 'italic', marginTop: '4px', color: '#8B1A1A', cursor: 'pointer', padding: '2px 4px', borderRadius: t.radius }} onClick={() => setEditingCause(true)} title="Cliquer pour éditer">
+            <p style={{ fontSize: '13px', fontStyle: 'italic', marginTop: '4px', color: t.danger, cursor: 'pointer', padding: '2px 4px', borderRadius: t.radius }} onClick={() => setEditingCause(true)} title="Cliquer pour éditer">
               ↳ Cause : {cause}
             </p>
           )}
@@ -1732,40 +1806,40 @@ Règles strictes :
         <div style={{ ...cardCSS(t), marginTop: t.sectionGap }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
             <div>
-              <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: t.mutedText, marginBottom: '8px' }}>Perte mensuelle récurrente</p>
-              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: '40px', color: t.primary, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatEUR(losses.monthly)}<span style={{ fontSize: '16px', color: t.mutedText, fontWeight: 400 }}> /mois</span></p>
+              <p style={{ ...labelCSS(t), marginBottom: '8px' }}>Perte mensuelle récurrente</p>
+              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.big, color: t.danger, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>-{formatEUR(losses.monthly)}<span style={{ fontSize: '16px', color: t.mutedText, fontWeight: 400 }}> /mois</span></p>
             </div>
             <div>
-              <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: t.mutedText, marginBottom: '8px' }}>One-shot devis dormants</p>
-              <p style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: '30px', color: t.text, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatEUR(losses.oneShot)}</p>
+              <p style={{ ...labelCSS(t), marginBottom: '8px' }}>One-shot devis dormants</p>
+              <p style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.h1, color: t.text, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatEUR(losses.oneShot)}</p>
             </div>
           </div>
 
-          <div style={{ paddingTop: '24px', borderTop: `1px solid ${t.primaryLight}` }}>
-            <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.22em', color: t.mutedText, marginBottom: '16px' }}>CA actuel vs CA potentiel</p>
+          <div style={{ paddingTop: '24px', ...separatorCSS(t, t.border) }}>
+            <p style={{ ...labelCSS(t), marginBottom: '16px' }}>CA actuel vs CA potentiel</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
                   <span style={{ color: t.mutedText }}>Actuel</span>
                   <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.text }}>{formatEUR(losses.caActuel)}</span>
                 </div>
-                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.primaryLight}` }}>
+                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.border}` }}>
                   <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: actuelBarWidth + '%', background: t.primary, opacity: 0.4 }} />
                 </div>
               </div>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
-                  <span style={{ fontWeight: 600, color: t.primary }}>Potentiel</span>
-                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.primary }}>{formatEUR(losses.caPotentielMensuel)}</span>
+                  <span style={{ fontWeight: 600, color: t.success }}>Potentiel</span>
+                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.success }}>{formatEUR(losses.caPotentielMensuel)}</span>
                 </div>
-                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.primaryLight}` }}>
-                  <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: '100%', background: t.primary }} />
+                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.border}` }}>
+                  <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: '100%', background: `linear-gradient(90deg, ${t.primary} 0%, ${t.success} 100%)` }} />
                 </div>
               </div>
             </div>
             <div style={{ marginTop: '32px', textAlign: 'center' }}>
-              <p style={{ fontSize: '13px', color: t.mutedText, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Vous laissez sur la table chaque mois</p>
-              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: '64px', color: t.primary, lineHeight: 1, letterSpacing: '-0.03em', fontFamily: `'${t.font}', sans-serif` }}>{formatEUR(losses.monthly)}</p>
+              <p style={{ fontSize: '13px', color: t.mutedText, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing, marginBottom: '8px' }}>Vous laissez sur la table chaque mois</p>
+              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.huge, color: t.danger, lineHeight: 1, letterSpacing: '-0.03em', fontFamily: `'${t.font}', sans-serif` }}>{formatEUR(losses.monthly)}</p>
               {ratio > 0 && <p style={{ fontSize: '16px', color: t.mutedText, marginTop: '8px' }}>= {ratio.toFixed(2).replace('.', ',')}× votre CA actuel</p>}
             </div>
           </div>
@@ -1780,14 +1854,14 @@ Règles strictes :
         { num: '03', title: 'Reprendre le contrôle\npar la donnée', desc: 'Voir en temps réel ce qui marche, ce qui fuit, où agir' },
       ];
       return (
-        <div style={{ marginTop: t.sectionGap, paddingTop: t.sectionGap, borderTop: `1px solid ${t.primaryLight}` }}>
-          <h2 style={{ ...titleCSS(t), textAlign: 'center', fontSize: '18px', color: t.primary, marginBottom: '40px' }}>Comment récupérer cet argent — 3 axes</h2>
+        <div style={{ marginTop: t.sectionGap, paddingTop: t.sectionGap, ...separatorCSS(t, t.border) }}>
+          <h2 style={{ ...titleCSS(t, 'h2'), textAlign: 'center', color: t.primary, marginBottom: '40px' }}>Comment récupérer cet argent — 3 axes</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
             {axes.map((a, idx) => (
               <div key={a.num} className="fade-up" style={{ ...cardCSS(t), textAlign: 'center', animationDelay: `${idx * 100}ms` }}>
-                <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: '64px', color: t.primary, letterSpacing: '-0.02em', lineHeight: 1, fontFamily: `'${t.font}', sans-serif` }}>{a.num}</p>
+                <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.huge, color: t.primary, letterSpacing: '-0.02em', lineHeight: 1, fontFamily: `'${t.font}', sans-serif` }}>{a.num}</p>
                 <div style={{ margin: '16px auto', width: '40px', height: '2px', background: t.primary }} />
-                <p style={{ ...titleCSS(t), fontSize: '14px', lineHeight: 1.5, whiteSpace: 'pre-line', color: t.text }}>{a.title}</p>
+                <p style={{ ...titleCSS(t, 'h2'), lineHeight: 1.5, whiteSpace: 'pre-line' }}>{a.title}</p>
                 <p style={{ marginTop: '16px', fontSize: '14px', color: t.mutedText, lineHeight: 1.6 }}>{a.desc}</p>
               </div>
             ))}

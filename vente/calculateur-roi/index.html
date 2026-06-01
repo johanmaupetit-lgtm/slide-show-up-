@@ -287,8 +287,9 @@
       const lossRdvHonore = calcStepLoss('rdvHonore');
       const lossDevisSignature = calcStepLoss('devisSignature');
 
-      // Devis dormants — one-shot
-      const lossDormants = devisDormants * m.devisDormants * m.devisSignature * ticket;
+      // Devis dormants — one-shot (taux de conversion réactivation = 0.33, médian ELCIA)
+      const REACTIVATION_SIGNATURE_RATE = 0.33;
+      const lossDormants = devisDormants * m.devisDormants * REACTIVATION_SIGNATURE_RATE * ticket;
 
       const monthly = lossLeadTraite.loss + lossLeadRdv.loss + lossRdvHonore.loss + lossDevisSignature.loss;
       const annual = monthly * 12;

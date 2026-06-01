@@ -1624,12 +1624,14 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
 
     const bandeauCSS = (tokens) => {
       if (tokens.bandeauStyle === 'gradient') {
-        return { background: tokens.bandeauGradient || `linear-gradient(135deg, ${tokens.primary} 0%, ${lightenHex(tokens.primary, -0.2)} 100%)`, color: tokens.bgAlt };
+        return { background: tokens.bandeauGradient || `linear-gradient(135deg, ${tokens.primary} 0%, ${lightenHex(tokens.primary, -0.2)} 100%)`, color: tokens.bgAlt, isColored: true };
       }
       if (tokens.bandeauStyle === 'pattern') {
-        return { background: tokens.bgAlt, backgroundImage: `radial-gradient(${tokens.primaryLight} 1px, transparent 1px)`, backgroundSize: '24px 24px' };
+        return { background: tokens.bgAlt, backgroundImage: `radial-gradient(${tokens.primaryLight} 1px, transparent 1px)`, backgroundSize: '24px 24px', isColored: false };
       }
-      return { background: tokens.bgAlt };
+      // FLAT : on tape un fond très subtil dérivé du primary pour donner de l'identité,
+      // pas un blanc plat.
+      return { background: tokens.primaryFaint, isColored: false };
     };
 
     const inputCSS = (tokens) => {
@@ -1646,38 +1648,73 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
       const allFilled = ['leadsRecus','rdvPris','signatures','ticket'].every(k => +session.inputs[k] > 0);
       const t = computeTokens(session);
       const bandeau = bandeauCSS(t);
-      const isBandeauColored = t.bandeauStyle === 'gradient';
+      const isBandeauColored = !!bandeau.isColored;
+      delete bandeau.isColored;
+      const stripHeight = t.bandeauStyle === 'gradient' ? 0 : 6;
 
       return (
         <div style={{ background: t.bg, color: t.text, minHeight: '100vh', fontFamily: `'${t.font}', Inter, sans-serif` }}>
+          {/* === BAND TOP COLORÉ (toujours visible, signature visuelle forte) === */}
+          {stripHeight > 0 && (
+            <div style={{ height: `${stripHeight}px`, background: `linear-gradient(90deg, ${t.primary} 0%, ${t.primary} 70%, ${t.accent} 100%)` }} />
+          )}
+
           {/* === BANDEAU PROSPECT === */}
-          <div style={{ ...bandeau, padding: `${parseInt(t.cardPadding)}px ${parseInt(t.cardPadding)*1.2}px ${parseInt(t.cardPadding)*0.8}px` }}>
+          <div style={{ ...bandeau, padding: `${parseInt(t.cardPadding)*1.1}px ${parseInt(t.cardPadding)*1.2}px ${parseInt(t.cardPadding)}px`, borderBottom: isBandeauColored ? 'none' : `1px solid ${t.border}` }}>
             <div style={{ maxWidth: t.maxWidth, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
                 {session.clientLogoUrl
-                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '72px', maxWidth: '220px', objectFit: 'contain', filter: isBandeauColored ? 'brightness(0) invert(1)' : 'none' }} />
-                  : <div style={{ ...titleCSS(t, 'h1'), fontSize: '40px', color: isBandeauColored ? t.bgAlt : t.primary }}>{session.companyName.substring(0,2).toUpperCase()}</div>
+                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '84px', maxWidth: '240px', objectFit: 'contain', filter: isBandeauColored ? 'brightness(0) invert(1)' : 'none' }} />
+                  : <div style={{
+                      width: '84px', height: '84px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: t.primary, color: t.bgAlt,
+                      borderRadius: t.radius,
+                      fontFamily: `'${t.headingFont}', sans-serif`,
+                      fontWeight: 800, fontSize: '32px',
+                      letterSpacing: '-0.02em',
+                      boxShadow: t.shadows.float,
+                    }}>{session.companyName.substring(0,2).toUpperCase()}</div>
                 }
                 <div>
-                  <h1 style={{ ...titleCSS(t, 'h1'), color: isBandeauColored ? t.bgAlt : t.primary, margin: 0, lineHeight: 1.1 }}>{session.companyName}</h1>
-                  {t.tagline
-                    ? <p style={{ color: isBandeauColored ? 'rgba(255,255,255,0.85)' : t.mutedText, fontSize: '14px', marginTop: '6px', fontStyle: 'italic' }}>{t.tagline}</p>
-                    : <p style={{ ...labelCSS(t), color: isBandeauColored ? 'rgba(255,255,255,0.7)' : t.mutedText, marginTop: '6px' }}>Audit personnalisé — Système ROI</p>
-                  }
+                  <h1 style={{ ...titleCSS(t, 'h1'), color: isBandeauColored ? t.bgAlt : t.primary, margin: 0, lineHeight: 1.05, fontSize: `calc(${t.sizes.h1} * 1.3)` }}>{session.companyName}</h1>
+                  {t.tagline && (
+                    <p style={{ color: isBandeauColored ? 'rgba(255,255,255,0.9)' : t.text, fontSize: '17px', marginTop: '8px', fontStyle: 'italic', fontWeight: 500, lineHeight: 1.3 }}>{t.tagline}</p>
+                  )}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+                    {t.secteur && (
+                      <span style={{
+                        background: isBandeauColored ? 'rgba(255,255,255,0.18)' : t.primary,
+                        color: isBandeauColored ? t.bgAlt : t.bgAlt,
+                        padding: '4px 10px',
+                        borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius,
+                        fontSize: '11px', fontWeight: 600,
+                        textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing,
+                      }}>{t.secteur.replace(/-/g, ' ')}</span>
+                    )}
+                    <span style={{
+                      background: 'transparent',
+                      color: isBandeauColored ? 'rgba(255,255,255,0.85)' : t.mutedText,
+                      border: `1px solid ${isBandeauColored ? 'rgba(255,255,255,0.4)' : t.border}`,
+                      padding: '4px 10px',
+                      borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius,
+                      fontSize: '11px', fontWeight: 600,
+                      textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing,
+                    }}>Audit personnalisé · Système ROI</span>
+                  </div>
                 </div>
               </div>
-              <div style={{ textAlign: 'right', color: isBandeauColored ? 'rgba(255,255,255,0.9)' : t.mutedText, fontSize: '13px' }}>
-                <p style={{ margin: 0, fontWeight: 600 }}>{session.dirigeantName}</p>
-                <p style={{ margin: '2px 0 0', fontSize: '12px', opacity: 0.85 }}>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
+              <div style={{ textAlign: 'right', color: isBandeauColored ? 'rgba(255,255,255,0.95)' : t.text, fontSize: '14px' }}>
+                <p style={{ ...labelCSS(t), color: isBandeauColored ? 'rgba(255,255,255,0.7)' : t.mutedText, margin: 0 }}>Préparé pour</p>
+                <p style={{ margin: '4px 0 0', fontWeight: 700, fontSize: '18px', color: isBandeauColored ? t.bgAlt : t.primary, fontFamily: `'${t.headingFont}', sans-serif` }}>{session.dirigeantName}</p>
+                <p style={{ margin: '4px 0 0', fontSize: '12px', opacity: 0.85 }}>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
               </div>
             </div>
           </div>
 
           {/* === Décor sous le bandeau === */}
-          {t.decorative !== 'none' && (
-            <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `0 ${parseInt(t.cardPadding)*1.2}px` }}>
-              <div style={{ marginTop: '8px', height: '4px', background: `linear-gradient(90deg, ${t.primary} 0%, ${t.accent} 100%)`, borderRadius: '2px', opacity: 0.6 }} />
-            </div>
+          {!isBandeauColored && (
+            <div style={{ height: '2px', background: `linear-gradient(90deg, transparent 0%, ${t.primary} 50%, transparent 100%)`, opacity: 0.5 }} />
           )}
 
           <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `${t.sectionGap} ${parseInt(t.cardPadding)*1.2}px` }}>
@@ -1722,7 +1759,13 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
         </div>
       );
       return (
-        <div style={{ marginBottom: t.sectionGap, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
+        <div style={{ marginBottom: t.sectionGap }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginBottom: '20px' }}>
+            <span style={{ ...labelCSS(t), color: t.primary, fontWeight: 700 }}>Vos chiffres</span>
+            <span style={{ flex: 1, height: '1px', background: t.primaryLight }} />
+            <span style={{ ...labelCSS(t), color: t.mutedText, fontSize: '10px' }}>Saisissez les 7 valeurs</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
           <Input k="leadsRecus" label="Leads reçus/mois" />
           <Input k="leadsTraites" label="Leads traités" />
           <Input k="rdvPris" label="RDV pris" />
@@ -1730,6 +1773,7 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
           <Input k="signatures" label="Signatures" />
           <Input k="ticket" label="Ticket €" suffix="€" />
           <Input k="devisDormants" label="Devis dormants" />
+          </div>
         </div>
       );
     };
@@ -1737,18 +1781,21 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
     const ActivityBlock = ({ session, losses, expanded, setExpanded, t }) => {
       const i = session.inputs;
       const Row = ({ label, value, isTotal = false }) => (
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', ...separatorCSS(t, t.border), borderBottomWidth: 0, borderTopWidth: '1px' }}>
-          <span style={{ color: isTotal ? t.text : t.mutedText, fontSize: isTotal ? '15px' : '14px', fontWeight: isTotal ? 600 : 400 }}>{label}</span>
-          <span style={{ color: isTotal ? t.primary : t.text, fontSize: isTotal ? t.sizes.h1 : '16px', fontWeight: isTotal ? 700 : 600, fontVariantNumeric: 'tabular-nums', fontFamily: `'${t.font}', sans-serif` }}>{value}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: isTotal ? '0' : '12px 0', borderTop: isTotal ? 'none' : `1px solid ${t.primaryLight}` }}>
+          <span style={{ color: isTotal ? t.text : t.mutedText, fontSize: isTotal ? '15px' : '14px', fontWeight: isTotal ? 700 : 500, textTransform: isTotal ? 'uppercase' : 'none', letterSpacing: isTotal ? t.labelLetterSpacing : 'normal' }}>{label}</span>
+          <span style={{ color: isTotal ? t.primary : t.text, fontSize: isTotal ? t.sizes.big : '17px', fontWeight: isTotal ? 800 : 600, fontVariantNumeric: 'tabular-nums', fontFamily: `'${t.font}', sans-serif`, letterSpacing: isTotal ? '-0.02em' : 'normal' }}>{value}</span>
         </div>
       );
       return (
-        <div style={cardCSS(t)}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <h2 style={{ ...titleCSS(t, 'h2'), margin: 0 }}>Votre activité commerciale</h2>
+        <div style={{ ...cardCSS(t), borderTop: `4px solid ${t.primary}`, borderTopLeftRadius: t.radius, borderTopRightRadius: t.radius, position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', paddingBottom: '16px', borderBottom: `2px solid ${t.primaryLight}` }}>
+            <div>
+              <p style={{ ...labelCSS(t), color: t.primary, margin: '0 0 4px 0' }}>Étape 01</p>
+              <h2 style={{ ...titleCSS(t, 'h2'), margin: 0 }}>Votre activité commerciale</h2>
+            </div>
             <button
               onClick={() => setExpanded(e => !e)}
-              style={{ width: '44px', height: '44px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.bgAlt, fontWeight: 'bold', background: t.primary, border: 'none', cursor: 'pointer', fontSize: '18px', transition: 'transform 0.15s', boxShadow: t.shadows.float }}
+              style={{ width: '52px', height: '52px', borderRadius: t.buttonStyle === 'pill' ? '9999px' : t.radius, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.bgAlt, fontWeight: 'bold', background: t.primary, border: 'none', cursor: 'pointer', fontSize: '22px', transition: 'transform 0.15s', boxShadow: t.shadows.float }}
               onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
               onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
               title="Comparer au marché"
@@ -1765,7 +1812,7 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
             <Row label="Ticket moyen" value={formatEUR(+i.ticket)} />
             <Row label="Devis dormants" value={formatNumber(+i.devisDormants)} />
           </div>
-          <div style={{ marginTop: '20px', paddingTop: '20px', ...separatorCSS(t, t.primary), borderTopWidth: Math.max(2, t.sep.width) + 'px' }}>
+          <div style={{ marginTop: '28px', paddingTop: '24px', background: t.primaryFaint, margin: `28px ${'-'+t.cardPadding} ${'-'+t.cardPadding}`, padding: `24px ${t.cardPadding}`, borderBottomLeftRadius: t.radius, borderBottomRightRadius: t.radius, borderTop: `3px solid ${t.primary}` }}>
             <Row label="CA actuel" value={`${formatEUR(losses.caActuel)} /mois`} isTotal />
           </div>
         </div>
@@ -1775,14 +1822,20 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
     const ComparisonBlock = ({ losses, session, updateCauses, updateMarketOverride, marketRates, t }) => {
       const stepsOrder = ['leadTraite', 'leadRdv', 'rdvHonore', 'devisSignature'];
       return (
-        <div style={{ ...cardCSS(t), marginTop: '24px' }}>
-          <h2 style={{ ...titleCSS(t, 'h2'), margin: '0 0 24px 0' }}>Comparaison avec le marché</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ ...cardCSS(t), marginTop: '24px', borderTop: `4px solid ${t.danger}` }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '24px', paddingBottom: '16px', borderBottom: `2px solid ${lightenHex(t.danger, 0.85)}` }}>
+            <div>
+              <p style={{ ...labelCSS(t), color: t.danger, margin: '0 0 4px 0' }}>Étape 02 · Pertes invisibles</p>
+              <h2 style={{ ...titleCSS(t, 'h2'), margin: 0 }}>Comparaison avec le marché</h2>
+            </div>
+            <span style={{ fontSize: '11px', color: t.mutedText, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing }}>Sources indépendantes ↓</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             {stepsOrder.map(key => (
               <ComparisonRow key={key} stepKey={key} step={losses.steps[key]} cause={session.causes[key]} updateCause={(v) => updateCauses({ [key]: v })} updateMarketOverride={(v) => updateMarketOverride(key, v)} t={t} />
             ))}
           </div>
-          <div style={{ marginTop: '32px', paddingTop: '32px', ...separatorCSS(t, t.border) }}>
+          <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: `2px dashed ${t.primaryLight}` }}>
             <ComparisonRow stepKey="devisDormants" step={losses.steps.devisDormants} cause={session.causes.devisDormants} updateCause={(v) => updateCauses({ devisDormants: v })} updateMarketOverride={(v) => updateMarketOverride('devisDormants', v)} t={t} isOneShot />
           </div>
         </div>
@@ -1837,44 +1890,49 @@ Sois précis. Sois fidèle. Sois rigoureux. La carrière de quelqu'un en dépend
       const actuelBarWidth = losses.caPotentielMensuel > 0 ? (losses.caActuel / losses.caPotentielMensuel) * 100 : 0;
 
       return (
-        <div style={{ ...cardCSS(t), marginTop: t.sectionGap }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
-            <div>
-              <p style={{ ...labelCSS(t), marginBottom: '8px' }}>Perte mensuelle récurrente</p>
+        <div style={{ ...cardCSS(t), marginTop: t.sectionGap, borderTop: `4px solid ${t.primary}`, background: t.bgAlt }}>
+          <div style={{ marginBottom: '28px', paddingBottom: '20px', borderBottom: `2px solid ${t.primaryLight}` }}>
+            <p style={{ ...labelCSS(t), color: t.primary, margin: '0 0 4px 0' }}>Étape 03 · Synthèse chiffrée</p>
+            <h2 style={{ ...titleCSS(t, 'h2'), margin: 0 }}>Ce que vous laissez sur la table</h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '40px' }}>
+            <div style={{ padding: '24px', background: lightenHex(t.danger, 0.92), borderRadius: t.radius, borderLeft: `4px solid ${t.danger}` }}>
+              <p style={{ ...labelCSS(t), color: t.danger, marginBottom: '12px' }}>Perte mensuelle récurrente</p>
               <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.big, color: t.danger, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>-{formatEUR(losses.monthly)}<span style={{ fontSize: '16px', color: t.mutedText, fontWeight: 400 }}> /mois</span></p>
             </div>
-            <div>
-              <p style={{ ...labelCSS(t), marginBottom: '8px' }}>One-shot devis dormants</p>
-              <p style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.h1, color: t.text, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatEUR(losses.oneShot)}</p>
+            <div style={{ padding: '24px', background: t.primaryFaint, borderRadius: t.radius, borderLeft: `4px solid ${t.primary}` }}>
+              <p style={{ ...labelCSS(t), color: t.primary, marginBottom: '12px' }}>One-shot devis dormants</p>
+              <p style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.h1, color: t.primary, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatEUR(losses.oneShot)}</p>
             </div>
           </div>
 
-          <div style={{ paddingTop: '24px', ...separatorCSS(t, t.border) }}>
-            <p style={{ ...labelCSS(t), marginBottom: '16px' }}>CA actuel vs CA potentiel</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ paddingTop: '24px', borderTop: `1px solid ${t.primaryLight}` }}>
+            <p style={{ ...labelCSS(t), color: t.primary, marginBottom: '20px' }}>CA actuel vs CA potentiel</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
-                  <span style={{ color: t.mutedText }}>Actuel</span>
-                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.text }}>{formatEUR(losses.caActuel)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '6px' }}>
+                  <span style={{ color: t.mutedText, fontWeight: 600 }}>Actuel</span>
+                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.text, fontSize: '18px' }}>{formatEUR(losses.caActuel)}</span>
                 </div>
-                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.border}` }}>
-                  <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: actuelBarWidth + '%', background: t.primary, opacity: 0.4 }} />
+                <div style={{ height: '36px', borderRadius: t.radius, background: t.primaryFaint, border: `1px solid ${t.primaryLight}`, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: actuelBarWidth + '%', background: t.primary, opacity: 0.5 }} />
                 </div>
               </div>
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
-                  <span style={{ fontWeight: 600, color: t.success }}>Potentiel</span>
-                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.success }}>{formatEUR(losses.caPotentielMensuel)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '6px' }}>
+                  <span style={{ fontWeight: 700, color: t.success, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing, fontSize: '12px' }}>Potentiel</span>
+                  <span style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: t.success, fontSize: '18px' }}>{formatEUR(losses.caPotentielMensuel)}</span>
                 </div>
-                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.border}` }}>
+                <div style={{ height: '36px', borderRadius: t.radius, background: t.primaryFaint, border: `1px solid ${t.primaryLight}`, overflow: 'hidden' }}>
                   <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: '100%', background: `linear-gradient(90deg, ${t.primary} 0%, ${t.success} 100%)` }} />
                 </div>
               </div>
             </div>
-            <div style={{ marginTop: '32px', textAlign: 'center' }}>
-              <p style={{ fontSize: '13px', color: t.mutedText, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing, marginBottom: '8px' }}>Vous laissez sur la table chaque mois</p>
-              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.huge, color: t.danger, lineHeight: 1, letterSpacing: '-0.03em', fontFamily: `'${t.font}', sans-serif` }}>{formatEUR(losses.monthly)}</p>
-              {ratio > 0 && <p style={{ fontSize: '16px', color: t.mutedText, marginTop: '8px' }}>= {ratio.toFixed(2).replace('.', ',')}× votre CA actuel</p>}
+            <div style={{ marginTop: '48px', textAlign: 'center', padding: '32px 24px', background: lightenHex(t.danger, 0.94), borderRadius: t.radius, border: `2px solid ${lightenHex(t.danger, 0.7)}` }}>
+              <p style={{ fontSize: '13px', color: t.danger, textTransform: 'uppercase', letterSpacing: t.labelLetterSpacing, marginBottom: '12px', fontWeight: 700 }}>Vous laissez sur la table chaque mois</p>
+              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: t.sizes.huge, color: t.danger, lineHeight: 1, letterSpacing: '-0.03em', fontFamily: `'${t.font}', sans-serif` }}>-{formatEUR(losses.monthly)}</p>
+              {ratio > 0 && <p style={{ fontSize: '17px', color: t.text, marginTop: '12px', fontWeight: 500 }}>= <strong style={{ color: t.danger }}>{ratio.toFixed(2).replace('.', ',')}×</strong> votre CA actuel</p>}
             </div>
           </div>
         </div>

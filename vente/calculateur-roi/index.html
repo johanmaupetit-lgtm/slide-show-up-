@@ -427,12 +427,25 @@
           slug,
           dirigeantName: data.dirigeantName,
           companyName: data.companyName,
+          clientWebsite: data.clientWebsite || '',
           clientLogoUrl: data.clientLogoUrl || '',
+          // Design tokens charte
           clientPrimaryColor: data.clientPrimaryColor || '#1E5F8E',
           clientSecondaryColor: data.clientSecondaryColor || '#888888',
           clientAccentColor: data.clientAccentColor || '',
+          clientBgColor: data.clientBgColor || '#FAFAFA',
+          clientBgAltColor: data.clientBgAltColor || '#FFFFFF',
+          clientTextColor: data.clientTextColor || '#1A1A1A',
+          clientMutedTextColor: data.clientMutedTextColor || '#666666',
           clientPrimaryFont: data.clientPrimaryFont || 'Inter',
           clientSecondaryFont: data.clientSecondaryFont || '',
+          clientBorderRadius: data.clientBorderRadius || '4px',
+          clientCardStyle: data.clientCardStyle || 'flat',
+          clientButtonStyle: data.clientButtonStyle || 'filled',
+          clientSpacing: data.clientSpacing || 'balanced',
+          clientTitleCase: data.clientTitleCase || 'none',
+          clientTitleWeight: data.clientTitleWeight || '700',
+          clientTitleLetterSpacing: data.clientTitleLetterSpacing || 'normal',
           clientStyleGeneral: data.clientStyleGeneral || '',
           clientAmbiance: data.clientAmbiance || '',
           meetingDate: data.meetingDate,
@@ -631,12 +644,24 @@
       const [data, setData] = useState({
         dirigeantName: '',
         companyName: '',
+        clientWebsite: '',
         meetingDate: new Date().toISOString().slice(0, 10),
         clientPrimaryColor: '#1E5F8E',
         clientSecondaryColor: '#888888',
         clientAccentColor: '',
+        clientBgColor: '#FAFAFA',
+        clientBgAltColor: '#FFFFFF',
+        clientTextColor: '#1A1A1A',
+        clientMutedTextColor: '#666666',
         clientPrimaryFont: 'Inter',
         clientSecondaryFont: '',
+        clientBorderRadius: '4px',
+        clientCardStyle: 'flat',
+        clientButtonStyle: 'filled',
+        clientSpacing: 'balanced',
+        clientTitleCase: 'none',
+        clientTitleWeight: '700',
+        clientTitleLetterSpacing: 'normal',
         clientStyleGeneral: '',
         clientAmbiance: '',
         clientLogoUrl: '',
@@ -648,39 +673,77 @@
       const [extracting, setExtracting] = useState(false);
       const [aiAnalyzing, setAiAnalyzing] = useState(false);
       const [aiResult, setAiResult] = useState(null);
+      const [urlFetching, setUrlFetching] = useState(false);
       const dropZoneRef = useRef(null);
 
-      const runAIAnalysis = async () => {
-        if (!apiKey) { alert('Configure d\'abord ta clé API Anthropic dans /admin (en bas de page).'); return; }
-        if (screenshots.length === 0) { alert('Upload au moins une capture d\'abord.'); return; }
+      const fetchFromUrl = async () => {
+        const url = data.clientWebsite.trim();
+        if (!url) { alert('Saisis une URL d\'abord.'); return; }
+        setUrlFetching(true);
+        setNotice('');
+        try {
+          const screenshotDataUrl = await fetchUrlScreenshot(url);
+          // Ajouter le screenshot aux screenshots existants
+          const newShots = [...screenshots, screenshotDataUrl];
+          setScreenshots(newShots);
+          // Lancer extraction couleurs locale
+          const blob = await (await fetch(screenshotDataUrl)).blob();
+          const colors = await extractFromMultiple([blob], 6);
+          if (colors.length > 0) setPalette(colors);
+          setNotice(`✓ Screenshot du site récupéré. ${apiKey ? 'Clique "Analyser avec IA" pour la charte complète.' : 'Configure une clé Gemini pour l\'analyse complète.'}`);
+          // Si clé API → lancer auto
+          if (apiKey) {
+            await runAIAnalysisOn(newShots);
+          }
+        } catch (e) {
+          alert('Erreur récupération URL : ' + e.message + '\n\nAstuce : si Microlink bloque le site, fais un screenshot manuel.');
+        } finally {
+          setUrlFetching(false);
+        }
+      };
+
+      const runAIAnalysisOn = async (shotsToUse) => {
+        const shots = shotsToUse || screenshots;
+        if (!apiKey) { alert('Configure d\'abord ta clé API Gemini dans /admin (en bas de page).'); return; }
+        if (shots.length === 0) { alert('Upload ou récupère au moins un screenshot.'); return; }
         setAiAnalyzing(true);
         setNotice('');
         try {
-          const result = await analyzeCharteAI(apiKey, screenshots);
+          const result = await analyzeCharteAI(apiKey, shots);
           setAiResult(result);
-          // Apply to form
           const patch = {};
+          // Couleurs
           if (result.couleurPrimaire) patch.clientPrimaryColor = result.couleurPrimaire;
           if (result.couleurSecondaire) patch.clientSecondaryColor = result.couleurSecondaire;
           if (result.couleurAccent) patch.clientAccentColor = result.couleurAccent;
-          if (result.policePrimaire) {
-            patch.clientPrimaryFont = result.policePrimaire;
-            loadGoogleFont(result.policePrimaire);
-          }
-          if (result.policeSecondaire) {
-            patch.clientSecondaryFont = result.policeSecondaire;
-            loadGoogleFont(result.policeSecondaire);
-          }
+          if (result.couleurFond) patch.clientBgColor = result.couleurFond;
+          if (result.couleurFondAlt) patch.clientBgAltColor = result.couleurFondAlt;
+          if (result.couleurTexte) patch.clientTextColor = result.couleurTexte;
+          if (result.couleurTexteSubtil) patch.clientMutedTextColor = result.couleurTexteSubtil;
+          // Polices
+          if (result.policePrimaire) { patch.clientPrimaryFont = result.policePrimaire; loadGoogleFont(result.policePrimaire); }
+          if (result.policeSecondaire) { patch.clientSecondaryFont = result.policeSecondaire; loadGoogleFont(result.policeSecondaire); }
+          // Tokens design
+          if (result.borderRadius) patch.clientBorderRadius = result.borderRadius;
+          if (result.styleCartes) patch.clientCardStyle = result.styleCartes;
+          if (result.styleBoutons) patch.clientButtonStyle = result.styleBoutons;
+          if (result.espacement) patch.clientSpacing = result.espacement;
+          if (result.casseTitres) patch.clientTitleCase = result.casseTitres;
+          if (result.graisseTitres) patch.clientTitleWeight = result.graisseTitres;
+          if (result.letterSpacingTitres) patch.clientTitleLetterSpacing = result.letterSpacingTitres;
+          // Méta
           if (result.styleGeneral) patch.clientStyleGeneral = result.styleGeneral;
           if (result.ambiance) patch.clientAmbiance = result.ambiance;
           setData(d => ({ ...d, ...patch }));
-          setNotice('✓ Analyse IA appliquée — vérifiez les champs ci-dessous.');
+          setNotice('✓ Charte complète appliquée — couleurs, polices, espacements, styles cartes/boutons.');
         } catch (e) {
           alert('Erreur analyse IA : ' + e.message);
         } finally {
           setAiAnalyzing(false);
         }
       };
+
+      const runAIAnalysis = () => runAIAnalysisOn(screenshots);
 
       const handleLogo = async (e) => {
         const file = e.target.files?.[0];
@@ -827,9 +890,35 @@
             </Field>
           </div>
 
-          {/* ===== CAPTURES DU SITE CLIENT ===== */}
+          {/* ===== URL DU SITE CLIENT (RACCOURCI) ===== */}
           <div className="mb-6 pt-6 border-t border-anthracite">
-            <label className="block text-xs uppercase tracking-wider text-or mb-2">Captures du site client → extraction auto de la palette</label>
+            <label className="block text-xs uppercase tracking-wider text-or mb-2">URL du site prospect (raccourci · screenshot auto)</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={data.clientWebsite}
+                onChange={e => setData(d => ({ ...d, clientWebsite: e.target.value }))}
+                placeholder="ex: www.lapeyre.fr"
+                className="form-input flex-1"
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); fetchFromUrl(); } }}
+              />
+              <button
+                type="button"
+                onClick={fetchFromUrl}
+                disabled={urlFetching || !data.clientWebsite.trim()}
+                className="bg-or text-noir px-5 py-2.5 rounded text-xs font-semibold uppercase tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {urlFetching ? 'Récupération…' : apiKey ? '🌐 Récupérer + Analyser IA' : '🌐 Screenshot URL'}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Screenshot via Microlink (50/jour gratuit). {apiKey && <>Analyse IA enchaînée automatiquement après récupération.</>}
+            </p>
+          </div>
+
+          {/* ===== CAPTURES DU SITE CLIENT (UPLOAD MANUEL) ===== */}
+          <div className="mb-6">
+            <label className="block text-xs uppercase tracking-wider text-or mb-2">Ou screenshots manuels — extraction auto de la palette</label>
             <p className="text-xs text-gray-500 mb-3">Glisse-dépose des screenshots (ou colle depuis le presse-papier · Ctrl+V). Les couleurs dominantes seront détectées automatiquement.</p>
 
             <div
@@ -1128,6 +1217,43 @@
       });
     };
 
+    // ===== SCREENSHOT URL VIA MICROLINK (gratuit, 50/jour sans clé) =====
+    const fetchUrlScreenshot = async (url) => {
+      // Normaliser l'URL
+      let target = url.trim();
+      if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
+
+      const params = new URLSearchParams({
+        url: target,
+        screenshot: 'true',
+        meta: 'false',
+        'viewport.width': '1280',
+        'viewport.height': '900',
+        'viewport.deviceScaleFactor': '1',
+        waitUntil: 'load',
+        'screenshot.type': 'png',
+      });
+      const apiUrl = `https://api.microlink.io/?${params.toString()}`;
+
+      const response = await fetch(apiUrl);
+      if (!response.ok) throw new Error(`Microlink HTTP ${response.status}`);
+      const data = await response.json();
+      if (data.status !== 'success') throw new Error('Microlink : ' + (data.message || 'erreur inconnue'));
+      const screenshotUrl = data?.data?.screenshot?.url;
+      if (!screenshotUrl) throw new Error('Aucun screenshot retourné par Microlink.');
+
+      // Récupérer l'image et la convertir en dataURL
+      const imgResp = await fetch(screenshotUrl);
+      if (!imgResp.ok) throw new Error('Impossible de récupérer le screenshot.');
+      const blob = await imgResp.blob();
+      return await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    };
+
     // ===== ANALYSE IA VISION (Google Gemini 2.0 Flash — Free Tier) =====
     const analyzeCharteAI = async (apiKey, screenshotDataUrls) => {
       if (!apiKey) throw new Error('Clé API Google Gemini manquante.');
@@ -1139,26 +1265,47 @@
         return { inline_data: { mime_type: mimeType, data: b64 } };
       });
 
-      const prompt = `Tu es un expert en branding et identité visuelle. Analyse ces captures d'écran du site web d'une entreprise (souvent une PME française du BTP / menuiserie).
+      const prompt = `Tu es un expert en branding et design system. Analyse précisément ces captures d'écran d'un site d'entreprise (PME française du BTP / menuiserie souvent).
 
-Retourne un objet JSON valide au format suivant :
+Ton objectif : extraire TOUS les tokens de design pour qu'on puisse recréer une page qui ressemble à ce site.
+
+Retourne UN SEUL objet JSON valide au format exact suivant :
 
 {
   "couleurPrimaire": "#XXXXXX",
   "couleurSecondaire": "#XXXXXX",
   "couleurAccent": "#XXXXXX",
-  "policePrimaire": "Nom Google Fonts exact",
-  "policeSecondaire": "Nom Google Fonts exact",
-  "styleGeneral": "modèle court (ex: moderne industriel, premium classique, minimaliste, traditionnel artisanal)",
+  "couleurFond": "#XXXXXX",
+  "couleurFondAlt": "#XXXXXX",
+  "couleurTexte": "#XXXXXX",
+  "couleurTexteSubtil": "#XXXXXX",
+  "policePrimaire": "Nom Google Fonts",
+  "policeSecondaire": "Nom Google Fonts",
+  "borderRadius": "0px" | "2px" | "4px" | "8px" | "12px" | "16px" | "24px" | "9999px",
+  "styleCartes": "flat" | "shadow" | "bordered" | "elevated",
+  "styleBoutons": "filled" | "outlined" | "pill" | "ghost",
+  "espacement": "tight" | "balanced" | "airy",
+  "casseTitres": "uppercase" | "capitalize" | "none",
+  "graisseTitres": "400" | "500" | "600" | "700" | "800" | "900",
+  "letterSpacingTitres": "normal" | "tight" | "wide" | "extra-wide",
+  "styleGeneral": "modèle court ex: moderne industriel, premium classique, minimaliste, traditionnel artisanal",
   "ambiance": "phrase courte décrivant l'identité visuelle (max 15 mots)"
 }
 
 Règles strictes :
 - Couleurs en HEX 6 chiffres, fidèles aux captures
-- couleurPrimaire = celle qui domine la marque (logo, titres, CTA)
-- couleurSecondaire = couleur d'appui visible
-- couleurAccent = touche complémentaire, ou répéter primaire si absente
-- Polices : noms exacts Google Fonts si reconnaissables. Préfère : Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Raleway, Source Sans Pro, Oswald, Roboto Slab, Playfair Display, Merriweather, PT Sans, Nunito, Mulish, Work Sans, Manrope, Cinzel, Bebas Neue, Anton, Archivo, Barlow, DM Sans, Fira Sans
+- couleurFond = couleur dominante de fond de page (souvent blanc / blanc cassé / gris très clair)
+- couleurFondAlt = couleur de fond secondaire (sections alternées)
+- couleurTexte = couleur principale du corps de texte (souvent gris foncé / noir)
+- couleurTexteSubtil = couleur des métadonnées (souvent gris moyen)
+- Polices : noms Google Fonts exacts, sinon le plus proche
+- borderRadius : observe les angles des boutons et cartes
+- styleCartes : flat (sans ombre), shadow (ombre douce), bordered (bordure fine), elevated (ombre forte)
+- styleBoutons : filled (fond plein), outlined (bordure + texte), pill (très arrondi), ghost (texte seul)
+- espacement : tight (compact), balanced (standard), airy (généreux, beaucoup de blanc)
+- casseTitres : observe les titres principaux (CAPITALES, Capitalisé Normal, ou pas)
+- graisseTitres : observe l'épaisseur des titres
+- letterSpacingTitres : tight (lettres serrées), normal, wide (légèrement espacé), extra-wide (très espacé)
 - Sois précis et fidèle aux captures, jamais inventer.`;
 
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
@@ -1172,7 +1319,7 @@ Règles strictes :
           generationConfig: {
             response_mime_type: 'application/json',
             temperature: 0.2,
-            max_output_tokens: 1024,
+            max_output_tokens: 2048,
           },
         }),
       });
@@ -1191,11 +1338,9 @@ Règles strictes :
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
       if (!text) throw new Error('Réponse IA vide.');
 
-      // JSON mode strict de Gemini : la sortie est déjà JSON pur
       try {
         return JSON.parse(text);
       } catch {
-        // Fallback : extraire le JSON si Gemini ajoute du texte
         const match = text.match(/\{[\s\S]*\}/);
         if (!match) throw new Error('Réponse IA invalide (pas de JSON détecté).');
         try { return JSON.parse(match[0]); }
@@ -1337,94 +1482,140 @@ Règles strictes :
     // MODE PERTES
     // ============================================================
 
+    // ===== DESIGN TOKENS depuis session =====
+    const computeTokens = (session) => {
+      const lsMap = { tight: '-0.01em', normal: '0', wide: '0.05em', 'extra-wide': '0.15em' };
+      const spacingMap = { tight: { sectionGap: '24px', cardPadding: '20px', maxWidth: '1000px' }, balanced: { sectionGap: '40px', cardPadding: '32px', maxWidth: '1100px' }, airy: { sectionGap: '64px', cardPadding: '48px', maxWidth: '1200px' } };
+      const sp = spacingMap[session.clientSpacing] || spacingMap.balanced;
+      return {
+        primary: session.clientPrimaryColor || '#1E5F8E',
+        secondary: session.clientSecondaryColor || '#888888',
+        accent: session.clientAccentColor || session.clientPrimaryColor || '#1E5F8E',
+        bg: session.clientBgColor || '#FAFAFA',
+        bgAlt: session.clientBgAltColor || '#FFFFFF',
+        text: session.clientTextColor || '#1A1A1A',
+        mutedText: session.clientMutedTextColor || '#666666',
+        font: session.clientPrimaryFont || 'Inter',
+        headingFont: session.clientSecondaryFont || session.clientPrimaryFont || 'Inter',
+        radius: session.clientBorderRadius || '4px',
+        cardStyle: session.clientCardStyle || 'flat',
+        buttonStyle: session.clientButtonStyle || 'filled',
+        titleCase: session.clientTitleCase || 'none',
+        titleWeight: session.clientTitleWeight || '700',
+        titleLetterSpacing: lsMap[session.clientTitleLetterSpacing] || '0',
+        sectionGap: sp.sectionGap,
+        cardPadding: sp.cardPadding,
+        maxWidth: sp.maxWidth,
+        primaryLight: lightenHex(session.clientPrimaryColor || '#1E5F8E', 0.92),
+      };
+    };
+
+    const cardCSS = (tokens) => {
+      const base = { background: tokens.bgAlt, borderRadius: tokens.radius, padding: tokens.cardPadding };
+      if (tokens.cardStyle === 'shadow') return { ...base, boxShadow: '0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)' };
+      if (tokens.cardStyle === 'bordered') return { ...base, border: `1px solid ${tokens.primaryLight}` };
+      if (tokens.cardStyle === 'elevated') return { ...base, boxShadow: '0 4px 16px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.06)' };
+      return base; // flat
+    };
+
+    const buttonCSS = (tokens) => {
+      const base = { borderRadius: tokens.buttonStyle === 'pill' ? '9999px' : tokens.radius, fontWeight: 600, transition: 'all 0.15s', cursor: 'pointer' };
+      if (tokens.buttonStyle === 'filled') return { ...base, background: tokens.primary, color: tokens.bgAlt, border: 'none' };
+      if (tokens.buttonStyle === 'outlined') return { ...base, background: 'transparent', color: tokens.primary, border: `1.5px solid ${tokens.primary}` };
+      if (tokens.buttonStyle === 'pill') return { ...base, background: tokens.primary, color: tokens.bgAlt, border: 'none' };
+      if (tokens.buttonStyle === 'ghost') return { ...base, background: 'transparent', color: tokens.primary, border: 'none' };
+      return base;
+    };
+
+    const titleCSS = (tokens) => ({
+      fontFamily: `'${tokens.headingFont}', sans-serif`,
+      fontWeight: tokens.titleWeight,
+      letterSpacing: tokens.titleLetterSpacing,
+      textTransform: tokens.titleCase === 'uppercase' ? 'uppercase' : tokens.titleCase === 'capitalize' ? 'capitalize' : 'none',
+      color: tokens.text,
+    });
+
     const ModePertes = ({ session, updateInputs, updateCauses, updateMarketOverride, marketRates }) => {
       const [expanded, setExpanded] = useState(false);
       const losses = useMemo(() => calcLosses(session.inputs, marketRates), [session.inputs, marketRates]);
       const allFilled = ['leadsRecus','rdvPris','signatures','ticket'].every(k => +session.inputs[k] > 0);
-
-      const primary = session.clientPrimaryColor;
-      const primaryLight = lightenHex(primary, 0.92);
-      const font = session.clientPrimaryFont || 'Inter';
+      const t = computeTokens(session);
 
       return (
-        <div style={{ background: '#FAFAFA', minHeight: '100vh', fontFamily: `'${font}', Inter, sans-serif` }}>
-          <div className="max-w-5xl mx-auto px-10 py-10">
+        <div style={{ background: t.bg, color: t.text, minHeight: '100vh', fontFamily: `'${t.font}', Inter, sans-serif` }}>
+          <div style={{ maxWidth: t.maxWidth, margin: '0 auto', padding: `40px ${parseInt(t.cardPadding)*1.2}px` }}>
             {/* Header */}
-            <div className="flex items-start justify-between pb-6 border-b" style={{ borderColor: primaryLight }}>
+            <div className="flex items-start justify-between pb-6" style={{ borderBottom: `1px solid ${t.primaryLight}`, marginBottom: t.sectionGap }}>
               <div className="flex items-center gap-5">
                 {session.clientLogoUrl
-                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '80px', maxWidth: '200px', objectFit: 'contain' }} />
-                  : <div className="text-3xl font-bold" style={{ color: primary }}>{session.companyName.substring(0,2).toUpperCase()}</div>
+                  ? <img src={session.clientLogoUrl} alt={session.companyName} style={{ height: '80px', maxWidth: '220px', objectFit: 'contain' }} />
+                  : <div style={{ fontSize: '32px', fontWeight: t.titleWeight, color: t.primary, ...titleCSS(t) }}>{session.companyName.substring(0,2).toUpperCase()}</div>
                 }
                 <div>
-                  <h1 className="font-bold uppercase" style={{ color: primary, fontSize: '22px', letterSpacing: '0.02em' }}>{session.companyName}</h1>
-                  <p className="text-sm text-gray-500 mt-1">Audit personnalisé</p>
+                  <h1 style={{ ...titleCSS(t), color: t.primary, fontSize: '24px', margin: 0 }}>{session.companyName}</h1>
+                  <p style={{ color: t.mutedText, fontSize: '13px', marginTop: '4px' }}>Audit personnalisé</p>
                 </div>
               </div>
-              <div className="text-right text-sm text-gray-500">
+              <div style={{ textAlign: 'right', color: t.mutedText, fontSize: '13px' }}>
                 <p>{session.dirigeantName}</p>
                 <p>{new Date(session.meetingDate).toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' })}</p>
               </div>
             </div>
 
             {/* Inputs panel */}
-            <InputsPanel session={session} updateInputs={updateInputs} primary={primary} />
+            <InputsPanel session={session} updateInputs={updateInputs} t={t} />
 
             {/* Activité commerciale */}
-            <ActivityBlock
-              session={session}
-              losses={losses}
-              expanded={expanded}
-              setExpanded={setExpanded}
-              primary={primary}
-              primaryLight={primaryLight}
-            />
+            <ActivityBlock session={session} losses={losses} expanded={expanded} setExpanded={setExpanded} t={t} />
 
             {/* Comparison expanded */}
             {expanded && (
-              <div className="mt-8 fade-in">
-                <ComparisonBlock
-                  losses={losses}
-                  session={session}
-                  updateCauses={updateCauses}
-                  updateMarketOverride={updateMarketOverride}
-                  marketRates={marketRates}
-                  primary={primary}
-                />
-                <TotalsBlock losses={losses} primary={primary} primaryLight={primaryLight} />
+              <div style={{ marginTop: t.sectionGap }} className="fade-in">
+                <ComparisonBlock losses={losses} session={session} updateCauses={updateCauses} updateMarketOverride={updateMarketOverride} marketRates={marketRates} t={t} />
+                <TotalsBlock losses={losses} t={t} />
               </div>
             )}
 
             {/* 3 axes */}
-            {expanded && allFilled && <ThreeAxesBlock primary={primary} primaryLight={primaryLight} />}
+            {expanded && allFilled && <ThreeAxesBlock t={t} />}
           </div>
         </div>
       );
     };
 
-    const InputsPanel = ({ session, updateInputs, primary }) => {
-      const inputClass = "w-full bg-white border-2 rounded-md px-3 py-2 text-base font-semibold tabular focus:outline-none transition";
-      const labelClass = "block text-[11px] uppercase tracking-wider text-gray-500 mb-1";
+    const InputsPanel = ({ session, updateInputs, t }) => {
       const Input = ({ k, label, suffix = '' }) => (
         <div>
-          <label className={labelClass}>{label}</label>
-          <div className="relative">
+          <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: t.mutedText, marginBottom: '4px' }}>{label}</label>
+          <div style={{ position: 'relative' }}>
             <input
               type="number"
               value={session.inputs[k] ?? ''}
               onChange={e => updateInputs({ [k]: e.target.value })}
               placeholder="0"
-              className={inputClass}
-              style={{ borderColor: 'rgba(0,0,0,0.08)' }}
-              onFocus={e => e.target.style.borderColor = primary}
-              onBlur={e => e.target.style.borderColor = 'rgba(0,0,0,0.08)'}
+              style={{
+                width: '100%',
+                background: t.bgAlt,
+                border: `1.5px solid ${t.primaryLight}`,
+                borderRadius: t.radius,
+                padding: '10px 12px',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: t.text,
+                fontVariantNumeric: 'tabular-nums',
+                fontFamily: `'${t.font}', sans-serif`,
+                outline: 'none',
+                transition: 'border-color 0.15s',
+              }}
+              onFocus={e => e.target.style.borderColor = t.primary}
+              onBlur={e => e.target.style.borderColor = t.primaryLight}
             />
-            {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{suffix}</span>}
+            {suffix && <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', color: t.mutedText, fontSize: '13px' }}>{suffix}</span>}
           </div>
         </div>
       );
       return (
-        <div className="mt-6 mb-8 grid grid-cols-7 gap-3">
+        <div style={{ marginBottom: t.sectionGap, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px' }}>
           <Input k="leadsRecus" label="Leads reçus/mois" />
           <Input k="leadsTraites" label="Leads traités" />
           <Input k="rdvPris" label="RDV pris" />
@@ -1436,22 +1627,23 @@ Règles strictes :
       );
     };
 
-    const ActivityBlock = ({ session, losses, expanded, setExpanded, primary, primaryLight }) => {
+    const ActivityBlock = ({ session, losses, expanded, setExpanded, t }) => {
       const i = session.inputs;
       const Row = ({ label, value, isTotal = false }) => (
-        <div className="flex justify-between py-2.5" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-          <span className={isTotal ? 'font-semibold text-gray-900' : 'text-gray-600 text-sm'}>{label}</span>
-          <span className={`tabular ${isTotal ? 'text-2xl font-bold' : 'text-base font-semibold text-gray-900'}`} style={{ color: isTotal ? primary : undefined }}>{value}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+          <span style={{ color: isTotal ? t.text : t.mutedText, fontSize: isTotal ? '15px' : '14px', fontWeight: isTotal ? 600 : 400 }}>{label}</span>
+          <span style={{ color: isTotal ? t.primary : t.text, fontSize: isTotal ? '24px' : '16px', fontWeight: isTotal ? 700 : 600, fontVariantNumeric: 'tabular-nums', fontFamily: `'${t.font}', sans-serif` }}>{value}</span>
         </div>
       );
       return (
-        <div className="bg-white rounded-lg shadow-sm border" style={{ borderColor: primaryLight, padding: '32px' }}>
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="font-bold uppercase tracking-wider text-gray-900" style={{ fontSize: '15px', letterSpacing: '0.15em' }}>Votre activité commerciale</h2>
+        <div style={cardCSS(t)}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+            <h2 style={{ ...titleCSS(t), fontSize: '16px', margin: 0 }}>Votre activité commerciale</h2>
             <button
               onClick={() => setExpanded(e => !e)}
-              className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold transition hover:scale-105"
-              style={{ background: primary }}
+              style={{ width: '44px', height: '44px', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.bgAlt, fontWeight: 'bold', background: t.primary, border: 'none', cursor: 'pointer', fontSize: '18px', transition: 'transform 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
               title="Comparer au marché"
             >
               {expanded ? '↙' : '↗'}
@@ -1466,96 +1658,65 @@ Règles strictes :
             <Row label="Ticket moyen" value={formatEUR(+i.ticket)} />
             <Row label="Devis dormants" value={formatNumber(+i.devisDormants)} />
           </div>
-          <div className="mt-4 pt-4" style={{ borderTop: `2px solid ${primaryLight}` }}>
+          <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: `2px solid ${t.primaryLight}` }}>
             <Row label="CA actuel" value={`${formatEUR(losses.caActuel)} /mois`} isTotal />
           </div>
         </div>
       );
     };
 
-    const ComparisonBlock = ({ losses, session, updateCauses, updateMarketOverride, marketRates, primary }) => {
+    const ComparisonBlock = ({ losses, session, updateCauses, updateMarketOverride, marketRates, t }) => {
       const stepsOrder = ['leadTraite', 'leadRdv', 'rdvHonore', 'devisSignature'];
       return (
-        <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 mt-6">
-          <h2 className="font-bold uppercase tracking-wider text-gray-900 mb-6" style={{ fontSize: '15px', letterSpacing: '0.15em' }}>Comparaison avec le marché</h2>
-          <div className="space-y-6">
+        <div style={{ ...cardCSS(t), marginTop: '24px' }}>
+          <h2 style={{ ...titleCSS(t), fontSize: '16px', margin: '0 0 24px 0' }}>Comparaison avec le marché</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             {stepsOrder.map(key => (
-              <ComparisonRow
-                key={key}
-                stepKey={key}
-                step={losses.steps[key]}
-                cause={session.causes[key]}
-                updateCause={(v) => updateCauses({ [key]: v })}
-                updateMarketOverride={(v) => updateMarketOverride(key, v)}
-                primary={primary}
-              />
+              <ComparisonRow key={key} stepKey={key} step={losses.steps[key]} cause={session.causes[key]} updateCause={(v) => updateCauses({ [key]: v })} updateMarketOverride={(v) => updateMarketOverride(key, v)} t={t} />
             ))}
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <ComparisonRow
-              stepKey="devisDormants"
-              step={losses.steps.devisDormants}
-              cause={session.causes.devisDormants}
-              updateCause={(v) => updateCauses({ devisDormants: v })}
-              updateMarketOverride={(v) => updateMarketOverride('devisDormants', v)}
-              primary={primary}
-              isOneShot
-            />
+          <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: `1px solid ${t.primaryLight}` }}>
+            <ComparisonRow stepKey="devisDormants" step={losses.steps.devisDormants} cause={session.causes.devisDormants} updateCause={(v) => updateCauses({ devisDormants: v })} updateMarketOverride={(v) => updateMarketOverride('devisDormants', v)} t={t} isOneShot />
           </div>
         </div>
       );
     };
 
-    const ComparisonRow = ({ stepKey, step, cause, updateCause, updateMarketOverride, primary, isOneShot }) => {
+    const ComparisonRow = ({ stepKey, step, cause, updateCause, updateMarketOverride, t, isOneShot }) => {
       const [editingCause, setEditingCause] = useState(false);
       const [editingMarket, setEditingMarket] = useState(false);
       const [marketDraft, setMarketDraft] = useState(Math.round(step.marketRate * 100));
       const source = SOURCES[stepKey];
 
       return (
-        <div className="pl-4" style={{ borderLeft: `3px solid ${primary}` }}>
-          <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">{STEP_LABELS[stepKey]}</p>
-          <p className="font-semibold text-gray-900 leading-relaxed" style={{ fontSize: '17px' }}>
-            Vous : <span className="tabular" style={{ color: primary }}>{formatPct(step.prospectRate)}</span>
-            <span className="text-gray-400 mx-2">→</span>
+        <div style={{ paddingLeft: '16px', borderLeft: `3px solid ${t.primary}` }}>
+          <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: t.mutedText, marginBottom: '4px' }}>{STEP_LABELS[stepKey]}</p>
+          <p style={{ color: t.text, fontSize: '17px', fontWeight: 600, lineHeight: 1.5, fontFamily: `'${t.font}', sans-serif` }}>
+            Vous : <span style={{ color: t.primary, fontVariantNumeric: 'tabular-nums' }}>{formatPct(step.prospectRate)}</span>
+            <span style={{ color: t.mutedText, margin: '0 8px' }}>→</span>
             Marché : {editingMarket ? (
-              <input
-                type="number"
-                autoFocus
-                value={marketDraft}
-                onChange={e => setMarketDraft(e.target.value)}
-                onBlur={() => { updateMarketOverride(Math.max(0, Math.min(100, +marketDraft))/100); setEditingMarket(false); }}
-                onKeyDown={e => e.key === 'Enter' && e.target.blur()}
-                className="w-16 border-b-2 px-1 text-center tabular"
-                style={{ borderColor: primary }}
-              />
+              <input type="number" autoFocus value={marketDraft} onChange={e => setMarketDraft(e.target.value)} onBlur={() => { updateMarketOverride(Math.max(0, Math.min(100, +marketDraft))/100); setEditingMarket(false); }} onKeyDown={e => e.key === 'Enter' && e.target.blur()} style={{ width: '64px', borderBottom: `2px solid ${t.primary}`, padding: '0 4px', textAlign: 'center', fontVariantNumeric: 'tabular-nums', background: 'transparent', color: t.text, border: 'none', borderBottom: `2px solid ${t.primary}`, outline: 'none' }} />
             ) : (
-              <span className="tabular cursor-pointer hover:underline" onClick={() => { setMarketDraft(Math.round(step.marketRate*100)); setEditingMarket(true); }}>{formatPct(step.marketRate)} <span className="text-xs opacity-40">✎</span></span>
+              <span style={{ fontVariantNumeric: 'tabular-nums', cursor: 'pointer' }} onClick={() => { setMarketDraft(Math.round(step.marketRate*100)); setEditingMarket(true); }}>{formatPct(step.marketRate)} <span style={{ fontSize: '12px', opacity: 0.4 }}>✎</span></span>
             )}
             {step.atMarket
-              ? <span className="ml-3 text-green-700 text-sm font-semibold">✓ Au niveau du marché</span>
+              ? <span style={{ marginLeft: '12px', color: '#3A8A3A', fontSize: '14px', fontWeight: 600 }}>✓ Au niveau du marché</span>
               : <>
-                  <span className="text-gray-400 mx-2">→</span>
-                  <span className="text-rouge tabular">-{formatPct(step.delta)}</span>
-                  <span className="text-gray-400 mx-2">→</span>
-                  <span className="text-gray-900 tabular font-bold">-{formatEUR(step.loss)}{!isOneShot && '/mois'}</span>
-                  {isOneShot && <span className="ml-2 text-sm text-gray-500 italic">(one-shot)</span>}
+                  <span style={{ color: t.mutedText, margin: '0 8px' }}>→</span>
+                  <span style={{ color: '#8B1A1A', fontVariantNumeric: 'tabular-nums' }}>-{formatPct(step.delta)}</span>
+                  <span style={{ color: t.mutedText, margin: '0 8px' }}>→</span>
+                  <span style={{ color: t.text, fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>-{formatEUR(step.loss)}{!isOneShot && '/mois'}</span>
+                  {isOneShot && <span style={{ marginLeft: '8px', fontSize: '14px', color: t.mutedText, fontStyle: 'italic' }}>(one-shot)</span>}
                 </>
             }
           </p>
-          <p className="text-xs text-gray-500 italic mt-2">
-            ↳ Source : {source.name} <a href={source.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-800 inline-flex items-center gap-1">[voir l'étude ↗]</a>
+          <p style={{ fontSize: '12px', color: t.mutedText, fontStyle: 'italic', marginTop: '8px' }}>
+            ↳ Source : {source.name} <a href={source.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: t.mutedText }}>[voir l'étude ↗]</a>
           </p>
           {editingCause ? (
-            <textarea
-              autoFocus
-              defaultValue={cause}
-              onBlur={(e) => { updateCause(e.target.value); setEditingCause(false); }}
-              className="w-full mt-1 px-2 py-1 text-sm italic text-rouge border border-rouge/30 rounded resize-none"
-              rows={2}
-            />
+            <textarea autoFocus defaultValue={cause} onBlur={(e) => { updateCause(e.target.value); setEditingCause(false); }} style={{ width: '100%', marginTop: '4px', padding: '4px 8px', fontSize: '13px', fontStyle: 'italic', color: '#8B1A1A', border: '1px solid rgba(139,26,26,0.3)', borderRadius: t.radius, resize: 'none', background: t.bgAlt, fontFamily: `'${t.font}', sans-serif` }} rows={2} />
           ) : (
-            <p className="text-sm italic mt-1 text-rouge cursor-pointer hover:bg-rouge/5 rounded px-1" onClick={() => setEditingCause(true)} title="Cliquer pour éditer">
+            <p style={{ fontSize: '13px', fontStyle: 'italic', marginTop: '4px', color: '#8B1A1A', cursor: 'pointer', padding: '2px 4px', borderRadius: t.radius }} onClick={() => setEditingCause(true)} title="Cliquer pour éditer">
               ↳ Cause : {cause}
             </p>
           )}
@@ -1563,74 +1724,71 @@ Règles strictes :
       );
     };
 
-    const TotalsBlock = ({ losses, primary, primaryLight }) => {
+    const TotalsBlock = ({ losses, t }) => {
       const ratio = losses.caActuel > 0 ? losses.monthly / losses.caActuel : 0;
       const actuelBarWidth = losses.caPotentielMensuel > 0 ? (losses.caActuel / losses.caPotentielMensuel) * 100 : 0;
-      const potentielBarWidth = 100;
 
       return (
-        <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 mt-8">
-          <div className="grid grid-cols-2 gap-8 mb-8">
+        <div style={{ ...cardCSS(t), marginTop: t.sectionGap }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '32px' }}>
             <div>
-              <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">Perte mensuelle récurrente</p>
-              <p className="font-bold tabular" style={{ fontSize: '36px', color: primary }}>{formatEUR(losses.monthly)}<span className="text-base text-gray-500"> /mois</span></p>
+              <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: t.mutedText, marginBottom: '8px' }}>Perte mensuelle récurrente</p>
+              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: '40px', color: t.primary, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatEUR(losses.monthly)}<span style={{ fontSize: '16px', color: t.mutedText, fontWeight: 400 }}> /mois</span></p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">One-shot devis dormants</p>
-              <p className="font-bold tabular text-gray-900" style={{ fontSize: '28px' }}>{formatEUR(losses.oneShot)}</p>
+              <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: t.mutedText, marginBottom: '8px' }}>One-shot devis dormants</p>
+              <p style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', fontSize: '30px', color: t.text, fontFamily: `'${t.font}', sans-serif`, letterSpacing: '-0.02em', lineHeight: 1 }}>{formatEUR(losses.oneShot)}</p>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-gray-200">
-            <p className="text-xs uppercase tracking-wider text-gray-500 mb-4" style={{ letterSpacing: '0.2em' }}>CA actuel vs CA potentiel</p>
-            <div className="space-y-3">
+          <div style={{ paddingTop: '24px', borderTop: `1px solid ${t.primaryLight}` }}>
+            <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.22em', color: t.mutedText, marginBottom: '16px' }}>CA actuel vs CA potentiel</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Actuel</span>
-                  <span className="font-bold tabular text-gray-900">{formatEUR(losses.caActuel)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
+                  <span style={{ color: t.mutedText }}>Actuel</span>
+                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.text }}>{formatEUR(losses.caActuel)}</span>
                 </div>
-                <div className="h-8 rounded" style={{ background: '#F0F0F0' }}>
-                  <div className="h-full rounded transition-all duration-700" style={{ width: actuelBarWidth + '%', background: primary, opacity: 0.45 }} />
+                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.primaryLight}` }}>
+                  <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: actuelBarWidth + '%', background: t.primary, opacity: 0.4 }} />
                 </div>
               </div>
               <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="font-semibold" style={{ color: primary }}>Potentiel</span>
-                  <span className="font-bold tabular" style={{ color: primary }}>{formatEUR(losses.caPotentielMensuel)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '4px' }}>
+                  <span style={{ fontWeight: 600, color: t.primary }}>Potentiel</span>
+                  <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: t.primary }}>{formatEUR(losses.caPotentielMensuel)}</span>
                 </div>
-                <div className="h-8 rounded" style={{ background: '#F0F0F0' }}>
-                  <div className="h-full rounded transition-all duration-700" style={{ width: potentielBarWidth + '%', background: primary }} />
+                <div style={{ height: '32px', borderRadius: t.radius, background: t.bg, border: `1px solid ${t.primaryLight}` }}>
+                  <div style={{ height: '100%', borderRadius: t.radius, transition: 'width 0.7s ease', width: '100%', background: t.primary }} />
                 </div>
               </div>
             </div>
-            <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500 uppercase tracking-wider mb-2">Vous laissez sur la table chaque mois</p>
-              <p className="font-bold tabular" style={{ fontSize: '56px', color: primary, lineHeight: 1 }}>{formatEUR(losses.monthly)}</p>
-              {ratio > 0 && <p className="text-base text-gray-600 mt-2">= {ratio.toFixed(2).replace('.', ',')}× votre CA actuel</p>}
+            <div style={{ marginTop: '32px', textAlign: 'center' }}>
+              <p style={{ fontSize: '13px', color: t.mutedText, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>Vous laissez sur la table chaque mois</p>
+              <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: '64px', color: t.primary, lineHeight: 1, letterSpacing: '-0.03em', fontFamily: `'${t.font}', sans-serif` }}>{formatEUR(losses.monthly)}</p>
+              {ratio > 0 && <p style={{ fontSize: '16px', color: t.mutedText, marginTop: '8px' }}>= {ratio.toFixed(2).replace('.', ',')}× votre CA actuel</p>}
             </div>
           </div>
         </div>
       );
     };
 
-    const ThreeAxesBlock = ({ primary, primaryLight }) => {
+    const ThreeAxesBlock = ({ t }) => {
       const axes = [
         { num: '01', title: 'Réveiller votre base\nde devis dormants', desc: 'Quick win — un stock d\'anciens leads que vous pouvez réveiller en 30 jours' },
         { num: '02', title: 'Ne plus rien laisser fuir', desc: 'Capter chaque lead, traiter chaque devis, au bon moment' },
         { num: '03', title: 'Reprendre le contrôle\npar la donnée', desc: 'Voir en temps réel ce qui marche, ce qui fuit, où agir' },
       ];
       return (
-        <div className="mt-12 pt-12 border-t border-gray-200">
-          <h2 className="text-center font-bold uppercase mb-10" style={{ fontSize: '17px', letterSpacing: '0.22em', color: primary }}>
-            Comment récupérer cet argent — 3 axes
-          </h2>
-          <div className="grid grid-cols-3 gap-5">
+        <div style={{ marginTop: t.sectionGap, paddingTop: t.sectionGap, borderTop: `1px solid ${t.primaryLight}` }}>
+          <h2 style={{ ...titleCSS(t), textAlign: 'center', fontSize: '18px', color: t.primary, marginBottom: '40px' }}>Comment récupérer cet argent — 3 axes</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
             {axes.map((a, idx) => (
-              <div key={a.num} className="rounded-lg p-8 text-center fade-up" style={{ background: '#FAFAFA', border: `1px solid ${primary}33`, animationDelay: `${idx * 100}ms` }}>
-                <p className="font-bold tabular" style={{ fontSize: '56px', color: primary, letterSpacing: '-0.02em', lineHeight: 1 }}>{a.num}</p>
-                <div className="my-4 mx-auto" style={{ width: '40px', height: '2px', background: primary }} />
-                <p className="font-bold text-gray-900 uppercase whitespace-pre-line" style={{ fontSize: '13px', letterSpacing: '0.12em', lineHeight: 1.5 }}>{a.title}</p>
-                <p className="mt-4 text-sm text-gray-600 leading-relaxed">{a.desc}</p>
+              <div key={a.num} className="fade-up" style={{ ...cardCSS(t), textAlign: 'center', animationDelay: `${idx * 100}ms` }}>
+                <p style={{ fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontSize: '64px', color: t.primary, letterSpacing: '-0.02em', lineHeight: 1, fontFamily: `'${t.font}', sans-serif` }}>{a.num}</p>
+                <div style={{ margin: '16px auto', width: '40px', height: '2px', background: t.primary }} />
+                <p style={{ ...titleCSS(t), fontSize: '14px', lineHeight: 1.5, whiteSpace: 'pre-line', color: t.text }}>{a.title}</p>
+                <p style={{ marginTop: '16px', fontSize: '14px', color: t.mutedText, lineHeight: 1.6 }}>{a.desc}</p>
               </div>
             ))}
           </div>

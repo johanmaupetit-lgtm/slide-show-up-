@@ -1899,26 +1899,64 @@ La carrière de quelqu'un en dépend.`;
     );
 
     const ModePertes = ({ session, updateInputs, updateCauses, updateMarketOverride, marketRates }) => {
+      const { apiKey, updateSession } = useApp();
       const [expanded, setExpanded] = useState(false);
+      const [regenerating, setRegenerating] = useState(false);
+      const [regenError, setRegenError] = useState('');
       const losses = useMemo(() => calcLosses(session.inputs, marketRates), [session.inputs, marketRates]);
       const allFilled = ['leadsRecus','rdvPris','signatures','ticket'].every(k => +session.inputs[k] > 0);
       const t = computeTokens(session);
       const accent = t.accent && t.accent !== t.primary ? t.accent : lightenHex(t.primary, 0.55);
 
-      // Le hero s'adapte au bandeauStyle détecté par l'IA — un site minimaliste
-      // au header blanc plat doit donner un hero blanc plat, pas un bloc rouge.
-      // Un site bold avec gradient/photo doit donner un hero coloré.
       const heroMode = (t.bandeauStyle === 'gradient' || t.bandeauStyle === 'photo')
         ? 'bold'
         : 'minimal';
 
-      // CSS sur mesure généré par l'IA pour matcher l'identité du prospect.
-      // Scopé à .scalia-rendered pour éviter de polluer le reste de l'app.
       const customCSS = sanitizeCustomCSS(session.clientCustomCSS || '');
+      const hasCustomCSS = !!customCSS;
+
+      const regenerateCharte = async () => {
+        if (!session.clientWebsite) { alert('Cette session n\'a pas d\'URL prospect enregistrée.'); return; }
+        if (!apiKey) { alert('Configure d\'abord ta clé Gemini dans /admin.'); return; }
+        setRegenerating(true);
+        setRegenError('');
+        try {
+          const result = await fetchUrlScreenshot(session.clientWebsite);
+          const tokens = await analyzeCharteAI(apiKey, [result.screenshot]);
+          if (tokens.policePrimaire) loadGoogleFont(tokens.policePrimaire);
+          if (tokens.policeSecondaire) loadGoogleFont(tokens.policeSecondaire);
+          const patch = mapAITokensToSession(tokens);
+          // On garde le companyName actuel pour ne pas casser le slug
+          delete patch.companyName;
+          // Stocker aussi le nouveau screenshot compressé
+          try { patch.clientScreenshot = await compressDataUrl(result.screenshot, 1000, 0.72); } catch {}
+          updateSession(session.slug, patch);
+        } catch (e) {
+          setRegenError(e.message || String(e));
+        } finally {
+          setRegenerating(false);
+        }
+      };
 
       return (
         <div className="scalia-rendered" style={{ background: t.bg, color: t.text, minHeight: '100vh', fontFamily: `'${t.font}', Inter, sans-serif` }}>
           {customCSS && <style dangerouslySetInnerHTML={{ __html: customCSS }} />}
+
+          {/* Banner pour sessions sans customCSS (créées avant la fonctionnalité) */}
+          {!hasCustomCSS && session.clientWebsite && (
+            <div style={{ background: '#0D0D0D', color: '#C9A84C', padding: '12px 24px', textAlign: 'center', fontSize: '13px', fontFamily: 'Cinzel, Georgia, serif', letterSpacing: '0.05em', borderBottom: '1px solid #C9A84C' }}>
+              <span style={{ marginRight: '16px' }}>Cette session utilise le style par défaut.</span>
+              <button
+                onClick={regenerateCharte}
+                disabled={regenerating}
+                style={{ background: '#C9A84C', color: '#0D0D0D', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.15em', cursor: regenerating ? 'wait' : 'pointer', fontFamily: 'inherit' }}
+              >
+                {regenerating ? 'Analyse en cours…' : '✦ Régénérer le style sur mesure'}
+              </button>
+              {regenError && <p style={{ marginTop: '8px', color: '#8B1A1A', fontSize: '12px' }}>{regenError}</p>}
+            </div>
+          )}
+
           {heroMode === 'bold'
             ? <HeroBold session={session} t={t} accent={accent} />
             : <HeroMinimal session={session} t={t} accent={accent} />

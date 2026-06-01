@@ -89,6 +89,12 @@
       transition: border-color 0.2s;
     }
     .form-input:focus { outline: none; border-color: #C9A84C; }
+
+    /* Drop zone screenshots */
+    .drop-zone { transition: border-color 0.2s, background 0.2s; }
+    .drop-zone.drop-active { border-color: #C9A84C !important; background: rgba(201,168,76,0.05); }
+    .palette-swatch { transition: transform 0.15s, box-shadow 0.15s; }
+    .palette-swatch:hover { transform: scale(1.08); box-shadow: 0 0 0 2px rgba(201,168,76,0.5); }
   </style>
 </head>
 <body>
@@ -565,6 +571,10 @@
       });
       const [analysisText, setAnalysisText] = useState('');
       const [notice, setNotice] = useState('');
+      const [screenshots, setScreenshots] = useState([]); // dataUrls
+      const [palette, setPalette] = useState([]); // hex colors
+      const [extracting, setExtracting] = useState(false);
+      const dropZoneRef = useRef(null);
 
       const handleLogo = async (e) => {
         const file = e.target.files?.[0];
@@ -576,6 +586,84 @@
           alert('Erreur compression : ' + err.message);
         }
       };
+
+      const handleScreenshots = async (files) => {
+        if (!files || files.length === 0) return;
+        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+        if (imageFiles.length === 0) return;
+        setExtracting(true);
+        try {
+          // Compress and store thumbnails
+          const compressed = await Promise.all(imageFiles.map(f => compressImage(f)));
+          const newShots = [...screenshots, ...compressed];
+          setScreenshots(newShots);
+          // Extract palette from ALL screenshots (including previous)
+          const allFiles = [...imageFiles];
+          // For previous shots, convert dataUrl back to blob/file for re-extraction
+          for (const dataUrl of screenshots) {
+            const blob = await (await fetch(dataUrl)).blob();
+            allFiles.push(blob);
+          }
+          const colors = await extractFromMultiple(allFiles, 6);
+          setPalette(colors);
+          // Auto-set first 2 colors as primary/secondary
+          if (colors[0]) setData(d => ({ ...d, clientPrimaryColor: colors[0] }));
+          if (colors[1]) setData(d => ({ ...d, clientSecondaryColor: colors[1] }));
+          setNotice(`${colors.length} couleur(s) détectée(s) — ajustez en cliquant ci-dessous si besoin.`);
+        } catch (e) {
+          alert('Erreur extraction : ' + e.message);
+        } finally {
+          setExtracting(false);
+        }
+      };
+
+      const removeScreenshot = (idx) => {
+        const newShots = screenshots.filter((_, i) => i !== idx);
+        setScreenshots(newShots);
+        if (newShots.length === 0) setPalette([]);
+      };
+
+      // Drop zone events
+      useEffect(() => {
+        const zone = dropZoneRef.current;
+        if (!zone) return;
+        const onDragOver = (e) => { e.preventDefault(); zone.classList.add('drop-active'); };
+        const onDragLeave = () => zone.classList.remove('drop-active');
+        const onDrop = (e) => {
+          e.preventDefault();
+          zone.classList.remove('drop-active');
+          handleScreenshots(e.dataTransfer.files);
+        };
+        zone.addEventListener('dragover', onDragOver);
+        zone.addEventListener('dragleave', onDragLeave);
+        zone.addEventListener('drop', onDrop);
+        return () => {
+          zone.removeEventListener('dragover', onDragOver);
+          zone.removeEventListener('dragleave', onDragLeave);
+          zone.removeEventListener('drop', onDrop);
+        };
+      });
+
+      // Paste from clipboard
+      useEffect(() => {
+        const onPaste = (e) => {
+          const items = e.clipboardData?.items;
+          if (!items) return;
+          const files = [];
+          for (const item of items) {
+            if (item.type.startsWith('image/')) {
+              const f = item.getAsFile();
+              if (f) files.push(f);
+            }
+          }
+          if (files.length > 0) {
+            e.preventDefault();
+            handleScreenshots(files);
+          }
+        };
+        window.addEventListener('paste', onPaste);
+        return () => window.removeEventListener('paste', onPaste);
+      });
 
       const analyzeCharte = () => {
         const text = analysisText;
@@ -633,8 +721,73 @@
             </Field>
           </div>
 
+          {/* ===== CAPTURES DU SITE CLIENT ===== */}
+          <div className="mb-6 pt-6 border-t border-anthracite">
+            <label className="block text-xs uppercase tracking-wider text-or mb-2">Captures du site client → extraction auto de la palette</label>
+            <p className="text-xs text-gray-500 mb-3">Glisse-dépose des screenshots (ou colle depuis le presse-papier · Ctrl+V). Les couleurs dominantes seront détectées automatiquement.</p>
+
+            <div
+              ref={dropZoneRef}
+              className="drop-zone border-2 border-dashed border-anthracite rounded-lg p-6 text-center cursor-pointer hover:border-or/50"
+              onClick={() => document.getElementById('shots-input').click()}
+            >
+              <input
+                id="shots-input"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={e => { handleScreenshots(e.target.files); e.target.value = ''; }}
+              />
+              {extracting
+                ? <p className="text-or text-sm">Analyse en cours…</p>
+                : screenshots.length === 0
+                  ? <p className="text-gray-400 text-sm">Glissez les captures ici · ou cliquez pour parcourir · ou collez (Ctrl+V)</p>
+                  : <p className="text-gray-300 text-sm">{screenshots.length} capture(s) chargée(s) — ajoutez-en d'autres ou cliquez pour remplacer</p>
+              }
+            </div>
+
+            {screenshots.length > 0 && (
+              <div className="mt-3 flex gap-2 flex-wrap">
+                {screenshots.map((s, i) => (
+                  <div key={i} className="relative group">
+                    <img src={s} alt="" className="h-16 w-24 object-cover rounded border border-anthracite" />
+                    <button
+                      type="button"
+                      onClick={() => removeScreenshot(i)}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rouge text-white text-xs opacity-0 group-hover:opacity-100 transition flex items-center justify-center"
+                      title="Retirer"
+                    >×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {palette.length > 0 && (
+              <div className="mt-4 fade-in">
+                <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-2">Palette détectée — cliquez pour définir</p>
+                <div className="flex gap-2 flex-wrap">
+                  {palette.map((color, i) => (
+                    <div key={i} className="flex flex-col gap-1.5 items-center">
+                      <div
+                        className="palette-swatch w-12 h-12 rounded cursor-pointer border border-white/10"
+                        style={{ background: color }}
+                        title={color}
+                      />
+                      <span className="text-[10px] text-gray-400 font-mono">{color}</span>
+                      <div className="flex gap-1">
+                        <button type="button" onClick={() => setData(d => ({ ...d, clientPrimaryColor: color }))} className={`text-[9px] px-1.5 py-0.5 rounded transition ${data.clientPrimaryColor === color ? 'bg-or text-noir' : 'bg-noir border border-anthracite text-gray-400 hover:border-or'}`}>1aire</button>
+                        <button type="button" onClick={() => setData(d => ({ ...d, clientSecondaryColor: color }))} className={`text-[9px] px-1.5 py-0.5 rounded transition ${data.clientSecondaryColor === color ? 'bg-or text-noir' : 'bg-noir border border-anthracite text-gray-400 hover:border-or'}`}>2aire</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="mb-6">
-            <label className="block text-xs uppercase tracking-wider text-or mb-2">Analyse de la charte client (collez ici la réponse de l'IA)</label>
+            <label className="block text-xs uppercase tracking-wider text-or mb-2">Méthode alternative : analyse texte (collez la réponse d'une IA)</label>
             <textarea
               value={analysisText}
               onChange={e => setAnalysisText(e.target.value)}
@@ -750,6 +903,101 @@
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
+
+    // ===== EXTRACTION COULEURS DOMINANTES =====
+    // Algo : quantification 5-bit + bucket count, filtrage blanc/noir/gris,
+    // groupe les couleurs proches, retourne top N classées par fréquence × saturation.
+    const fileToImage = (file) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => resolve({ img, dataUrl: e.target.result });
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const extractDominantColors = async (file, maxColors = 6) => {
+      const { img } = await fileToImage(file);
+      const canvas = document.createElement('canvas');
+      const targetW = 200;
+      const ratio = targetW / img.width;
+      canvas.width = targetW;
+      canvas.height = Math.round(img.height * ratio);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+      const buckets = {};
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+        if (a < 200) continue;
+        // Quantize 5-bit per channel
+        const qr = (r >> 3) << 3, qg = (g >> 3) << 3, qb = (b >> 3) << 3;
+        const max = Math.max(qr, qg, qb), min = Math.min(qr, qg, qb);
+        const lum = 0.299*qr + 0.587*qg + 0.114*qb;
+        // Skip near-white, near-black, near-gray
+        if (lum > 245) continue;
+        if (lum < 15) continue;
+        if (max - min < 25) continue;
+        const key = `${qr},${qg},${qb}`;
+        buckets[key] = (buckets[key] || 0) + 1;
+      }
+
+      // Score : frequency × (1 + saturation)
+      const scored = Object.entries(buckets).map(([key, count]) => {
+        const [r,g,b] = key.split(',').map(Number);
+        const max = Math.max(r,g,b), min = Math.min(r,g,b);
+        const sat = max === 0 ? 0 : (max - min) / max;
+        return { key, count, sat, score: count * (1 + sat * 0.5) };
+      });
+      scored.sort((a,b) => b.score - a.score);
+
+      // Merge near-duplicates (distance < 30 in RGB)
+      const final = [];
+      for (const s of scored) {
+        const [r,g,b] = s.key.split(',').map(Number);
+        const close = final.find(f => {
+          const [fr,fg,fb] = f.key.split(',').map(Number);
+          return Math.abs(fr-r) + Math.abs(fg-g) + Math.abs(fb-b) < 60;
+        });
+        if (!close) final.push(s);
+        if (final.length >= maxColors) break;
+      }
+
+      return final.map(s => {
+        const [r,g,b] = s.key.split(',').map(Number);
+        return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+      });
+    };
+
+    const extractFromMultiple = async (files, maxColors = 6) => {
+      const allColors = [];
+      for (const f of files) {
+        try {
+          const cols = await extractDominantColors(f, maxColors);
+          allColors.push(...cols);
+        } catch (e) { console.warn('Color extraction failed', e); }
+      }
+      // Aggregate : count occurrences across screenshots
+      const counts = {};
+      allColors.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+      // Merge near-duplicates again across screenshots
+      const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+      const final = [];
+      for (const [hex] of sorted) {
+        const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+        const close = final.find(f => {
+          const fr = parseInt(f.slice(1,3),16), fg = parseInt(f.slice(3,5),16), fb = parseInt(f.slice(5,7),16);
+          return Math.abs(fr-r) + Math.abs(fg-g) + Math.abs(fb-b) < 60;
+        });
+        if (!close) final.push(hex);
+        if (final.length >= maxColors) break;
+      }
+      return final;
+    };
 
     // ============================================================
     // SESSION PAGE

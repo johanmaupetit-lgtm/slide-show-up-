@@ -297,10 +297,10 @@
                   <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
                          onloadeddata="this.style.display='block'; var mi=this.closest('.media-inner'); mi.querySelectorAll('.hero-photo,.hero-illu').forEach(function(e){e.style.display='none';}); mi.classList.add('has-media'); if(window.__heroOverlays)window.__heroOverlays();"
                          onerror="this.remove();">
-                    <source src="assets/hero-roipilot.mp4" type="video/mp4">
+                    <source src="hero-roipilot.mp4" type="video/mp4">
                   </video>
-                <!-- EMPLACEMENT PHOTO OPTIONNEL : dépose "vente/assets/hero-roipilot.jpg" pour remplacer l'illustration -->
-                <img class="hero-photo" src="assets/hero-roipilot.jpg" alt="" style="display:none;" onerror="this.remove();" onload="this.style.display='block'; var mi=this.closest('.media-inner'); var s=mi.querySelector('.hero-illu'); if(s){s.style.display='none';} mi.classList.add('has-media'); if(window.__heroOverlays)window.__heroOverlays();">
+                <!-- EMPLACEMENT PHOTO/VIDÉO : dépose "vente/hero-roipilot.jpg" (ou .mp4) pour la scène cinématique -->
+                <img class="hero-photo" src="hero-roipilot.jpg" alt="" style="display:none;" onerror="this.remove();" onload="this.style.display='block'; var mi=this.closest('.media-inner'); var s=mi.querySelector('.hero-illu'); if(s){s.style.display='none';} mi.classList.add('has-media'); if(window.__heroOverlays)window.__heroOverlays();">
                 <svg class="hero-illu" viewBox="0 0 600 560" width="100%" role="img" aria-label="Tableau de bord ROI Pilot en direct">
                   <defs>
                     <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBEFC0"/><stop offset="0.5" stop-color="#E9C75A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient>

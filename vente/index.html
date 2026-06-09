@@ -309,6 +309,35 @@
         #roi-ca { outline:none; cursor:text; border-bottom:2px dashed transparent; transition:border-color .2s; padding-bottom:2px; }
     #roi-ca:hover, #roi-ca:focus { border-bottom-color: rgba(201,168,76,0.55); }
 
+    /* ===================== LANGAGE DA — slides de contenu ===================== */
+    .reveal section.da-slide { text-align:left; padding: 40px 84px; }
+    .da-kicker { font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.3em; color:#C9A84C; font-size:17px; margin:0 0 14px 0; }
+    .da-h2 {
+      font-family:'Cinzel',serif; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; line-height:1.04;
+      font-size:62px; margin:0;
+      background: linear-gradient(135deg,#F8EFC8 0%,#E9CE7A 35%,#C9A84C 70%,#A88736 100%);
+      background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 6px 36px rgba(201,168,76,0.55));
+    }
+    .da-sub { font-family:'Inter',sans-serif; font-weight:300; color:#B9B9B9; font-size:24px; line-height:1.5; margin:22px 0 0; max-width:1200px; }
+    .da-cards { display:flex; gap:26px; margin-top:50px; }
+    .da-card {
+      flex:1; min-width:0; background: linear-gradient(180deg, rgba(26,24,18,0.92), rgba(26,24,18,0.40));
+      border-top:3px solid #C9A84C; border-radius:12px; padding:34px 28px;
+      box-shadow:0 14px 40px rgba(0,0,0,0.45);
+    }
+    .da-card .ico { width:60px; height:60px; margin-bottom:20px; display:block; }
+    .da-lab { font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.18em; text-transform:uppercase; font-size:13px; margin-bottom:8px; }
+    .da-val { font-family:'Cinzel',serif; color:#FFFFFF; font-size:27px; line-height:1.1; margin-bottom:14px; }
+    .da-txt { font-family:'Inter',sans-serif; color:#9a9a9a; font-size:16px; line-height:1.55; }
+    .ico-pulse { animation: icoPulse 2.4s ease-in-out infinite; transform-origin:center; }
+    @keyframes icoPulse { 0%,100%{opacity:.55; transform:scale(.95);} 50%{opacity:1; transform:scale(1.05);} }
+    .ico-spin { animation: icoSpin 9s linear infinite; transform-origin:center; }
+    @keyframes icoSpin { to { transform: rotate(360deg); } }
+    /* fragments des slides de contenu : glissement qui claque */
+    .reveal .da-slide .fragment { opacity:0; transform: translateY(46px) scale(0.92); filter: blur(8px); transition: opacity .55s ease, transform .7s cubic-bezier(.16,1.5,.3,1), filter .55s ease; }
+    .reveal .da-slide .fragment.visible { opacity:1 !important; transform: translateY(0) scale(1) !important; filter: blur(0) !important; }
+
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
@@ -380,26 +409,35 @@
         </div>
       </section>
 
-      <!-- 2 — SYSTÈME IA -->
-      <section>
-        <h2>Un système propulsé par l’IA</h2>
-        <p class="muted" style="margin-bottom: 32px;">Installé chez vous 100 % clé en main — vous donnez vos accès, on s’occupe de tout le reste.</p>
-        <div class="card-grid cols-2">
-          <div class="card">
-            <div class="card-num">100 % IA</div>
-            <div class="card-title">Propulsé par l’intelligence artificielle.</div>
+      <!-- 2 — SYSTÈME IA (da-slide) -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Le système</p>
+        <h2 class="da-h2">Un système propulsé par l’IA</h2>
+        <p class="da-sub">Installé chez vous 100 % clé en main — vous donnez vos accès, on s’occupe de tout le reste.</p>
+        <div class="da-cards">
+          <div class="da-card fragment" data-fragment-index="0">
+            <svg class="ico" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><circle cx="36" cy="36" r="27" stroke-width="3"/><path d="M23 37 l8 8 l18 -20" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-lab">Clé en main</div>
+            <div class="da-val">Déployé de A à Z</div>
+            <div class="da-txt">Sans rien changer à vos outils. Vous donnez vos accès, on installe tout.</div>
           </div>
-          <div class="card">
-            <div class="card-num">Clé en main</div>
-            <div class="card-title">Déployé chez vous de A à Z, sans rien changer à vos outils.</div>
+          <div class="da-card fragment" data-fragment-index="1">
+            <svg class="ico ico-pulse" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><circle cx="36" cy="15" r="5"/><circle cx="15" cy="50" r="5"/><circle cx="57" cy="50" r="5"/><circle cx="36" cy="40" r="7"/><path d="M36 22 L36 33 M31 38 L19 46 M41 38 L53 46" stroke-width="2.2"/></svg>
+            <div class="da-lab">Intelligence artificielle</div>
+            <div class="da-val">Propulsé par l’IA</div>
+            <div class="da-txt">Voicebots, scoring en temps réel, séquences automatiques calibrées.</div>
           </div>
-          <div class="card">
-            <div class="card-num">Sur mobile</div>
-            <div class="card-title">Piloté entièrement depuis votre téléphone.</div>
+          <div class="da-card fragment" data-fragment-index="2">
+            <svg class="ico" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><rect x="25" y="9" width="22" height="54" rx="6" stroke-width="3"/><path d="M30 46 l5 -7 l5 4 l8 -12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="32" y1="55" x2="40" y2="55" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <div class="da-lab">Sur mobile</div>
+            <div class="da-val">Piloté au téléphone</div>
+            <div class="da-txt">Tout votre business dans votre poche, en 30 secondes par jour.</div>
           </div>
-          <div class="card">
-            <div class="card-num">24h/24</div>
-            <div class="card-title">Produit en automatique — week-ends, congés, équipe occupée.</div>
+          <div class="da-card fragment" data-fragment-index="3">
+            <svg class="ico ico-spin" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><circle cx="36" cy="36" r="25" stroke-width="3" stroke-dasharray="105 42"/><path d="M55 21 l5 -3 l0 6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-lab">24 h / 24</div>
+            <div class="da-val">Produit en automatique</div>
+            <div class="da-txt">Même le week-end, en congés, ou quand votre équipe est occupée.</div>
           </div>
         </div>
       </section>

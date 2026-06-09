@@ -243,6 +243,38 @@
     .reveal { position: relative; z-index: 1; }
     .persistent-header, .persistent-footer { z-index: 2; }
 
+    /* ===================== HERO v5 — plein cadre, image XL ===================== */
+    .media-overlays { display:none !important; }
+    .reveal section.hero-roi {
+      padding: 0 0 0 90px;
+      background: radial-gradient(58% 82% at 72% 50%, rgba(201,168,76,0.12), transparent 72%), #080705;
+    }
+    .reveal section.hero-roi .hero-wrap { gap: 0; align-items: center; }
+    .reveal section.hero-roi .hero-left  { flex: 1 1 52%; padding-right: 48px; z-index: 2; }
+    .reveal section.hero-roi .hero-right { flex: 1 1 48%; }
+    .hero-kicker { font-size: 22px !important; letter-spacing: 0.32em !important; color: #C9A84C !important; margin: 0 0 30px 0 !important; }
+    .hero-title { font-size: 140px !important; margin: 0 0 38px 0 !important; filter: drop-shadow(0 10px 52px rgba(201,168,76,0.8)) !important; }
+    .hero-rule  { margin-bottom: 44px !important; height: 4px !important; }
+    .hero-obj   { font-size: 38px !important; line-height: 1.5 !important; color: #DADADA !important; max-width: none !important; }
+    .hero-obj .euro { font-size: 1.35em !important; }
+    .hero-chips { margin-top: 52px !important; gap: 18px !important; }
+    .hero-chip  { font-size: 15px !important; padding: 11px 22px !important; }
+    .hero-stage {
+      position: relative; height: 900px; width: 100%;
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.65), 0 0 0 1px rgba(201,168,76,0.28);
+    }
+    .hero-stage .hero-media, .hero-stage .hero-photo {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+      animation: kenburns 24s ease-in-out infinite alternate;
+    }
+    .hero-stage-scrim {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(8,7,5,0.92) 0%, rgba(8,7,5,0.45) 20%, rgba(8,7,5,0) 46%),
+        linear-gradient(0deg, rgba(8,7,5,0.45) 0%, transparent 28%);
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
@@ -275,14 +307,14 @@
   <div class="reveal">
     <div class="slides">
 
-      <!-- 1 — CONTEXTE : ROI PILOT + OBJECTIF (HERO) -->
+      <!-- 1 — CONTEXTE : ROI PILOT + OBJECTIF (HERO plein cadre) -->
       <section class="hero-roi" data-transition="fade">
         <div class="hero-wrap">
           <div class="hero-left">
             <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
             <h1 class="hero-title hero-anim">ROI PILOT</h1>
             <div class="hero-rule hero-anim"></div>
-            <p class="hero-obj hero-anim">Récupérer jusqu’à <span class="euro">[X €]</span> de CA par mois<br>et transformer votre entreprise en <span class="obj-strong">une machine qui tourne sans vous</span> — <span class="obj-gold">pilotée depuis votre téléphone</span>.</p>
+            <p class="hero-obj hero-anim">Récupérer jusqu’à <span class="euro">[X €]</span> de CA par mois et transformer votre entreprise en <span class="obj-strong">une machine qui tourne sans vous</span> — <span class="obj-gold">pilotée depuis votre téléphone</span>.</p>
             <div class="hero-chips hero-anim">
               <span class="hero-chip">Sans acheter un lead</span>
               <span class="hero-chip">Sans pub</span>
@@ -290,89 +322,14 @@
             </div>
           </div>
           <div class="hero-right hero-anim">
-            <div class="media-frame">
-              <span class="hud tl"></span><span class="hud tr"></span><span class="hud bl"></span><span class="hud br"></span>
-              <div class="media-inner">
-                <div class="reveal-clip">
-                  <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
-                         onloadeddata="this.style.display='block'; var mi=this.closest('.media-inner'); mi.querySelectorAll('.hero-photo,.hero-illu').forEach(function(e){e.style.display='none';}); mi.classList.add('has-media'); if(window.__heroOverlays)window.__heroOverlays();"
-                         onerror="this.remove();">
-                    <source src="hero-roipilot.mp4" type="video/mp4">
-                  </video>
-                <!-- EMPLACEMENT PHOTO/VIDÉO : dépose "vente/hero-roipilot.jpg" (ou .mp4) pour la scène cinématique -->
-                <img class="hero-photo" src="ChatGPT%20Image%209%20juin%202026,%2020_18_32.png" alt="" style="display:none;" onerror="this.remove();" onload="this.style.display='block'; var mi=this.closest('.media-inner'); var s=mi.querySelector('.hero-illu'); if(s){s.style.display='none';} mi.classList.add('has-media'); if(window.__heroOverlays)window.__heroOverlays();">
-                <svg class="hero-illu" viewBox="0 0 600 560" width="100%" role="img" aria-label="Tableau de bord ROI Pilot en direct">
-                  <defs>
-                    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBEFC0"/><stop offset="0.5" stop-color="#E9C75A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient>
-                    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9C75A" stop-opacity="0.55"/><stop offset="1" stop-color="#E9C75A" stop-opacity="0"/></linearGradient>
-                    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#E9C75A" stop-opacity="0.38"/><stop offset="0.55" stop-color="#C9A84C" stop-opacity="0.10"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/></radialGradient>
-                    <linearGradient id="screenglow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9C75A" stop-opacity="0.18"/><stop offset="1" stop-color="#E9C75A" stop-opacity="0"/></linearGradient>
-                    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-                  </defs>
-
-                  <ellipse class="glow-pulse" cx="300" cy="280" rx="250" ry="255" fill="url(#halo)"/>
-                  <g class="orbit" opacity="0.40"><circle cx="300" cy="280" r="232" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="2 12"/></g>
-                  <g class="orbit rev" opacity="0.26"><circle cx="300" cy="280" r="198" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="1 16"/></g>
-                  <g id="mf-orbitdot"><circle cx="300" cy="48" r="6" fill="url(#gold)" filter="url(#glow)"/></g>
-
-                  <!-- TELEPHONE -->
-                  <rect x="190" y="42" width="220" height="476" rx="42" fill="#17150F" stroke="url(#gold)" stroke-width="2.5"/>
-                  <rect x="208" y="60" width="184" height="440" rx="30" fill="#080808"/>
-                  <rect x="208" y="60" width="184" height="210" rx="30" fill="url(#screenglow)"/>
-                  <rect x="278" y="74" width="44" height="7" rx="3.5" fill="#2c2c2c"/>
-                  <text x="230" y="120" fill="#9a9a9a" font-family="Inter, sans-serif" font-size="13" letter-spacing="1.5">CA CE MOIS</text>
-                  <text id="mf-num" x="228" y="162" fill="#FBEFC0" font-family="Inter, sans-serif" font-size="34" font-weight="800" filter="url(#glow)">38 400 €</text>
-                  <text id="mf-delta" x="230" y="188" fill="#4BE6A0" font-family="Inter, sans-serif" font-size="13" font-weight="700">&#9650; +27 % ce mois</text>
-                  <path id="mf-area" d="M230 290 L230 268 L266 260 L302 266 L338 240 L366 222 L372 216 L372 290 Z" fill="url(#area)"/>
-                  <polyline id="mf-chartline" points="230,268 266,260 302,266 338,240 366,222 372,216" fill="none" stroke="url(#gold)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
-                  <rect id="mf-bar1" x="230" y="322" width="40" height="58" rx="5" fill="#E9C75A"/>
-                  <rect id="mf-bar2" x="282" y="336" width="40" height="44" rx="5" fill="#C9A84C" opacity="0.7"/>
-                  <rect id="mf-bar3" x="334" y="350" width="38" height="30" rx="5" fill="#C9A84C" opacity="0.5"/>
-                  <text x="232" y="398" fill="#7c7c7c" font-family="Inter, sans-serif" font-size="11">Leads</text>
-                  <text x="284" y="398" fill="#7c7c7c" font-family="Inter, sans-serif" font-size="11">Devis</text>
-                  <text x="336" y="398" fill="#7c7c7c" font-family="Inter, sans-serif" font-size="11">Signés</text>
-                  <rect x="230" y="452" width="152" height="26" rx="13" fill="#0f2a1d" stroke="#4BE6A0" stroke-width="1"/>
-                  <circle class="glow-pulse" cx="246" cy="465" r="4" fill="#4BE6A0"/>
-                  <text x="258" y="469" fill="#4BE6A0" font-family="Inter, sans-serif" font-size="11" font-weight="700">Pilotage automatique 24/7</text>
-
-                  <!-- EVENEMENTS AUTOMATIQUES (la machine qui tourne sans vous) -->
-                  <g class="ev-chip" id="ev1">
-                    <rect x="8" y="120" width="178" height="52" rx="13" fill="#15140F" fill-opacity="0.94" stroke="#C9A84C" stroke-width="1.2"/>
-                    <circle cx="30" cy="146" r="5" fill="#E9C75A" filter="url(#glow)"/>
-                    <text x="46" y="142" fill="#F0E6C8" font-family="Inter, sans-serif" font-size="13" font-weight="700">Lead capté</text>
-                    <text x="46" y="160" fill="#9a9a9a" font-family="Inter, sans-serif" font-size="11">rappelé en &lt; 5 min</text>
-                  </g>
-                  <g class="ev-chip" id="ev2">
-                    <rect x="414" y="146" width="178" height="52" rx="13" fill="#15140F" fill-opacity="0.94" stroke="#C9A84C" stroke-width="1.2"/>
-                    <circle cx="436" cy="172" r="5" fill="#E9C75A" filter="url(#glow)"/>
-                    <text x="452" y="168" fill="#F0E6C8" font-family="Inter, sans-serif" font-size="13" font-weight="700">RDV planifié</text>
-                    <text x="452" y="186" fill="#9a9a9a" font-family="Inter, sans-serif" font-size="11">automatiquement</text>
-                  </g>
-                  <g class="ev-chip" id="ev3">
-                    <rect x="8" y="368" width="178" height="52" rx="13" fill="#15140F" fill-opacity="0.94" stroke="#C9A84C" stroke-width="1.2"/>
-                    <circle cx="30" cy="394" r="5" fill="#E9C75A" filter="url(#glow)"/>
-                    <text x="46" y="390" fill="#F0E6C8" font-family="Inter, sans-serif" font-size="13" font-weight="700">Devis relancé</text>
-                    <text x="46" y="408" fill="#9a9a9a" font-family="Inter, sans-serif" font-size="11">séquence intelligente</text>
-                  </g>
-                  <g class="ev-chip" id="ev4">
-                    <rect x="414" y="392" width="178" height="52" rx="13" fill="#0f2a1d" fill-opacity="0.96" stroke="#4BE6A0" stroke-width="1.4"/>
-                    <circle cx="436" cy="418" r="5" fill="#4BE6A0" filter="url(#glow)"/>
-                    <text x="452" y="414" fill="#CFF6E6" font-family="Inter, sans-serif" font-size="13" font-weight="700">Devis signé</text>
-                    <text x="452" y="432" fill="#4BE6A0" font-family="Inter, sans-serif" font-size="12" font-weight="700">+6 400 €</text>
-                  </g>
-                </svg>
-                </div>
-<div class="media-overlays">
-                  <div class="ov-ca">
-                    <span class="ov-ca-label">CA ce mois</span>
-                    <span class="ov-ca-num" id="ov-num">38 400 €</span>
-                    <span class="ov-ca-delta">&#9650; +27 % ce mois</span>
-                  </div>
-                  <div class="ov-toast"><span class="ov-dot"></span>Devis signé · +6 400 €</div>
-                  <div class="ov-pill"><span class="ov-dot gold"></span>Pilotage automatique 24/7</div>
-                </div>
-                <span class="scanline"></span>
-              </div>
+            <div class="hero-stage">
+              <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
+                     onloadeddata="this.style.display='block'; var st=this.closest('.hero-stage'); st.querySelectorAll('.hero-photo').forEach(function(e){e.style.display='none';});"
+                     onerror="this.remove();">
+                <source src="hero-roipilot.mp4" type="video/mp4">
+              </video>
+              <img class="hero-photo" src="ChatGPT%20Image%209%20juin%202026,%2020_18_32.png" alt="" onerror="this.style.opacity=0;">
+              <div class="hero-stage-scrim"></div>
             </div>
           </div>
         </div>

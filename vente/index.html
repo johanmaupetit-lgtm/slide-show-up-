@@ -421,8 +421,8 @@
 
     /* ===== mini-animations sous les étapes "Concrètement" (piliers) ===== */
     .da-flow .da-card{ display:flex; flex-direction:column; }
-    .flow-anim{ margin-top:22px; height:62px; }
-    .flow-anim svg{ height:62px; width:auto; display:block; overflow:visible; }
+    .flow-anim{ margin-top:22px; height:168px; }
+    .flow-anim svg{ width:100%; height:100%; display:block; overflow:visible; }
     .fa-bell{ transform-box:fill-box; transform-origin:50% 18%; animation:faBell 1.5s ease-in-out infinite; }
     @keyframes faBell{ 0%,100%{transform:rotate(-13deg)} 50%{transform:rotate(13deg)} }
     .fa-dot{ transform-box:fill-box; animation:faDot 2.2s ease-in infinite; }
@@ -435,6 +435,35 @@
     .fa-loop{ transform-box:fill-box; transform-origin:center; animation:icoSpin 4s linear infinite; }
     .fa-bar{ transform-box:fill-box; transform-origin:center bottom; animation:iaBar 1.1s ease-in-out infinite; }
     .fa-pulse{ transform-box:fill-box; transform-origin:center; animation:glowPulse 1.6s ease-in-out infinite; }
+    /* toolkit scènes complètes */
+    .fa-flow{ stroke-dasharray:6 8; animation:iaFlow 1.4s linear infinite; }
+    .fa-stream{ transform-box:fill-box; animation:faStream 1.9s linear infinite; }
+    @keyframes faStream{ 0%{transform:translateX(0);opacity:0} 14%{opacity:1} 78%{opacity:1} 100%{transform:translateX(48px);opacity:0} }
+    .fa-pop{ transform-box:fill-box; transform-origin:center; animation:faPop 2.8s ease-in-out infinite; }
+    @keyframes faPop{ 0%,12%{transform:scale(0);opacity:0} 26%{transform:scale(1.18);opacity:1} 36%,100%{transform:scale(1);opacity:1} }
+    .fa-draw{ stroke-dasharray:52; stroke-dashoffset:52; animation:faDraw 2.8s ease-in-out infinite; }
+    @keyframes faDraw{ 0%,12%{stroke-dashoffset:52} 50%,100%{stroke-dashoffset:0} }
+    .fa-grow{ transform-box:fill-box; transform-origin:left center; animation:faGrow 2.8s ease-in-out infinite; }
+    @keyframes faGrow{ 0%,12%{transform:scaleX(0)} 58%,100%{transform:scaleX(1)} }
+    .fa-fill{ transform-box:fill-box; transform-origin:center bottom; animation:faFill 2.8s ease-in-out infinite; }
+    @keyframes faFill{ 0%,12%{transform:scaleY(0)} 58%,100%{transform:scaleY(1)} }
+    .fa-bob{ transform-box:fill-box; animation:faBob 2.4s ease-in-out infinite; }
+    @keyframes faBob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+    .fa-tap{ transform-box:fill-box; animation:faTap 1.9s ease-in-out infinite; }
+    @keyframes faTap{ 0%,38%,100%{transform:translateY(0)} 50%,58%{transform:translateY(5px)} }
+    .fa-turn{ transform-box:fill-box; transform-origin:center; animation:faTurn 2.8s ease-in-out infinite; }
+    @keyframes faTurn{ 0%,100%{transform:rotate(-16deg)} 50%{transform:rotate(16deg)} }
+    .fa-toggle{ transform-box:fill-box; animation:faToggle 2.6s ease-in-out infinite; }
+    @keyframes faToggle{ 0%,42%{transform:translateX(0)} 56%,100%{transform:translateX(15px)} }
+
+    /* slide 2 — grille 4 animations (une par bénéfice) */
+    .ia2-grid{ display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:30px; }
+    .ia2-card{ position:relative; background:linear-gradient(180deg, rgba(26,24,18,0.92), rgba(26,24,18,0.40)); border-top:3px solid #C9A84C; border-radius:14px; padding:22px 30px 24px; box-shadow:0 14px 40px rgba(0,0,0,0.45); display:flex; flex-direction:column; }
+    .ia2-lab{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.18em; text-transform:uppercase; font-size:13px; margin-bottom:7px; }
+    .ia2-txt{ font-family:'Inter',sans-serif; color:#ececec; font-size:23px; line-height:1.3; font-weight:300; }
+    .ia2-txt strong{ color:#F4D67A; font-weight:600; }
+    .ia2-scene{ height:176px; margin-top:16px; }
+    .ia2-scene svg{ width:100%; height:100%; display:block; overflow:visible; }
 
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
@@ -510,90 +539,103 @@
       <!-- 2 — SYSTÈME IA (da-slide) -->
       <section class="da-slide" data-transition="fade">
         <h2 class="da-h2">Un système boosté à l’IA</h2>
-        <div class="ia-hero">
-          <div class="ia-txt">
-            <div class="ia-li fragment" data-fragment-index="0"><strong>Boosté à l’intelligence artificielle.</strong></div>
-            <div class="ia-li fragment" data-fragment-index="1">Installé chez vous, <strong>100 % clé en main</strong>.</div>
-            <div class="ia-li fragment" data-fragment-index="2">Que vous <strong>pilotez depuis votre téléphone</strong>.</div>
-            <div class="ia-li fragment" data-fragment-index="3">Qui <strong>produit en automatique</strong><small>— même pendant vos week-ends, vos congés, ou pendant que votre équipe est occupée.</small></div>
+        <div class="ia2-grid">
+
+          <!-- 1 : Intelligence artificielle -->
+          <div class="ia2-card fragment" data-fragment-index="0">
+            <div class="ia2-lab">Intelligence</div>
+            <div class="ia2-txt"><strong>Boosté à l’intelligence artificielle.</strong></div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle class="fa-pulse" cx="150" cy="80" r="60" fill="none" stroke="#C9A84C" stroke-opacity="0.32" stroke-width="7"/>
+              <circle class="fa-stream" cx="14" cy="80" r="4" fill="#F4D67A"/>
+              <circle class="fa-stream" cx="14" cy="80" r="4" fill="#E9C75A" style="animation-delay:.6s"/>
+              <circle class="fa-stream" cx="14" cy="62" r="3.4" fill="#C9A84C" style="animation-delay:1.1s"/>
+              <g stroke="#C9A84C" stroke-width="2">
+                <line class="fa-flow" x1="150" y1="80" x2="150" y2="26"/>
+                <line class="fa-flow" x1="150" y1="80" x2="212" y2="50"/>
+                <line class="fa-flow" x1="150" y1="80" x2="214" y2="108"/>
+                <line class="fa-flow" x1="150" y1="80" x2="150" y2="134"/>
+                <line class="fa-flow" x1="150" y1="80" x2="86" y2="108"/>
+                <line class="fa-flow" x1="150" y1="80" x2="88" y2="50"/>
+              </g>
+              <circle class="fa-pop" cx="150" cy="26" r="7" fill="#F4D67A"/>
+              <circle class="fa-pop" cx="212" cy="50" r="7" fill="#E9C75A" style="animation-delay:.3s"/>
+              <circle class="fa-pop" cx="214" cy="108" r="7" fill="#F4D67A" style="animation-delay:.6s"/>
+              <circle class="fa-pop" cx="150" cy="134" r="7" fill="#E9C75A" style="animation-delay:.9s"/>
+              <circle class="fa-pop" cx="86" cy="108" r="7" fill="#F4D67A" style="animation-delay:1.2s"/>
+              <circle class="fa-pop" cx="88" cy="50" r="7" fill="#E9C75A" style="animation-delay:1.5s"/>
+              <circle cx="150" cy="80" r="26" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <path class="fa-pulse" d="M153 66 l-9 16 l7 0 l-3 12 l11 -17 l-7 0 z" fill="#F4D67A"/>
+              <circle class="fa-pop" cx="270" cy="34" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4" style="animation-delay:1.8s"/>
+              <path class="fa-pop" d="M264 34 l4 4 l8 -9" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" style="animation-delay:1.8s"/>
+            </svg></div>
           </div>
 
-          <div class="ia-stage fragment" data-fragment-index="0">
-            <svg viewBox="0 0 640 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <radialGradient id="iaG" cx="50%" cy="46%" r="50%">
-                  <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.30"/>
-                  <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <!-- halo -->
-              <circle class="ia-glow" cx="320" cy="248" r="190" fill="url(#iaG)"/>
-
-              <!-- wires robot -> badges -->
-              <path class="ia-wire" d="M252 210 L150 150" stroke="#C9A84C" stroke-width="2.4"/>
-              <path class="ia-wire" d="M388 210 L498 150" stroke="#C9A84C" stroke-width="2.4"/>
-              <path class="ia-wire" d="M252 290 L150 360" stroke="#C9A84C" stroke-width="2.4"/>
-              <path class="ia-wire" d="M388 290 L498 360" stroke="#C9A84C" stroke-width="2.4"/>
-
-              <!-- orbite -->
-              <g class="ia-orbit">
-                <circle cx="320" cy="248" r="138" stroke="#C9A84C" stroke-opacity="0.30" stroke-width="2" stroke-dasharray="3 12"/>
-                <circle cx="320" cy="110" r="5" fill="#F4D67A"/>
-                <circle cx="458" cy="248" r="4" fill="#E9C75A"/>
-                <circle cx="320" cy="386" r="5" fill="#F4D67A"/>
-                <circle cx="182" cy="248" r="4" fill="#E9C75A"/>
+          <!-- 2 : Clé en main -->
+          <div class="ia2-card fragment" data-fragment-index="1">
+            <div class="ia2-lab">Clé en main</div>
+            <div class="ia2-txt">Installé chez vous, <strong>100 % clé en main</strong>.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="fa-turn" style="transform-origin:54px 60px">
+                <circle cx="54" cy="60" r="20" fill="none" stroke="#F4D67A" stroke-width="4"/>
+                <circle cx="54" cy="60" r="7" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+                <rect x="50" y="78" width="8" height="42" rx="2" fill="#F4D67A"/>
+                <rect x="58" y="100" width="12" height="6" rx="2" fill="#F4D67A"/>
+                <rect x="58" y="110" width="9" height="6" rx="2" fill="#F4D67A"/>
               </g>
-
-              <!-- ROBOT -->
-              <g>
-                <!-- antenne -->
-                <line x1="320" y1="188" x2="320" y2="150" stroke="#C9A84C" stroke-width="3"/>
-                <circle class="ia-antenna" cx="320" cy="143" r="8" fill="#F4D67A"/>
-                <!-- oreilles -->
-                <rect x="246" y="232" width="14" height="34" rx="5" fill="#1c1a13" stroke="#C9A84C" stroke-width="2.4"/>
-                <rect x="380" y="232" width="14" height="34" rx="5" fill="#1c1a13" stroke="#C9A84C" stroke-width="2.4"/>
-                <!-- tête -->
-                <rect x="258" y="188" width="124" height="124" rx="28" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
-                <!-- écran visage -->
-                <rect x="276" y="208" width="88" height="62" rx="14" fill="#0c0b07" stroke="#C9A84C" stroke-opacity="0.5" stroke-width="1.6"/>
-                <!-- yeux -->
-                <circle class="ia-eye" cx="300" cy="236" r="11" fill="#F4D67A"/>
-                <circle class="ia-eye" cx="340" cy="236" r="11" fill="#F4D67A"/>
-                <!-- equalizer (voix / production) -->
-                <rect class="ia-bar" x="296" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
-                <rect class="ia-bar" x="310" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
-                <rect class="ia-bar" x="324" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
-                <rect class="ia-bar" x="338" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
+              <g font-family="Cinzel,serif" font-size="11" fill="#C9A84C">
+                <rect x="104" y="20" width="150" height="26" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="37">CRM</text>
+                <path class="fa-draw" d="M226 33 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="104" y="54" width="150" height="26" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="71">Téléphonie IA</text>
+                <path class="fa-draw" style="animation-delay:.5s" d="M226 67 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="104" y="88" width="150" height="26" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="105">Relances auto</text>
+                <path class="fa-draw" style="animation-delay:1s" d="M226 101 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               </g>
-
-              <!-- BADGE 1 : téléphone -->
-              <g class="ia-badge">
-                <circle cx="150" cy="150" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
-                <rect x="138" y="128" width="24" height="44" rx="6" fill="none" stroke="#F4D67A" stroke-width="2.6"/>
-                <line x1="145" y1="166" x2="155" y2="166" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
-                <path d="M143 140 l5 6 l5 -8 l5 9" stroke="#E9C75A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </g>
-              <!-- BADGE 2 : clé en main / engrenage -->
-              <g class="ia-badge">
-                <circle cx="498" cy="150" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
-                <circle class="ia-orbit-rev" cx="498" cy="150" r="20" fill="none" stroke="#F4D67A" stroke-width="3" stroke-dasharray="6 7" style="transform-origin:498px 150px;"/>
-                <circle cx="498" cy="150" r="8" fill="none" stroke="#E9C75A" stroke-width="2.6"/>
-              </g>
-              <!-- BADGE 3 : week-end / lune -->
-              <g class="ia-badge">
-                <circle cx="150" cy="360" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
-                <path d="M162 344 a18 18 0 1 0 0 32 a14 14 0 1 1 0 -32 z" fill="#F4D67A"/>
-                <circle cx="170" cy="340" r="1.8" fill="#E9C75A"/><circle cx="176" cy="350" r="1.4" fill="#E9C75A"/>
-              </g>
-              <!-- BADGE 4 : 24/7 -->
-              <g class="ia-badge">
-                <circle cx="498" cy="360" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
-                <circle cx="498" cy="360" r="22" fill="none" stroke="#F4D67A" stroke-width="2.4"/>
-                <line x1="498" y1="360" x2="498" y2="346" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
-                <line x1="498" y1="360" x2="509" y2="360" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
-              </g>
-            </svg>
+              <rect x="104" y="128" width="150" height="10" rx="5" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/>
+              <rect class="fa-grow" x="104" y="128" width="150" height="10" rx="5" fill="#F4D67A"/>
+              <text x="276" y="138" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">100%</text>
+            </svg></div>
           </div>
+
+          <!-- 3 : Mobile -->
+          <div class="ia2-card fragment" data-fragment-index="2">
+            <div class="ia2-lab">Mobile</div>
+            <div class="ia2-txt">Que vous <strong>pilotez depuis votre téléphone</strong>.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="fa-pulse" d="M64 58 a26 26 0 0 0 0 44" stroke="#C9A84C" stroke-width="2" fill="none"/>
+              <path class="fa-pulse" style="animation-delay:.4s" d="M48 48 a40 40 0 0 0 0 64" stroke="#8a6f2e" stroke-width="2" fill="none"/>
+              <rect x="110" y="14" width="84" height="132" rx="14" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <rect x="120" y="30" width="64" height="84" rx="6" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.4"/>
+              <path class="fa-draw" d="M126 90 l12 -14 l12 8 l16 -22" stroke="#E9C75A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="128" y="94" width="9" height="14" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="142" y="94" width="9" height="14" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="156" y="94" width="9" height="14" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <rect x="124" y="122" width="34" height="14" rx="7" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/>
+              <circle class="fa-toggle" cx="132" cy="129" r="6" fill="#F4D67A"/>
+              <circle class="fa-wave" cx="174" cy="129" r="12" fill="none" stroke="#F4D67A" stroke-width="2" style="transform-origin:174px 129px"/>
+              <g class="fa-tap"><circle cx="174" cy="129" r="5" fill="#C9A84C"/></g>
+            </svg></div>
+          </div>
+
+          <!-- 4 : Automatique -->
+          <div class="ia2-card fragment" data-fragment-index="3">
+            <div class="ia2-lab">Automatique</div>
+            <div class="ia2-txt"><strong>Produit en automatique</strong> — même week-ends, congés, équipe occupée.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="mc-sun" style="transform-origin:42px 40px"><circle cx="42" cy="40" r="13" fill="none" stroke="#F4D67A" stroke-width="2.4"/><g stroke="#F4D67A" stroke-width="2.2" stroke-linecap="round"><line x1="42" y1="20" x2="42" y2="26"/><line x1="42" y1="54" x2="42" y2="60"/><line x1="22" y1="40" x2="28" y2="40"/><line x1="56" y1="40" x2="62" y2="40"/><line x1="28" y1="26" x2="32" y2="30"/><line x1="52" y1="50" x2="56" y2="54"/><line x1="28" y1="54" x2="32" y2="50"/><line x1="52" y1="30" x2="56" y2="26"/></g></g>
+              <path d="M268 30 a16 16 0 1 0 0 28 a12 12 0 1 1 0 -28 z" fill="#F4D67A"/>
+              <text class="mc-zzz" x="236" y="38" font-family="Cinzel,serif" font-size="15" fill="#C9A84C">z</text>
+              <text class="mc-zzz" x="248" y="26" font-family="Cinzel,serif" font-size="19" fill="#C9A84C" style="animation-delay:1s">Z</text>
+              <rect x="96" y="64" width="108" height="76" rx="14" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+              <rect x="120" y="72" width="60" height="16" rx="8" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <text class="fa-pulse" x="150" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">IA · 24/7</text>
+              <g class="mc-cog" style="transform-origin:130px 110px"><circle cx="130" cy="110" r="20" fill="none" stroke="#F4D67A" stroke-width="7" stroke-dasharray="5 6"/><circle cx="130" cy="110" r="8" fill="none" stroke="#E9C75A" stroke-width="2.6"/></g>
+              <g class="mc-cog rev" style="transform-origin:172px 122px"><circle cx="172" cy="122" r="14" fill="none" stroke="#E9C75A" stroke-width="6" stroke-dasharray="4 5"/><circle cx="172" cy="122" r="6" fill="none" stroke="#C9A84C" stroke-width="2.4"/></g>
+              <g class="mc-coin" style="transform-origin:210px 96px"><circle cx="210" cy="96" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="210" y="101" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.9s"><circle cx="210" cy="96" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="210" y="101" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+
         </div>
       </section>
 
@@ -651,29 +693,53 @@
         <h2 class="da-h2">Il réveille votre base, tout seul</h2>
         <div class="da-cards da-flow">
           <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Extrait &amp; trie avec l’IA</div><div class="da-txt">Toute votre base nettoyée et segmentée : chauds / tièdes / froids.</div>
-            <div class="flow-anim"><svg viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g stroke="#F4D67A" stroke-width="2.4" fill="#16140e"><ellipse cx="24" cy="16" rx="14" ry="5"/><path d="M10 16 L10 40 a14 5 0 0 0 28 0 L38 16"/><path d="M10 28 a14 5 0 0 0 28 0" fill="none"/></g>
-              <circle class="fa-dot" cx="44" cy="28" r="3.6" fill="#F4D67A"/>
-              <circle class="fa-dot" style="animation-delay:.55s" cx="44" cy="28" r="3.6" fill="#E9C75A"/>
-              <circle class="fa-dot" style="animation-delay:1.1s" cx="44" cy="28" r="3.6" fill="#C9A84C"/>
-              <circle class="fa-dot" style="animation-delay:1.65s" cx="44" cy="28" r="3.6" fill="#F4D67A"/>
-              <rect x="112" y="13" width="30" height="10" rx="3" fill="#F4D67A"/>
-              <rect x="112" y="27" width="30" height="10" rx="3" fill="#C9A84C" opacity="0.7"/>
-              <rect x="112" y="41" width="30" height="10" rx="3" fill="#8a6f2e" opacity="0.55"/>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#F4D67A" stroke-width="2.4" fill="#16140e"><ellipse cx="40" cy="34" rx="20" ry="7"/><path d="M20 34 L20 74 a20 7 0 0 0 40 0 L60 34"/><path d="M20 54 a20 7 0 0 0 40 0" fill="none"/></g>
+              <line class="fa-flow" x1="68" y1="55" x2="120" y2="55" stroke="#C9A84C" stroke-width="2.2"/><path d="M118 50 l8 5 l-8 5" fill="none" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle class="fa-stream" cx="74" cy="55" r="3.4" fill="#F4D67A"/>
+              <circle class="fa-pulse" cx="170" cy="55" r="30" fill="none" stroke="#C9A84C" stroke-opacity=".35" stroke-width="6"/>
+              <circle cx="170" cy="55" r="21" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <path class="fa-pulse" d="M173 42 l-8 15 l6 0 l-3 11 l10 -16 l-6 0 z" fill="#F4D67A"/>
+              <text x="170" y="100" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C9A84C">IA</text>
+              <line class="fa-flow" x1="200" y1="55" x2="252" y2="55" stroke="#C9A84C" stroke-width="2.2"/><path d="M250 50 l8 5 l-8 5" fill="none" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle class="fa-stream" cx="206" cy="55" r="3.4" fill="#F4D67A" style="animation-delay:.5s"/>
+              <rect x="276" y="26" width="54" height="13" rx="3" fill="#F4D67A"/>
+              <rect x="276" y="48" width="54" height="13" rx="3" fill="#C9A84C" opacity=".7"/>
+              <rect x="276" y="70" width="54" height="13" rx="3" fill="#8a6f2e" opacity=".55"/>
+              <path class="fa-pulse" d="M267 33 c-4 -6 2 -8 0 -13 c6 3 9 9 4 13 z" fill="#F4D67A"/>
             </svg></div>
           </div>
           <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Séquence multicanale auto</div><div class="da-txt">Réactive 100 % de vos archives sans que vous touchiez à rien.</div>
-            <div class="flow-anim"><svg viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g class="fa-pulse"><rect x="14" y="20" width="28" height="20" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><path d="M15 22 l13 9 l13 -9" stroke="#F4D67A" stroke-width="1.8" fill="none"/></g>
-              <g class="fa-pulse" style="animation-delay:.4s"><rect x="60" y="18" width="30" height="22" rx="6" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><path d="M68 40 l0 6 l7 -6" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><circle cx="69" cy="29" r="1.8" fill="#F4D67A"/><circle cx="75" cy="29" r="1.8" fill="#F4D67A"/><circle cx="81" cy="29" r="1.8" fill="#F4D67A"/></g>
-              <g class="fa-pulse" style="animation-delay:.8s"><path d="M112 20 a26 26 0 0 0 18 18 l4 -6 a4 4 0 0 0 -4 -4 l-5 1 a20 20 0 0 1 -9 -9 l1 -5 a4 4 0 0 0 -4 -4 z" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/></g>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="42" cy="44" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path d="M26 80 a16 18 0 0 1 32 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <text class="mc-zzz" x="58" y="34" font-family="Cinzel,serif" font-size="13" fill="#C9A84C">z</text>
+              <line class="fa-flow" x1="72" y1="55" x2="118" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pulse"><rect x="132" y="18" width="30" height="20" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M133 20 l14 8 l14 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="fa-pulse" style="animation-delay:.35s"><rect x="132" y="44" width="30" height="20" rx="5" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><circle cx="140" cy="54" r="1.7" fill="#F4D67A"/><circle cx="147" cy="54" r="1.7" fill="#F4D67A"/><circle cx="154" cy="54" r="1.7" fill="#F4D67A"/></g>
+              <g class="fa-pulse" style="animation-delay:.7s"><path d="M134 72 a22 22 0 0 0 16 16 l3 -5 a3 3 0 0 0 -3 -4 l-4 1 a16 16 0 0 1 -7 -7 l1 -4 a3 3 0 0 0 -4 -3 z" fill="#16140e" stroke="#F4D67A" stroke-width="2"/></g>
+              <circle class="fa-stream" cx="166" cy="28" r="2.6" fill="#F4D67A"/>
+              <circle class="fa-stream" cx="166" cy="54" r="2.6" fill="#F4D67A" style="animation-delay:.4s"/>
+              <line class="fa-flow" x1="214" y1="55" x2="262" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="296" cy="44" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <circle cx="290" cy="42" r="2.4" fill="#F4D67A"/><circle cx="302" cy="42" r="2.4" fill="#F4D67A"/>
+              <path d="M289 52 a8 8 0 0 0 14 0" fill="none" stroke="#F4D67A" stroke-width="2"/>
+              <path d="M280 82 a16 18 0 0 1 32 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <g class="fa-pop" style="transform-origin:320px 26px"><circle cx="320" cy="26" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><line x1="320" y1="20" x2="320" y2="28" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/><circle cx="320" cy="32" r="1.6" fill="#F4D67A"/></g>
             </svg></div>
           </div>
           <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte prospect chaud</div><div class="da-txt">Vos équipes sont prévenues avec le contexte, au bon moment.</div>
-            <div class="flow-anim"><svg viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle class="fa-wave" cx="62" cy="30" r="22" fill="none" stroke="#C9A84C" stroke-width="2" style="transform-origin:62px 30px"/>
-              <circle class="fa-wave" cx="62" cy="30" r="22" fill="none" stroke="#E9C75A" stroke-width="2" style="transform-origin:62px 30px;animation-delay:.9s"/>
-              <g class="fa-bell" style="transform-origin:62px 14px"><path d="M62 16 C52 16 50 26 50 34 L74 34 C74 26 72 16 62 16 Z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="46" y1="38" x2="78" y2="38" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/><circle cx="62" cy="44" r="3.5" fill="#F4D67A"/><line x1="62" y1="10" x2="62" y2="16" stroke="#F4D67A" stroke-width="2.4"/></g>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="34" y="20" width="14" height="50" rx="7" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <circle cx="41" cy="78" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <rect class="fa-fill" x="37" y="30" width="6" height="44" rx="3" fill="#F4D67A" style="transform-origin:40px 74px"/>
+              <circle cx="41" cy="78" r="6" fill="#F4D67A"/>
+              <line class="fa-flow" x1="62" y1="55" x2="116" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bell" style="transform-origin:170px 24px"><path d="M170 26 C156 26 153 40 153 50 L187 50 C187 40 184 26 170 26 Z" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><line x1="148" y1="55" x2="192" y2="55" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/><circle cx="170" cy="63" r="5" fill="#F4D67A"/><line x1="170" y1="18" x2="170" y2="26" stroke="#F4D67A" stroke-width="2.6"/></g>
+              <circle class="fa-wave" cx="170" cy="44" r="30" fill="none" stroke="#C9A84C" stroke-width="2" style="transform-origin:170px 44px"/>
+              <line class="fa-flow" x1="206" y1="55" x2="258" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="280" y="18" width="40" height="74" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <path class="fa-pop" d="M290 54 l7 8 l16 -18" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transform-origin:300px 50px"/>
             </svg></div>
           </div>
         </div>
@@ -753,34 +819,49 @@
         <h2 class="da-h2">Plus rien ne s’échappe, jamais</h2>
         <div class="da-cards da-flow">
           <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Traite TOUS vos leads &lt; 5 min</div><div class="da-txt">24/7 — qualifie et planifie le RDV, via un voice bot entrant et sortant.<br><span class="da-mini">Conversion ×4 vs un rappel sous 24 h</span></div>
-            <div class="flow-anim"><svg viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="62" y="14" width="16" height="26" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
-              <path d="M56 34 a14 14 0 0 0 28 0" stroke="#F4D67A" stroke-width="2.4" fill="none"/>
-              <line x1="70" y1="48" x2="70" y2="54" stroke="#F4D67A" stroke-width="2.4"/>
-              <path class="fa-pulse" d="M46 22 a12 12 0 0 0 0 18" stroke="#E9C75A" stroke-width="2.2" fill="none"/>
-              <path class="fa-pulse" style="animation-delay:.3s" d="M38 18 a18 18 0 0 0 0 26" stroke="#C9A84C" stroke-width="2" fill="none"/>
-              <path class="fa-pulse" style="animation-delay:.15s" d="M94 22 a12 12 0 0 1 0 18" stroke="#E9C75A" stroke-width="2.2" fill="none"/>
-              <path class="fa-pulse" style="animation-delay:.45s" d="M102 18 a18 18 0 0 1 0 26" stroke="#C9A84C" stroke-width="2" fill="none"/>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 32 a30 30 0 0 0 22 22 l5 -7 a4 4 0 0 0 -4 -5 l-6 1 a20 20 0 0 1 -10 -10 l1 -6 a4 4 0 0 0 -5 -4 z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-pulse" d="M58 24 a14 14 0 0 1 6 10" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="72" y1="55" x2="116" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="150" y="30" width="40" height="38" rx="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <circle class="ia-eye" cx="162" cy="47" r="4.6" fill="#F4D67A"/><circle class="ia-eye" cx="178" cy="47" r="4.6" fill="#F4D67A"/>
+              <line x1="170" y1="22" x2="170" y2="30" stroke="#F4D67A" stroke-width="2.4"/><circle class="ia-antenna" cx="170" cy="18" r="4" fill="#F4D67A"/>
+              <path class="fa-pulse" d="M142 38 a10 10 0 0 0 0 22" fill="none" stroke="#E9C75A" stroke-width="2"/>
+              <path class="fa-pulse" style="animation-delay:.3s" d="M198 38 a10 10 0 0 1 0 22" fill="none" stroke="#E9C75A" stroke-width="2"/>
+              <text x="170" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#C9A84C">&lt; 5 min</text>
+              <line class="fa-flow" x1="210" y1="55" x2="258" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="280" y="24" width="44" height="44" rx="5" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <line x1="280" y1="34" x2="324" y2="34" stroke="#C9A84C" stroke-width="2"/>
+              <line x1="290" y1="20" x2="290" y2="28" stroke="#F4D67A" stroke-width="2.4"/><line x1="314" y1="20" x2="314" y2="28" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-pop" d="M290 48 l6 6 l13 -15" stroke="#F4D67A" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transform-origin:300px 46px"/>
             </svg></div>
           </div>
           <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Relance vos devis et réduit les annulations</div><div class="da-txt">Automatiquement et intelligemment, jusqu’à signature.<br><span class="da-mini">Séquence anti no-show automatique pour augmenter le taux de présence.</span></div>
-            <div class="flow-anim"><svg viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="18" y="12" width="34" height="40" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
-              <line x1="25" y1="22" x2="45" y2="22" stroke="#C9A84C" stroke-width="2"/><line x1="25" y1="30" x2="45" y2="30" stroke="#C9A84C" stroke-width="2"/><line x1="25" y1="38" x2="38" y2="38" stroke="#C9A84C" stroke-width="2"/>
-              <g class="fa-loop" style="transform-origin:80px 32px"><circle cx="80" cy="32" r="13" fill="none" stroke="#F4D67A" stroke-width="2.6" stroke-dasharray="55 28"/><path d="M90 24 l4 -3 l-1 5" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
-              <rect x="106" y="14" width="30" height="30" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
-              <line x1="106" y1="22" x2="136" y2="22" stroke="#C9A84C" stroke-width="2"/>
-              <path class="fa-pulse" d="M113 32 l4 4 l9 -10" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="26" y="20" width="40" height="52" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <line x1="34" y1="32" x2="58" y2="32" stroke="#C9A84C" stroke-width="2"/><line x1="34" y1="42" x2="58" y2="42" stroke="#C9A84C" stroke-width="2"/><line x1="34" y1="52" x2="50" y2="52" stroke="#C9A84C" stroke-width="2"/>
+              <text x="46" y="68" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">€</text>
+              <line class="fa-flow" x1="74" y1="46" x2="120" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-loop" style="transform-origin:170px 46px"><circle cx="170" cy="46" r="20" fill="none" stroke="#F4D67A" stroke-width="3" stroke-dasharray="86 30"/><path d="M186 36 l5 -4 l-1 7" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <path class="fa-pulse" d="M170 38 a8 8 0 0 1 0 16" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <text x="170" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C9A84C">anti no-show</text>
+              <line class="fa-flow" x1="200" y1="46" x2="250" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="288" cy="30" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <path d="M274 64 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:316px 30px"><circle cx="316" cy="30" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><path d="M310 30 l4 4 l8 -9" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
             </svg></div>
           </div>
           <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte dès qu’un prospect est chaud</div><div class="da-txt">Vos équipes appellent au moment opportun.</div>
-            <div class="flow-anim"><svg viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g class="fa-bell" style="transform-origin:50px 14px"><path d="M50 16 C40 16 38 26 38 34 L62 34 C62 26 60 16 50 16 Z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="34" y1="38" x2="66" y2="38" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="44" r="3.5" fill="#F4D67A"/><line x1="50" y1="10" x2="50" y2="16" stroke="#F4D67A" stroke-width="2.4"/></g>
-              <path class="fa-pulse" d="M74 24 a10 10 0 0 1 0 18" stroke="#C9A84C" stroke-width="2" fill="none"/>
-              <rect x="100" y="14" width="10" height="30" rx="5" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
-              <circle cx="105" cy="46" r="7" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
-              <circle class="fa-rise" cx="105" cy="40" r="3" fill="#F4D67A"/>
-              <circle cx="105" cy="46" r="3.5" fill="#F4D67A"/>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="48" cy="50" r="26" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <circle cx="48" cy="50" r="16" fill="none" stroke="#C9A84C" stroke-width="1.3" opacity=".5"/>
+              <g class="fa-radar" style="transform-origin:48px 50px"><path d="M48 50 L48 24 A26 26 0 0 1 71 38 Z" fill="#F4D67A" opacity=".32"/><line x1="48" y1="50" x2="48" y2="24" stroke="#F4D67A" stroke-width="2"/></g>
+              <line class="fa-flow" x1="78" y1="50" x2="122" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <path class="fa-pulse" d="M170 22 c-11 13 7 17 0 30 c-15 -4 -17 -19 -6 -25 c0 6 4 8 6 4 c0 -5 0 -7 0 -9 z" fill="#F4D67A"/>
+              <text x="170" y="88" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C9A84C">chaud</text>
+              <line class="fa-flow" x1="206" y1="50" x2="252" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bell" style="transform-origin:286px 22px"><path d="M286 24 C274 24 272 36 272 45 L300 45 C300 36 298 24 286 24 Z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="268" y1="49" x2="304" y2="49" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/><circle cx="286" cy="56" r="4" fill="#F4D67A"/><line x1="286" y1="17" x2="286" y2="24" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <path class="fa-pulse" d="M312 60 a24 24 0 0 0 16 16 l4 -6 a3 3 0 0 0 -4 -4 l-4 1 a16 16 0 0 1 -8 -8 l1 -4 a3 3 0 0 0 -5 -3 z" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
             </svg></div>
           </div>
         </div>
@@ -820,31 +901,64 @@
         <h2 class="da-h2">Vous reprenez le contrôle</h2>
         <div class="da-cards da-flow">
           <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Devis en dictée vocale</div><div class="da-txt">Générés et envoyés sous 1 h — avant le concurrent.</div>
-            <div class="flow-anim"><svg viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="22" y="12" width="14" height="24" rx="7" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
-              <path d="M17 30 a12 12 0 0 0 24 0" stroke="#F4D67A" stroke-width="2.4" fill="none"/>
-              <line x1="29" y1="42" x2="29" y2="48" stroke="#F4D67A" stroke-width="2.4"/>
-              <path class="fa-pulse" d="M52 30 l22 0 m-6 -5 l6 5 l-6 5" stroke="#F4D67A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <rect x="96" y="10" width="34" height="42" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
-              <line x1="103" y1="20" x2="123" y2="20" stroke="#C9A84C" stroke-width="2"/><line x1="103" y1="28" x2="123" y2="28" stroke="#C9A84C" stroke-width="2"/><line x1="103" y1="36" x2="116" y2="36" stroke="#C9A84C" stroke-width="2"/>
-              <text x="113" y="49" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#F4D67A">€</text>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="34" y="20" width="16" height="28" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path d="M28 40 a14 14 0 0 0 28 0" stroke="#F4D67A" stroke-width="2.4" fill="none"/>
+              <line x1="42" y1="54" x2="42" y2="62" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-pulse" d="M18 30 a16 16 0 0 0 0 22" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <path class="fa-pulse" style="animation-delay:.3s" d="M62 30 a16 16 0 0 1 0 22" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="74" y1="46" x2="118" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="146" y="16" width="48" height="60" rx="5" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-draw" d="M154 30 l32 0" stroke="#C9A84C" stroke-width="2.4" fill="none"/>
+              <path class="fa-draw" style="animation-delay:.3s" d="M154 40 l32 0" stroke="#C9A84C" stroke-width="2.4" fill="none"/>
+              <path class="fa-draw" style="animation-delay:.6s" d="M154 50 l22 0" stroke="#C9A84C" stroke-width="2.4" fill="none"/>
+              <text class="fa-pop" x="178" y="70" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A" style="transform-origin:178px 66px">€</text>
+              <line class="fa-flow" x1="202" y1="46" x2="250" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bob">
+                <circle cx="292" cy="38" r="18" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+                <circle cx="285" cy="34" r="2.6" fill="#F4D67A"/><circle cx="299" cy="34" r="2.6" fill="#F4D67A"/>
+                <path d="M283 44 a10 8 0 0 0 18 0" fill="none" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/>
+              </g>
+              <g class="fa-pop" style="transform-origin:318px 22px"><circle cx="318" cy="22" r="10" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M313 22 l3 4 l7 -8" stroke="#F4D67A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
             </svg></div>
           </div>
           <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Dashboard temps réel</div><div class="da-txt">Leads, devis, signatures, CA — sur votre téléphone, 30 s/jour.</div>
-            <div class="flow-anim"><svg viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="40" y="6" width="44" height="48" rx="6" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
-              <path d="M47 26 l8 -6 l7 4 l9 -8" stroke="#C9A84C" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <rect class="fa-bar" x="48" y="34" width="6" height="14" rx="2" fill="#F4D67A"/>
-              <rect class="fa-bar" x="58" y="34" width="6" height="14" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
-              <rect class="fa-bar" x="68" y="34" width="6" height="14" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g font-family="Cinzel,serif" font-size="9" fill="#C9A84C">
+                <rect x="14" y="20" width="46" height="16" rx="4" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/><text x="22" y="31">Leads</text>
+                <rect x="14" y="44" width="46" height="16" rx="4" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/><text x="22" y="55">Devis</text>
+                <rect x="14" y="68" width="46" height="16" rx="4" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/><text x="24" y="79">CA</text>
+              </g>
+              <circle class="fa-stream" cx="64" cy="28" r="3" fill="#F4D67A"/>
+              <circle class="fa-stream" cx="64" cy="52" r="3" fill="#F4D67A" style="animation-delay:.4s"/>
+              <circle class="fa-stream" cx="64" cy="76" r="3" fill="#F4D67A" style="animation-delay:.8s"/>
+              <rect x="142" y="10" width="56" height="90" rx="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <rect x="150" y="22" width="40" height="58" rx="4" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.3"/>
+              <path class="fa-draw" d="M154 60 l9 -12 l9 7 l12 -18" stroke="#E9C75A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="155" y="64" width="7" height="12" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="167" y="64" width="7" height="12" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="179" y="64" width="7" height="12" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <line class="fa-flow" x1="206" y1="55" x2="252" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="290" cy="44" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <circle cx="284" cy="42" r="2.4" fill="#F4D67A"/><circle cx="296" cy="42" r="2.4" fill="#F4D67A"/>
+              <path d="M284 50 a8 7 0 0 0 12 0" fill="none" stroke="#F4D67A" stroke-width="2"/>
+              <path d="M276 76 a15 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:320px 28px"><circle cx="320" cy="28" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="320" y="32" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#F4D67A">30s</text></g>
             </svg></div>
           </div>
           <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alertes intelligentes</div><div class="da-txt">Surveillent vos KPIs et vous préviennent au bon moment.</div>
-            <div class="flow-anim"><svg viewBox="0 0 150 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="60" cy="30" r="24" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
-              <circle cx="60" cy="30" r="15" fill="none" stroke="#C9A84C" stroke-width="1.4" opacity="0.5"/>
-              <g class="fa-radar" style="transform-origin:60px 30px"><path d="M60 30 L60 6 A24 24 0 0 1 81 19 Z" fill="#F4D67A" opacity="0.35"/><line x1="60" y1="30" x2="60" y2="6" stroke="#F4D67A" stroke-width="2"/></g>
-              <circle class="fa-pulse" cx="72" cy="20" r="3" fill="#F4D67A"/>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 64 a30 30 0 0 1 56 0" fill="none" stroke="#C9A84C" stroke-width="3"/>
+              <g class="fa-turn" style="transform-origin:50px 64px"><line x1="50" y1="64" x2="68" y2="44" stroke="#F4D67A" stroke-width="3" stroke-linecap="round"/></g>
+              <circle cx="50" cy="64" r="4" fill="#F4D67A"/>
+              <line class="fa-flow" x1="86" y1="50" x2="122" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="170" cy="50" r="26" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <g class="fa-radar" style="transform-origin:170px 50px"><path d="M170 50 L170 24 A26 26 0 0 1 193 38 Z" fill="#F4D67A" opacity=".3"/><line x1="170" y1="50" x2="170" y2="24" stroke="#F4D67A" stroke-width="2"/></g>
+              <circle class="fa-pop" cx="184" cy="40" r="4" fill="#F4D67A" style="transform-origin:184px 40px"/>
+              <line class="fa-flow" x1="200" y1="50" x2="250" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="278" y="14" width="44" height="80" rx="10" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <g class="fa-pop" style="transform-origin:300px 40px"><rect x="286" y="30" width="28" height="20" rx="4" fill="#0c0b07" stroke="#F4D67A" stroke-width="1.8"/><circle cx="293" cy="40" r="2" fill="#F4D67A"/><line x1="299" y1="37" x2="309" y2="37" stroke="#F4D67A" stroke-width="1.6"/><line x1="299" y1="43" x2="306" y2="43" stroke="#C9A84C" stroke-width="1.6"/></g>
+              <circle class="fa-pulse" cx="314" cy="24" r="4" fill="#F4D67A"/>
             </svg></div>
           </div>
         </div>

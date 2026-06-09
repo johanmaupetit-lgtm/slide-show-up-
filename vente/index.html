@@ -464,6 +464,26 @@
     .ia2-txt strong{ color:#F4D67A; font-weight:600; }
     .ia2-scene{ height:176px; margin-top:16px; }
     .ia2-scene svg{ width:100%; height:100%; display:block; overflow:visible; }
+    .fa-draw-lg{ stroke-dasharray:240; stroke-dashoffset:240; animation:faDrawLg 2.8s ease-in-out infinite; }
+    @keyframes faDrawLg{ 0%,12%{stroke-dashoffset:240} 55%,100%{stroke-dashoffset:0} }
+    .flow-anim.xl{ height:228px; }
+
+    /* slide prix */
+    .prix-card{ max-width:780px; margin:30px auto 0; text-align:center; background:linear-gradient(180deg, rgba(26,24,18,0.92), rgba(26,24,18,0.40)); border-top:3px solid #C9A84C; border-radius:18px; padding:42px 50px; box-shadow:0 18px 54px rgba(0,0,0,0.5); }
+    .prix-lab{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.22em; text-transform:uppercase; font-size:15px; }
+    .prix-num{ font-family:'Cinzel',serif; color:#F4D67A; font-size:120px; line-height:1; text-shadow:0 0 44px rgba(201,168,76,0.55); margin:10px 0 16px; }
+    .prix-txt{ font-family:'Inter',sans-serif; color:#cfcfcf; font-size:23px; font-weight:300; }
+
+    /* slide garantie */
+    .gar-figs{ display:flex; align-items:stretch; justify-content:center; gap:34px; margin:26px 0 6px; width:100%; }
+    .gar-fig{ flex:1; max-width:440px; text-align:center; background:linear-gradient(180deg, rgba(20,30,26,0.9), rgba(18,22,20,0.4)); border-top:3px solid #34D399; border-radius:18px; padding:30px 30px 34px; box-shadow:0 18px 50px rgba(0,0,0,0.5); }
+    .gar-lab{ font-family:'Cinzel',serif; letter-spacing:.2em; text-transform:uppercase; font-size:14px; color:#7fccab; margin-bottom:12px; }
+    .gar-big{ font-family:'Cinzel',serif; font-weight:600; font-size:100px; line-height:1; color:#4BE6A0; text-shadow:0 0 44px rgba(52,211,153,0.5); }
+    .gar-sub{ font-family:'Inter',sans-serif; color:#B9B9B9; font-size:17px; margin-top:14px; font-weight:300; }
+    .gar-points{ display:flex; gap:16px; justify-content:center; margin-top:24px; flex-wrap:wrap; }
+    .gar-pt{ font-family:'Inter',sans-serif; font-size:18px; color:#e4e4e4; padding:13px 22px; border:1px solid rgba(52,211,153,0.4); border-radius:999px; background:rgba(52,211,153,0.06); }
+    .gar-pt b{ color:#4BE6A0; }
+    .gar-foot{ margin-top:28px; font-family:'Cinzel',serif; color:#4BE6A0; font-size:25px; letter-spacing:.03em; }
 
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
@@ -992,35 +1012,151 @@
         <p class="da-kicker">2 · Déploiement clé en main</p>
         <h2 class="da-h2">Opérationnel en 30 jours</h2>
         <div class="da-cards da-flow">
-          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">1</div><div class="da-val">Vous signez</div><div class="da-txt">On démarre la collaboration.</div></div>
-          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">2</div><div class="da-val">On déploie</div><div class="da-txt">30 jours, avec votre validation à chaque étape.</div></div>
-          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">3</div><div class="da-val">Ça rapporte</div><div class="da-txt">Système opérationnel A à Z, du cash dès le 1<sup>er</sup> mois.</div></div>
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">1</div><div class="da-val">Début de la collaboration</div><div class="da-txt">On démarre ensemble — vous donnez vos accès.</div>
+            <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="92" y="26" width="116" height="118" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <line x1="112" y1="52" x2="188" y2="52" stroke="#C9A84C" stroke-width="2.4"/>
+              <line x1="112" y1="70" x2="188" y2="70" stroke="#C9A84C" stroke-width="2.4"/>
+              <line x1="112" y1="88" x2="166" y2="88" stroke="#C9A84C" stroke-width="2.4"/>
+              <path class="fa-draw-lg" d="M112 120 c10 -16 16 14 26 2 c8 -8 14 8 24 -2 c6 -6 12 4 18 -2" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <g class="fa-tap"><path d="M178 104 l18 -18 l9 9 l-18 18 l-11 2 z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:212px 150px"><circle cx="212" cy="150" r="18" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><path d="M203 150 l6 6 l13 -15" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <text x="120" y="168" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#C9A84C">Signé</text>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">2</div><div class="da-val">On déploie</div><div class="da-txt">30 jours, avec votre validation à chaque étape.</div>
+            <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="122" y="50" width="56" height="74" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <rect x="131" y="60" width="11" height="11" fill="#C9A84C" opacity=".55"/><rect x="148" y="60" width="11" height="11" fill="#C9A84C" opacity=".55"/>
+              <rect x="131" y="78" width="11" height="11" fill="#C9A84C" opacity=".55"/><rect x="148" y="78" width="11" height="11" fill="#C9A84C" opacity=".55"/>
+              <rect x="142" y="100" width="14" height="24" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <circle class="fa-pulse" cx="44" cy="44" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="44" y="48" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#F4D67A">Mine</text>
+              <circle class="fa-pulse" style="animation-delay:.3s" cx="256" cy="44" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="256" y="47" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#F4D67A">Machine</text>
+              <circle class="fa-pulse" style="animation-delay:.6s" cx="256" cy="112" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="256" y="115" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#F4D67A">Pilot</text>
+              <line class="fa-flow" x1="62" y1="52" x2="122" y2="74" stroke="#C9A84C" stroke-width="2.2"/>
+              <line class="fa-flow" x1="238" y1="50" x2="178" y2="72" stroke="#C9A84C" stroke-width="2.2"/>
+              <line class="fa-flow" x1="238" y1="110" x2="178" y2="92" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:104px 66px"><circle cx="104" cy="66" r="9" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M99 66 l3 3 l7 -8" stroke="#F4D67A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:196px 64px;animation-delay:.4s"><circle cx="196" cy="64" r="9" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M191 64 l3 3 l7 -8" stroke="#F4D67A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:196px 100px;animation-delay:.8s"><circle cx="196" cy="100" r="9" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M191 100 l3 3 l7 -8" stroke="#F4D67A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <rect x="60" y="150" width="180" height="12" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/>
+              <rect class="fa-grow" x="60" y="150" width="180" height="12" rx="6" fill="#F4D67A"/>
+              <text x="150" y="176" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#C9A84C">Déploiement · 30 jours</text>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">3</div><div class="da-val">Ça rapporte</div><div class="da-txt">Du cash dès le 1<sup>er</sup> mois.</div>
+            <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="40,140 90,120 130,128 175,90 220,96 266,48" fill="none" stroke="#C9A84C" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M266 48 l-11 1 l4 -10" fill="none" stroke="#C9A84C" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="92" y="92" width="116" height="74" rx="14" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+              <rect x="116" y="100" width="68" height="16" rx="8" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <text class="fa-pulse" x="150" y="112" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#F4D67A">CASH MACHINE</text>
+              <g class="mc-cog" style="transform-origin:130px 134px"><circle cx="130" cy="134" r="20" fill="none" stroke="#F4D67A" stroke-width="7" stroke-dasharray="5 6"/><circle cx="130" cy="134" r="8" fill="none" stroke="#E9C75A" stroke-width="2.6"/></g>
+              <g class="mc-cog rev" style="transform-origin:172px 144px"><circle cx="172" cy="144" r="14" fill="none" stroke="#E9C75A" stroke-width="6" stroke-dasharray="4 5"/><circle cx="172" cy="144" r="6" fill="none" stroke="#C9A84C" stroke-width="2.4"/></g>
+              <g class="mc-coin" style="transform-origin:212px 96px"><circle cx="214" cy="100" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="214" y="105" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.7s"><circle cx="214" cy="100" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="214" y="105" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:1.4s"><circle cx="214" cy="100" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="214" y="105" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
         </div>
         <p class="da-foot fragment" data-fragment-index="3">Vous donnez vos accès — on s’occupe de tout le reste.</p>
       </section>
 
       <!-- 14 — BLOC 3 — 4 MOIS OFFERTS -->
-      <section class="da-slide da-center" data-transition="fade">
+      <section class="da-slide" data-transition="fade">
         <p class="da-kicker">3 · Gestion offerte</p>
-        <h2 class="da-h2 da-big">4 mois offerts</h2>
-        <p class="da-sub fragment" data-fragment-index="0" style="text-align:center;margin:14px auto 22px;">Soit <strong style="color:#F4D67A;">12 000 €</strong> de prestation incluse, sans aucun frais mensuel de votre côté.</p>
-        <div class="da-list" style="max-width:980px;margin:0 auto;text-align:left;">
-          <div class="da-li fragment" data-fragment-index="1">Maintenance technique 24/7 — bugs urgents corrigés en &lt; 24 h</div>
-          <div class="da-li fragment" data-fragment-index="2">Optimisation continue : scripts voicebots, A/B testing, calibrage IA</div>
-          <div class="da-li fragment" data-fragment-index="3">1 réunion mensuelle de pilotage pour vos ajustements</div>
-          <div class="da-li fragment" data-fragment-index="4">Tous les outils tiers offerts — aucun frais mensuel supplémentaire</div>
+        <h2 class="da-h2">4 mois de gestion offerts</h2>
+        <p class="da-sub">Soit <strong style="color:#F4D67A;">12 000 €</strong> de prestation incluse — zéro frais mensuel de votre côté.</p>
+        <div class="ia2-grid">
+
+          <div class="ia2-card fragment" data-fragment-index="0">
+            <div class="ia2-lab">Maintenance</div>
+            <div class="ia2-txt">Maintenance technique <strong>24/7</strong> — bugs corrigés en &lt; 24 h.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M150 18 l64 22 v40 c0 40 -34 60 -64 70 c-30 -10 -64 -30 -64 -70 v-40 z" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <g class="fa-turn" style="transform-origin:146px 74px"><path d="M134 56 a16 16 0 1 0 16 26 l22 22 l9 -9 l-22 -22 a16 16 0 0 0 -25 -17 z" fill="none" stroke="#F4D67A" stroke-width="3" stroke-linejoin="round"/></g>
+              <circle class="fa-pulse" cx="228" cy="40" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <text x="228" y="44" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">24/7</text>
+              <g class="fa-pop" style="transform-origin:150px 120px"><path d="M134 118 l11 11 l22 -27" stroke="#F4D67A" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+            </svg></div>
+          </div>
+
+          <div class="ia2-card fragment" data-fragment-index="1">
+            <div class="ia2-lab">Optimisation</div>
+            <div class="ia2-txt"><strong>Optimisation continue</strong> : A/B testing &amp; calibrage de l’IA.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="40" y1="120" x2="262" y2="120" stroke="#C9A84C" stroke-opacity=".4" stroke-width="2"/>
+              <path class="fa-draw-lg" d="M44 112 l40 -10 l36 6 l40 -34 l44 -30" stroke="#F4D67A" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <g class="fa-pop" style="transform-origin:248px 48px;animation-delay:1.2s"><path d="M238 48 l18 0 l-6 -13" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <line x1="70" y1="142" x2="230" y2="142" stroke="#C9A84C" stroke-width="3"/>
+              <circle class="fa-toggle" cx="118" cy="142" r="8" fill="#F4D67A"/>
+              <text x="74" y="42" font-family="Cinzel,serif" font-size="14" fill="#C9A84C" class="fa-pulse">A / B</text>
+            </svg></div>
+          </div>
+
+          <div class="ia2-card fragment" data-fragment-index="2">
+            <div class="ia2-lab">Pilotage</div>
+            <div class="ia2-txt"><strong>1 réunion / mois</strong> de pilotage pour vos ajustements.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="40" y="42" width="80" height="74" rx="6" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <line x1="40" y1="60" x2="120" y2="60" stroke="#C9A84C" stroke-width="2"/>
+              <line x1="56" y1="34" x2="56" y2="48" stroke="#F4D67A" stroke-width="2.6"/><line x1="104" y1="34" x2="104" y2="48" stroke="#F4D67A" stroke-width="2.6"/>
+              <g class="fa-pop" style="transform-origin:80px 88px"><circle cx="80" cy="88" r="14" fill="none" stroke="#F4D67A" stroke-width="2.4"/><path d="M73 88 l5 5 l10 -12" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-bob"><circle cx="180" cy="62" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M166 94 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <g class="fa-bob" style="animation-delay:.5s"><circle cx="230" cy="62" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M216 94 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <g class="fa-pulse"><rect x="190" y="28" width="36" height="20" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><circle cx="200" cy="38" r="1.7" fill="#F4D67A"/><circle cx="208" cy="38" r="1.7" fill="#F4D67A"/><circle cx="216" cy="38" r="1.7" fill="#F4D67A"/></g>
+            </svg></div>
+          </div>
+
+          <div class="ia2-card fragment" data-fragment-index="3">
+            <div class="ia2-lab">Outils</div>
+            <div class="ia2-txt"><strong>Tous les outils tiers offerts</strong> — aucun frais supplémentaire.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="fa-pop" style="transform-origin:70px 60px"><rect x="48" y="38" width="44" height="44" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><circle cx="70" cy="60" r="11" fill="none" stroke="#F4D67A" stroke-width="2.4" stroke-dasharray="4 4"/></g>
+              <g class="fa-pop" style="transform-origin:130px 60px;animation-delay:.3s"><rect x="108" y="38" width="44" height="44" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M120 70 l8 -16 l8 16" fill="none" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:190px 60px;animation-delay:.6s"><rect x="168" y="38" width="44" height="44" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><rect x="180" y="50" width="20" height="20" rx="4" fill="none" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <g class="fa-bob"><rect x="226" y="44" width="40" height="34" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="246" y1="44" x2="246" y2="78" stroke="#F4D67A" stroke-width="2.4"/><path d="M246 44 c-8 -12 -20 -4 -8 4 m8 -4 c8 -12 20 -4 8 4" fill="none" stroke="#F4D67A" stroke-width="2.2"/></g>
+              <g class="fa-pulse"><rect x="104" y="104" width="92" height="34" rx="17" fill="rgba(52,211,153,0.08)" stroke="#34D399" stroke-width="2"/><text x="150" y="127" text-anchor="middle" font-family="Cinzel,serif" font-size="17" fill="#4BE6A0">0 €/mois</text></g>
+            </svg></div>
+          </div>
+
         </div>
       </section>
 
-      <!-- 14 — PRIX + GARANTIE -->
-      <section class="da-slide" data-transition="fade">
-        <p class="da-kicker">Investissement &amp; garantie</p>
-        <h2 class="da-h2">Un risque nul, un retour garanti</h2>
-        <div class="da-cards">
-          <div class="da-card fragment" data-fragment-index="0"><div class="da-lab">Investissement total</div><div class="da-val gold-xl">16 000 €</div><div class="da-txt">Setup complet du système + 4 mois de gestion offerts.</div></div>
-          <div class="da-card res fragment" data-fragment-index="1" style="border-top-color:#34D399;"><div class="da-lab" style="color:#34D399;">Garantie contractuelle</div><div class="da-val" style="color:#4BE6A0;">+50 000 € de CA</div><div class="da-txt">Minimum additionnel attribuable sur 4 mois — <strong>sinon remboursement intégral</strong>.</div></div>
+      <!-- 17 — PRIX -->
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">Investissement</p>
+        <h2 class="da-h2">Un risque nul, un ROI garanti</h2>
+        <div class="prix-card fragment" data-fragment-index="0">
+          <div class="prix-lab">Investissement total</div>
+          <div class="prix-num">16 000 €</div>
+          <div class="prix-txt">Installation complète du système <strong style="color:#F4D67A;">+ les 4 mois de gestion</strong>.</div>
         </div>
-        <p class="da-foot fragment" data-fragment-index="2">À l’issue des 4 mois : retainer 3 000 €/mois (optionnel).</p>
+        <p class="da-foot fragment" data-fragment-index="1">À l’issue des 4 mois : retainer 3 000 €/mois (optionnel).</p>
+      </section>
+
+      <!-- 18 — GARANTIE (dédiée) -->
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">La garantie</p>
+        <h2 class="da-h2">Inscrite dans votre contrat</h2>
+        <div class="gar-figs">
+          <div class="gar-fig fragment" data-fragment-index="0">
+            <div class="gar-lab">CA additionnel garanti</div>
+            <div class="gar-big">+50 000 €</div>
+            <div class="gar-sub">minimum, attribuable sur 4 mois</div>
+          </div>
+          <div class="gar-fig fragment" data-fragment-index="1">
+            <div class="gar-lab">ROI minimum</div>
+            <div class="gar-big">×&nbsp;2</div>
+            <div class="gar-sub">+50 000 € générés − 16 000 € investis = +34 000 € net</div>
+          </div>
+        </div>
+        <div class="gar-points fragment" data-fragment-index="2">
+          <span class="gar-pt"><b>Inscrit</b> noir sur blanc dans le contrat</span>
+          <span class="gar-pt"><b>+50 000 €</b> de CA minimum sur 4 mois</span>
+          <span class="gar-pt"><b>Sinon</b>, remboursement intégral</span>
+        </div>
+        <p class="gar-foot fragment" data-fragment-index="3">Et ce, de manière garantie.</p>
       </section>
 
       <!-- 14 — FINALE -->

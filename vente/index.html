@@ -377,6 +377,48 @@
     @keyframes icoGlow { 0%,100%{filter:drop-shadow(0 0 4px rgba(201,168,76,0.3));} 50%{filter:drop-shadow(0 0 14px rgba(201,168,76,0.8));} }
     .da-step { animation: icoGlow 3s ease-in-out infinite; }
 
+    /* ===== slide 2 — système IA : liste bénéfices + robot motion ===== */
+    .ia-hero { display:flex; align-items:center; gap:70px; min-height:720px; }
+    .ia-txt  { flex:1 1 46%; min-width:0; }
+    .ia-stage{ flex:1 1 54%; position:relative; aspect-ratio:4/3; border-radius:18px; overflow:hidden;
+               background:radial-gradient(120% 120% at 50% 42%, #1d1a12 0%, #100e0a 60%, #0b0a07 100%);
+               box-shadow:0 34px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(201,168,76,0.28),0 0 90px rgba(201,168,76,0.12); }
+    .ia-stage svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+    .ia-li{ font-family:'Inter',sans-serif; font-size:27px; line-height:1.25; color:#ececec; font-weight:300;
+            padding:20px 26px; margin-bottom:16px; border-left:3px solid #C9A84C;
+            background:linear-gradient(90deg, rgba(201,168,76,0.10), rgba(201,168,76,0.0));
+            border-radius:0 10px 10px 0; }
+    .ia-li strong{ color:#F4D67A; font-weight:600; }
+    .ia-li small{ display:block; font-size:18px; color:#9a9a9a; margin-top:6px; }
+    /* robot animations */
+    .ia-orbit{ transform-origin:320px 248px; animation:icoSpin 26s linear infinite; }
+    .ia-orbit-rev{ transform-origin:320px 248px; animation:icoSpin 34s linear infinite reverse; }
+    .ia-eye{ transform-origin:center; animation:iaBlink 4.2s ease-in-out infinite; }
+    @keyframes iaBlink{ 0%,92%,100%{transform:scaleY(1);} 96%{transform:scaleY(0.12);} }
+    .ia-antenna{ animation:glowPulse 1.8s ease-in-out infinite; transform-origin:center; }
+    .ia-bar{ transform-origin:center bottom; animation:iaBar 1.1s ease-in-out infinite; }
+    .ia-bar:nth-child(2){ animation-delay:.18s; } .ia-bar:nth-child(3){ animation-delay:.36s; } .ia-bar:nth-child(4){ animation-delay:.54s; }
+    @keyframes iaBar{ 0%,100%{transform:scaleY(.4);} 50%{transform:scaleY(1);} }
+    .ia-wire{ stroke-dasharray:7 9; animation:iaFlow 1.6s linear infinite; }
+    @keyframes iaFlow{ to{ stroke-dashoffset:-32; } }
+    .ia-badge{ animation:iaFloat 5s ease-in-out infinite; }
+    .ia-badge:nth-of-type(2){ animation-delay:.6s; } .ia-badge:nth-of-type(3){ animation-delay:1.2s; } .ia-badge:nth-of-type(4){ animation-delay:1.8s; }
+    @keyframes iaFloat{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-9px);} }
+    .ia-glow{ animation:glowPulse 3.4s ease-in-out infinite; transform-origin:center; }
+
+    /* ===== slide 8 — Machine à Chantiers : machine qui tourne pendant que vous vous reposez ===== */
+    .mc-cog{ transform-box:fill-box; transform-origin:center; animation:icoSpin 11s linear infinite; }
+    .mc-cog.rev{ animation:icoSpin 8s linear infinite reverse; }
+    .mc-core{ transform-box:fill-box; transform-origin:center; animation:glowPulse 2s ease-in-out infinite; }
+    .mc-lead{ transform-box:fill-box; animation:mcLead 2.6s ease-in infinite; }
+    @keyframes mcLead{ 0%{transform:translateX(0);opacity:0} 12%{opacity:1} 80%{opacity:1} 100%{transform:translateX(148px);opacity:0} }
+    .mc-coin{ transform-box:fill-box; animation:mcCoin 2.4s ease-out infinite; }
+    @keyframes mcCoin{ 0%{transform:translate(0,0) scale(.6);opacity:0} 18%{opacity:1} 100%{transform:translate(72px,-104px) scale(1);opacity:0} }
+    .mc-zzz{ transform-box:fill-box; animation:mcZzz 3s ease-in-out infinite; }
+    @keyframes mcZzz{ 0%{transform:translateY(0);opacity:0} 30%{opacity:1} 100%{transform:translateY(-24px);opacity:0} }
+    .mc-wire{ stroke-dasharray:6 9; animation:iaFlow 1.4s linear infinite; }
+    .mc-sun{ transform-box:fill-box; transform-origin:center; animation:icoSpin 30s linear infinite; }
+
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
@@ -451,32 +493,90 @@
       <!-- 2 — SYSTÈME IA (da-slide) -->
       <section class="da-slide" data-transition="fade">
         <p class="da-kicker">Le système</p>
-        <h2 class="da-h2">Un système propulsé par l’IA</h2>
-        <p class="da-sub">Installé chez vous 100 % clé en main — vous donnez vos accès, on s’occupe de tout le reste.</p>
-        <div class="da-cards">
-          <div class="da-card fragment" data-fragment-index="0">
-            <svg class="ico" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><circle cx="36" cy="36" r="27" stroke-width="3"/><path d="M23 37 l8 8 l18 -20" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div class="da-lab">Clé en main</div>
-            <div class="da-val">Déployé de A à Z</div>
-            <div class="da-txt">Sans rien changer à vos outils. Vous donnez vos accès, on installe tout.</div>
+        <h2 class="da-h2">Un système boosté à l’IA</h2>
+        <div class="ia-hero">
+          <div class="ia-txt">
+            <div class="ia-li fragment" data-fragment-index="0"><strong>Boosté à l’intelligence artificielle.</strong></div>
+            <div class="ia-li fragment" data-fragment-index="1">Installé chez vous, <strong>100 % clé en main</strong>.</div>
+            <div class="ia-li fragment" data-fragment-index="2">Que vous <strong>pilotez depuis votre téléphone</strong>.</div>
+            <div class="ia-li fragment" data-fragment-index="3">Qui <strong>produit en automatique</strong><small>— même pendant vos week-ends, vos congés, ou pendant que votre équipe est occupée.</small></div>
           </div>
-          <div class="da-card fragment" data-fragment-index="1">
-            <svg class="ico ico-pulse" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><circle cx="36" cy="15" r="5"/><circle cx="15" cy="50" r="5"/><circle cx="57" cy="50" r="5"/><circle cx="36" cy="40" r="7"/><path d="M36 22 L36 33 M31 38 L19 46 M41 38 L53 46" stroke-width="2.2"/></svg>
-            <div class="da-lab">Intelligence artificielle</div>
-            <div class="da-val">Propulsé par l’IA</div>
-            <div class="da-txt">Voicebots, scoring en temps réel, séquences automatiques calibrées.</div>
-          </div>
-          <div class="da-card fragment" data-fragment-index="2">
-            <svg class="ico" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><rect x="25" y="9" width="22" height="54" rx="6" stroke-width="3"/><path d="M30 46 l5 -7 l5 4 l8 -12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="32" y1="55" x2="40" y2="55" stroke-width="2.4" stroke-linecap="round"/></svg>
-            <div class="da-lab">Sur mobile</div>
-            <div class="da-val">Piloté au téléphone</div>
-            <div class="da-txt">Tout votre business dans votre poche, en 30 secondes par jour.</div>
-          </div>
-          <div class="da-card fragment" data-fragment-index="3">
-            <svg class="ico ico-spin" viewBox="0 0 72 72" fill="none" stroke="#E9C75A"><circle cx="36" cy="36" r="25" stroke-width="3" stroke-dasharray="105 42"/><path d="M55 21 l5 -3 l0 6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <div class="da-lab">24 h / 24</div>
-            <div class="da-val">Produit en automatique</div>
-            <div class="da-txt">Même le week-end, en congés, ou quand votre équipe est occupée.</div>
+
+          <div class="ia-stage fragment" data-fragment-index="0">
+            <svg viewBox="0 0 640 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="iaG" cx="50%" cy="46%" r="50%">
+                  <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.30"/>
+                  <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <!-- halo -->
+              <circle class="ia-glow" cx="320" cy="248" r="190" fill="url(#iaG)"/>
+
+              <!-- wires robot -> badges -->
+              <path class="ia-wire" d="M252 210 L150 150" stroke="#C9A84C" stroke-width="2.4"/>
+              <path class="ia-wire" d="M388 210 L498 150" stroke="#C9A84C" stroke-width="2.4"/>
+              <path class="ia-wire" d="M252 290 L150 360" stroke="#C9A84C" stroke-width="2.4"/>
+              <path class="ia-wire" d="M388 290 L498 360" stroke="#C9A84C" stroke-width="2.4"/>
+
+              <!-- orbite -->
+              <g class="ia-orbit">
+                <circle cx="320" cy="248" r="138" stroke="#C9A84C" stroke-opacity="0.30" stroke-width="2" stroke-dasharray="3 12"/>
+                <circle cx="320" cy="110" r="5" fill="#F4D67A"/>
+                <circle cx="458" cy="248" r="4" fill="#E9C75A"/>
+                <circle cx="320" cy="386" r="5" fill="#F4D67A"/>
+                <circle cx="182" cy="248" r="4" fill="#E9C75A"/>
+              </g>
+
+              <!-- ROBOT -->
+              <g>
+                <!-- antenne -->
+                <line x1="320" y1="188" x2="320" y2="150" stroke="#C9A84C" stroke-width="3"/>
+                <circle class="ia-antenna" cx="320" cy="143" r="8" fill="#F4D67A"/>
+                <!-- oreilles -->
+                <rect x="246" y="232" width="14" height="34" rx="5" fill="#1c1a13" stroke="#C9A84C" stroke-width="2.4"/>
+                <rect x="380" y="232" width="14" height="34" rx="5" fill="#1c1a13" stroke="#C9A84C" stroke-width="2.4"/>
+                <!-- tête -->
+                <rect x="258" y="188" width="124" height="124" rx="28" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+                <!-- écran visage -->
+                <rect x="276" y="208" width="88" height="62" rx="14" fill="#0c0b07" stroke="#C9A84C" stroke-opacity="0.5" stroke-width="1.6"/>
+                <!-- yeux -->
+                <circle class="ia-eye" cx="300" cy="236" r="11" fill="#F4D67A"/>
+                <circle class="ia-eye" cx="340" cy="236" r="11" fill="#F4D67A"/>
+                <!-- equalizer (voix / production) -->
+                <rect class="ia-bar" x="296" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
+                <rect class="ia-bar" x="310" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
+                <rect class="ia-bar" x="324" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
+                <rect class="ia-bar" x="338" y="284" width="8" height="20" rx="3" fill="#E9C75A"/>
+              </g>
+
+              <!-- BADGE 1 : téléphone -->
+              <g class="ia-badge">
+                <circle cx="150" cy="150" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
+                <rect x="138" y="128" width="24" height="44" rx="6" fill="none" stroke="#F4D67A" stroke-width="2.6"/>
+                <line x1="145" y1="166" x2="155" y2="166" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
+                <path d="M143 140 l5 6 l5 -8 l5 9" stroke="#E9C75A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <!-- BADGE 2 : clé en main / engrenage -->
+              <g class="ia-badge">
+                <circle cx="498" cy="150" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
+                <circle class="ia-orbit-rev" cx="498" cy="150" r="20" fill="none" stroke="#F4D67A" stroke-width="3" stroke-dasharray="6 7" style="transform-origin:498px 150px;"/>
+                <circle cx="498" cy="150" r="8" fill="none" stroke="#E9C75A" stroke-width="2.6"/>
+              </g>
+              <!-- BADGE 3 : week-end / lune -->
+              <g class="ia-badge">
+                <circle cx="150" cy="360" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
+                <path d="M162 344 a18 18 0 1 0 0 32 a14 14 0 1 1 0 -32 z" fill="#F4D67A"/>
+                <circle cx="170" cy="340" r="1.8" fill="#E9C75A"/><circle cx="176" cy="350" r="1.4" fill="#E9C75A"/>
+              </g>
+              <!-- BADGE 4 : 24/7 -->
+              <g class="ia-badge">
+                <circle cx="498" cy="360" r="42" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
+                <circle cx="498" cy="360" r="22" fill="none" stroke="#F4D67A" stroke-width="2.4"/>
+                <line x1="498" y1="360" x2="498" y2="346" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
+                <line x1="498" y1="360" x2="509" y2="360" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
+              </g>
+            </svg>
           </div>
         </div>
       </section>
@@ -555,9 +655,49 @@
       <!-- 8 — TITRE PILIER 2 -->
       <section class="da-slide" data-transition="fade">
         <div class="da-hero">
-          <div class="hero-stage fragment" data-fragment-index="0">
-            <img class="hero-photo" src="machine.png" alt="" onerror="this.style.opacity=0;">
-            <div class="hero-stage-scrim"></div>
+          <div class="ia-stage fragment" data-fragment-index="0">
+            <svg viewBox="0 0 640 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="mcG" cx="50%" cy="44%" r="52%">
+                  <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.28"/>
+                  <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <circle class="mc-core" cx="320" cy="210" r="185" fill="url(#mcG)"/>
+
+              <!-- ENTRÉE : les leads affluent, aucun ne s'échappe -->
+              <text x="74" y="150" font-family="Cinzel,serif" font-size="15" letter-spacing="2" fill="#C9A84C">LEADS · 24/7</text>
+              <path class="mc-wire" d="M70 210 L250 210" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="mc-lead"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:.65s"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:1.3s"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:1.95s"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+
+              <!-- LA MACHINE -->
+              <rect x="250" y="138" width="158" height="150" rx="22" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+              <rect x="288" y="150" width="82" height="28" rx="14" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.6"/>
+              <text class="mc-core" x="329" y="170" text-anchor="middle" font-family="Cinzel,serif" font-size="16" fill="#F4D67A">IA</text>
+              <!-- cogs -->
+              <g class="mc-cog"><circle cx="300" cy="228" r="30" fill="none" stroke="#F4D67A" stroke-width="9" stroke-dasharray="5 6"/><circle cx="300" cy="228" r="10" fill="none" stroke="#E9C75A" stroke-width="3"/></g>
+              <g class="mc-cog rev"><circle cx="360" cy="262" r="20" fill="none" stroke="#E9C75A" stroke-width="8" stroke-dasharray="4 5"/><circle cx="360" cy="262" r="7" fill="none" stroke="#C9A84C" stroke-width="2.6"/></g>
+
+              <!-- SORTIE : le cash sort tout seul -->
+              <path class="mc-wire" d="M408 200 L470 150" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="mc-coin"><circle cx="412" cy="206" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="412" y="212" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.8s"><circle cx="412" cy="206" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="412" y="212" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:1.6s"><circle cx="412" cy="206" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="412" y="212" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">€</text></g>
+              <text class="mc-core" x="512" y="118" text-anchor="middle" font-family="Cinzel,serif" font-size="30" fill="#F4D67A">€€€</text>
+
+              <!-- RIBBON REPOS : pendant que vous vous reposez -->
+              <rect x="46" y="372" width="548" height="92" rx="20" fill="rgba(201,168,76,0.07)" stroke="#C9A84C" stroke-opacity="0.32" stroke-width="1.5"/>
+              <!-- soleil -->
+              <g class="mc-sun"><circle cx="100" cy="418" r="13" fill="none" stroke="#F4D67A" stroke-width="2.6"/><g stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"><line x1="100" y1="396" x2="100" y2="402"/><line x1="100" y1="434" x2="100" y2="440"/><line x1="78" y1="418" x2="84" y2="418"/><line x1="116" y1="418" x2="122" y2="418"/><line x1="85" y1="403" x2="89" y2="407"/><line x1="111" y1="429" x2="115" y2="433"/><line x1="85" y1="433" x2="89" y2="429"/><line x1="111" y1="407" x2="115" y2="403"/></g></g>
+              <text class="mc-zzz" x="128" y="398" font-family="Cinzel,serif" font-size="18" fill="#C9A84C">z</text>
+              <!-- lune -->
+              <path d="M548 404 a18 18 0 1 0 0 30 a14 14 0 1 1 0 -30 z" fill="#F4D67A"/>
+              <text x="320" y="412" text-anchor="middle" font-family="Inter,sans-serif" font-size="20" fill="#ECECEC" font-weight="300">Pendant que vous vous reposez,</text>
+              <text x="320" y="440" text-anchor="middle" font-family="Cinzel,serif" font-size="20" fill="#F4D67A">la machine tourne.</text>
+            </svg>
           </div>
           <div class="da-hero-txt">
             <p class="da-kicker">Pilier 02</p>

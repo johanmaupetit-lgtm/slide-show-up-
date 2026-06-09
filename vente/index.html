@@ -17,7 +17,7 @@
     /* ============================================================ */
     /* >>> CHIFFRE À MODIFIER : CA mensuel récupérable du prospect  */
     /*     (le grand chiffre doré sous l'image de la slide 1)        */
-    var ROI_CA = 38400;          /* ex : 52000  (mets le chiffre du dirigeant) */
+    var ROI_CA = (window.ROI_CA != null ? window.ROI_CA : 38400);
     /* ============================================================ */
     (function(){
       var el = document.getElementById('roi-ca');
@@ -38,6 +38,14 @@
   </script>
 </body>';throw new Error('denied');}
     })();
+  </script>
+
+  <script>
+    /* ===========================================================
+       >>> CA MENSUEL À MODIFIER (grand chiffre doré de la slide 1)
+       Mets ici le chiffre du dirigeant, puis sauvegarde.
+       =========================================================== */
+    window.ROI_CA = 38400;   /* ex : 30000 · 52000 · 75000 ... */
   </script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
@@ -269,102 +277,54 @@
     .reveal { position: relative; z-index: 1; }
     .persistent-header, .persistent-footer { z-index: 2; }
 
-    /* ===================== HERO v7 — fond unifié, bénéfices à gauche ===================== */
+    /* ===================== HERO v9 — cartes encadrées (charte) + clack ===================== */
     .media-overlays { display:none !important; }
-    /* UN SEUL fond cinématique sur tout le viewport */
-    .reveal {
-      background: radial-gradient(115% 80% at 50% 36%, #120d07 0%, #070504 70%) !important;
-    }
+    .reveal { background: radial-gradient(115% 80% at 50% 36%, #120d07 0%, #070504 70%) !important; }
     .reveal section.hero-roi {
-      background: transparent !important;
-      text-align: center; padding: 24px 72px;
-      min-height: 950px;
-      display: flex; flex-direction: column; justify-content: center; gap: 40px;
+      background: transparent !important; text-align:center;
+      padding: 24px 80px; min-height: 950px;
+      display:flex; flex-direction:column; justify-content:center; gap: 46px;
     }
-    .hero-top { width: 100%; }
-    .hero-kicker { font-size:19px !important; letter-spacing:0.34em !important; color:#C9A84C !important; margin:0 0 12px 0 !important; }
+    .hero-top { width:100%; }
+    .hero-kicker { font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.34em; color:#C9A84C; font-size:19px; margin:0 0 14px 0; }
     .hero-title {
-      font-size:104px !important; line-height:0.95 !important; margin:0 !important; white-space:nowrap;
-      filter: drop-shadow(0 8px 54px rgba(201,168,76,0.85)) !important;
+      font-family:'Cinzel',serif; font-weight:600; text-transform:uppercase; white-space:nowrap;
+      font-size:124px; line-height:0.95; letter-spacing:0.05em; margin:0;
+      background: linear-gradient(135deg,#F8EFC8 0%,#E9CE7A 30%,#C9A84C 60%,#A88736 100%);
+      background-size:220% auto; -webkit-background-clip:text; background-clip:text;
+      color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 8px 56px rgba(201,168,76,0.85));
     }
-    .hero-tl { height:3px; width:0; margin:18px auto 0; background:linear-gradient(90deg, transparent, #C9A84C, transparent); border-radius:2px; }
-    body.da-started .reveal section.hero-roi.present .hero-tl { animation: heroTl 1s ease forwards 1.1s; }
-    @keyframes heroTl { to { width: 320px; } }
+    .hero-tl { height:3px; width:0; margin:20px auto 0; background:linear-gradient(90deg,transparent,#C9A84C,transparent); border-radius:2px; }
+    body.da-started .reveal section.hero-roi.present .hero-kicker { animation: daUp .7s ease forwards .15s; }
+    body.da-started .reveal section.hero-roi.present .hero-title  { animation: daPop 1.0s cubic-bezier(.2,.85,.2,1) forwards .4s, shimmer 7s ease-in-out 1.7s infinite; }
+    body.da-started .reveal section.hero-roi.present .hero-tl     { animation: heroTl 1s ease forwards 1.0s; }
+    @keyframes heroTl { to { width: 340px; } }
 
-    .hero-body { display:flex; align-items:center; gap:68px; width:100%; }
-    .hero-benefits { flex:1 1 47%; text-align:left; }
-    .bn { display:flex; align-items:flex-start; gap:22px; padding:22px 0; border-top:1px solid rgba(201,168,76,0.16); }
-    .bn:first-child { border-top:none; padding-top:0; }
-    .bn-idx { font-family:'Cinzel',serif; color:#C9A84C; font-size:20px; opacity:0.6; min-width:34px; padding-top:10px; }
-    .bn-main { display:flex; flex-direction:column; min-width:0; }
-    .bn-num { font-family:'Inter',sans-serif; font-weight:800; font-size:64px; color:#F4D67A; text-shadow:0 0 36px rgba(201,168,76,0.75); line-height:0.92; letter-spacing:-0.02em; }
-    .bn-num .bn-per { font-size:26px; font-weight:600; color:#E9C75A; letter-spacing:0; }
-    .bn-cap { font-family:'Inter',sans-serif; font-size:16px; color:#9a9a9a; letter-spacing:0.04em; margin-top:6px; }
-    .bn-big { font-family:'Inter',sans-serif; font-weight:800; font-size:36px; color:#FFFFFF; text-transform:uppercase; letter-spacing:0.005em; line-height:1.06; }
-    .bn-big .g { color:#E9C75A; }
-    .hero-chips { display:flex; gap:14px; margin-top:30px; flex-wrap:wrap; }
-    .hero-chip {
-      font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.14em;
-      font-size:13px; color:var(--or); border:1px solid rgba(201,168,76,0.45);
-      border-radius:999px; padding:8px 16px; background: rgba(201,168,76,0.05);
+    .hero-body { display:flex; align-items:center; gap:72px; width:100%; }
+    .hero-benefits { flex:1 1 48%; display:flex; flex-direction:column; gap:22px; text-align:left; }
+    .bcard {
+      background: linear-gradient(90deg, rgba(26,24,18,0.92), rgba(26,24,18,0.42));
+      border:0.5px solid rgba(201,168,76,0.4); border-left:4px solid #C9A84C;
+      border-radius:8px; padding:22px 30px; box-shadow:0 10px 30px rgba(0,0,0,0.4);
     }
-    .hero-stage {
-      flex:1 1 53%; position:relative; aspect-ratio:16/9;
-      border-radius:16px; overflow:hidden;
-      box-shadow: 0 34px 100px rgba(0,0,0,0.72), 0 0 0 1px rgba(201,168,76,0.30), 0 0 80px rgba(201,168,76,0.12);
-    }
-    .hero-stage .hero-media, .hero-stage .hero-photo {
-      position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
-      animation: kenburns 26s ease-in-out infinite alternate;
-    }
-    .hero-stage-scrim {
-      position:absolute; inset:0; pointer-events:none;
-      background: radial-gradient(120% 120% at 50% 45%, transparent 58%, rgba(6,5,4,0.5) 100%);
-    }
-    /* entrées en cascade */
-    body.da-started .reveal section.hero-roi.present .hero-stage { animation: daFloat .9s ease forwards .9s; }
+    .bcard-label { font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.2em; text-transform:uppercase; font-size:14px; margin-bottom:10px; }
+    .bcard-value { font-family:'Cinzel',serif; color:#FFFFFF; font-size:38px; line-height:1.06; }
+    .bcard-value .g { color:#E9C75A; }
+    .bcard-value.gold { color:#F4D67A; font-size:66px; text-shadow:0 0 32px rgba(201,168,76,0.6); letter-spacing:0.02em; }
+    .bcard-value .bcard-per { font-size:24px; color:#E9C75A; }
+    .hero-chips { display:flex; gap:12px; margin-top:4px; flex-wrap:wrap; }
+    .hero-chip { font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.14em; font-size:12px; color:var(--or); border:1px solid rgba(201,168,76,0.45); border-radius:999px; padding:8px 16px; background:rgba(201,168,76,0.05); }
+    .hero-stage { flex:1 1 52%; position:relative; aspect-ratio:16/9; border-radius:16px; overflow:hidden; box-shadow:0 34px 100px rgba(0,0,0,0.72),0 0 0 1px rgba(201,168,76,0.3),0 0 80px rgba(201,168,76,0.12); }
+    .hero-stage .hero-media, .hero-stage .hero-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; animation: kenburns 26s ease-in-out infinite alternate; }
+    .hero-stage-scrim { position:absolute; inset:0; pointer-events:none; background: radial-gradient(120% 120% at 50% 45%, transparent 58%, rgba(6,5,4,0.5) 100%); }
 
-        /* --- ajustements bénéfices : espacement, contraste, symétrie --- */
-    .hero-body { gap: 76px !important; }
-    .bn { padding: 26px 0 !important; gap: 24px !important; align-items: center !important; }
-    .bn-idx { padding-top: 0 !important; font-size: 19px !important; }
-    .bn-num { font-size: 72px !important; }
-    .bn1 {
-      border-top: none !important;
-      background: linear-gradient(90deg, rgba(201,168,76,0.10), rgba(201,168,76,0) 64%);
-      border-radius: 14px; padding: 22px 20px !important; margin-bottom: 8px;
-    }
-    .bn1 .bn-idx { color:#F4D67A !important; opacity:0.9 !important; }
-    .bn-big { font-size: 38px !important; }
-    /* fragments : état caché propre */
-    .reveal .fragment.fade-up { transform: translateY(28px); }
+    /* CLACK : fragments (cartes, chips, image) surgissent */
+    .reveal .hero-roi .fragment { opacity:0; transform: translateY(42px) scale(0.9); filter: blur(9px); transition: opacity .5s ease, transform .66s cubic-bezier(.16,1.55,.3,1), filter .5s ease; }
+    .reveal .hero-roi .fragment.visible { opacity:1 !important; transform: translateY(0) scale(1) !important; filter: blur(0) !important; }
+    .reveal .hero-roi .hero-stage.fragment { transform: scale(0.93); filter: blur(6px); }
 
-    /* ===== HERO v8 — gros, espacé, animation qui claque ===== */
-    .reveal section.hero-roi { background: transparent !important; }
-    .hero-body { gap: 80px !important; align-items: center !important; }
-    .hero-benefits { display:flex; flex-direction:column; gap: 12px; }
-    .bn { padding: 30px 0 !important; gap: 26px !important; align-items:center !important; border-top: 1px solid rgba(201,168,76,0.14) !important; }
-    .bn1 { border-top: none !important; padding: 26px 22px !important; }
-    .bn-idx { font-size: 22px !important; min-width: 40px !important; }
-    .bn-num { font-size: 86px !important; }
-    .bn-num .bn-per { font-size: 30px !important; }
-    .bn-cap { font-size: 18px !important; margin-top: 8px !important; }
-    .bn-big { font-size: 44px !important; line-height: 1.06 !important; }
-    .hero-chips { margin-top: 34px !important; gap: 14px !important; }
-    .hero-chip { font-size: 14px !important; padding: 10px 18px !important; }
-
-    /* animation qui CLAQUE */
-    .reveal .hero-benefits .fragment,
-    .reveal .hero-chips.fragment {
-      opacity: 0; transform: translateX(-64px) scale(0.9); filter: blur(8px);
-      transition: opacity .45s ease, transform .6s cubic-bezier(.16,1.6,.3,1), filter .45s ease;
-    }
-    .reveal .hero-benefits .fragment.visible,
-    .reveal .hero-chips.fragment.visible {
-      opacity: 1 !important; transform: translateX(0) scale(1) !important; filter: blur(0) !important;
-    }
-
-@media (prefers-reduced-motion: reduce) {
+    @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
       .scanline, .media-frame { animation: none !important; }
@@ -396,7 +356,7 @@
   <div class="reveal">
     <div class="slides">
 
-      <!-- 1 — CONTEXTE : ROI PILOT (HERO v7) -->
+      <!-- 1 — CONTEXTE : ROI PILOT (HERO v9) -->
       <section class="hero-roi" data-transition="fade">
         <div class="hero-top">
           <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
@@ -405,28 +365,25 @@
         </div>
         <div class="hero-body">
           <div class="hero-benefits">
-            <div class="bn bn1 fragment">
-              <span class="bn-idx">01</span>
-              <div class="bn-main">
-                <span class="bn-num"><span id="roi-ca">38 400</span> €<span class="bn-per"> / mois</span></span>
-                <span class="bn-cap">de chiffre d’affaires récupéré</span>
-              </div>
+            <div class="bcard fragment" data-fragment-index="0">
+              <div class="bcard-label">CA récupéré chaque mois</div>
+              <div class="bcard-value gold"><span id="roi-ca">38 400</span> €<span class="bcard-per"> / mois</span></div>
             </div>
-            <div class="bn bn2 fragment">
-              <span class="bn-idx">02</span>
-              <div class="bn-main"><span class="bn-big">Une machine qui tourne <span class="g">sans vous</span></span></div>
+            <div class="bcard fragment" data-fragment-index="1">
+              <div class="bcard-label">Votre liberté</div>
+              <div class="bcard-value">Une machine qui tourne <span class="g">sans vous</span></div>
             </div>
-            <div class="bn bn3 fragment">
-              <span class="bn-idx">03</span>
-              <div class="bn-main"><span class="bn-big">Pilotée depuis votre <span class="g">téléphone</span></span></div>
+            <div class="bcard fragment" data-fragment-index="2">
+              <div class="bcard-label">Le contrôle</div>
+              <div class="bcard-value">Piloté depuis votre <span class="g">téléphone</span></div>
             </div>
-            <div class="hero-chips fragment">
-              <span class="hero-chip">Sans acheter un lead</span>
+            <div class="hero-chips fragment" data-fragment-index="3">
+              <span class="hero-chip">Sans lead</span>
               <span class="hero-chip">Sans pub</span>
               <span class="hero-chip">Sans recruter</span>
             </div>
           </div>
-          <div class="hero-stage hero-anim">
+          <div class="hero-stage fragment" data-fragment-index="0">
             <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
                    onloadeddata="this.style.display='block'; var st=this.closest('.hero-stage'); st.querySelectorAll('.hero-photo').forEach(function(e){e.style.display='none';});"
                    onerror="this.remove();">

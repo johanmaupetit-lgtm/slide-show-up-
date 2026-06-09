@@ -92,30 +92,37 @@
       letter-spacing: 0.04em; line-height: 0.92; white-space: nowrap;
       font-size: 118px; margin: 0 0 26px 0;
       background: linear-gradient(135deg, #F8EFC8 0%, #E9CE7A 30%, #C9A84C 60%, #A88736 100%);
+      background-size: 220% auto;
       -webkit-background-clip: text; background-clip: text;
       color: transparent; -webkit-text-fill-color: transparent;
       filter: drop-shadow(0 6px 34px var(--or-glow));
     }
     .hero-rule { height:3px; width:0; background: linear-gradient(90deg, var(--or), rgba(201,168,76,0)); margin-bottom: 30px; border-radius:2px; }
     .hero-obj {
-      font-family:'Inter',sans-serif; color:#F2F2F2; font-size: 30px; line-height:1.45;
-      max-width: 820px; font-weight: 400; margin: 0;
+      font-family:'Inter',sans-serif; color:#B9B9B9; font-size: 33px; line-height:1.5;
+      max-width: 880px; font-weight: 300; margin: 0;
     }
     .hero-obj .euro {
-      color: var(--or); font-weight: 800; font-size: 1.3em; white-space: nowrap;
-      text-shadow: 0 0 24px var(--or-glow);
+      color: var(--or); font-weight: 800; font-size: 1.32em; white-space: nowrap;
+      text-shadow: 0 0 26px var(--or-glow);
     }
-    .hero-sans {
-      margin: 34px 0 0 0; font-family:'Cinzel',serif; text-transform:uppercase;
-      letter-spacing:0.16em; color:#fff; font-size:18px; opacity:0.85;
+    .hero-obj .obj-strong { color:#FFFFFF; font-weight:700; }
+    .hero-obj .obj-gold { color: var(--or); font-weight:600; }
+    .hero-chips { display:flex; gap:14px; margin-top:36px; flex-wrap:wrap; }
+    .hero-chip {
+      font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.14em;
+      font-size:14px; color:var(--or); border:1px solid rgba(201,168,76,0.45);
+      border-radius:999px; padding:9px 18px; background: rgba(201,168,76,0.05);
     }
+    body.da-started .reveal section.hero-roi.present .hero-chips { animation: daUp .7s ease forwards 1.7s; }
     .hero-visual { width:100%; max-width:540px; position:relative; }
     .hero-photo { width:100%; border-radius:18px; display:block; box-shadow:0 24px 80px rgba(0,0,0,0.6); }
 
     /* ===================== ANIMATIONS D'ENTRÉE ===================== */
     .hero-anim { opacity: 0; }
     body.da-started .reveal section.hero-roi.present .hero-kicker { animation: daUp .7s ease forwards .15s; }
-    body.da-started .reveal section.hero-roi.present .hero-title  { animation: daPop 1.0s cubic-bezier(.2,.85,.2,1) forwards .45s; }
+    body.da-started .reveal section.hero-roi.present .hero-title  { animation: daPop 1.0s cubic-bezier(.2,.85,.2,1) forwards .45s, shimmer 7s ease-in-out 1.7s infinite; }
+    @keyframes shimmer { 0%,100% { background-position: 0% center; } 50% { background-position: 220% center; } }
     body.da-started .reveal section.hero-roi.present .hero-rule   { animation: daRule .85s ease forwards 1.15s; }
     body.da-started .reveal section.hero-roi.present .hero-obj    { animation: daUp .7s ease forwards 1.3s; }
     body.da-started .reveal section.hero-roi.present .hero-sans   { animation: daUp .7s ease forwards 1.65s; }
@@ -137,7 +144,8 @@
     .chart-area { opacity: 0; }
     body.da-started .reveal section.hero-roi.present .chart-area { animation: fadeArea 1.2s ease forwards 1.9s; }
     @keyframes fadeArea { to { opacity: 1; } }
-    .orbit { transform-origin: 230px 290px; animation: spin 26s linear infinite; }
+    .orbit { transform-origin: 260px 300px; animation: spin 26s linear infinite; }
+    #mf-bar1, #mf-bar2, #mf-bar3 { transform-box: fill-box; }
     .orbit.rev { animation: spin 34s linear infinite reverse; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .glow-pulse { animation: glowPulse 3.2s ease-in-out infinite; transform-origin:center; }
@@ -234,8 +242,12 @@
             <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
             <h1 class="hero-title hero-anim">ROI PILOT</h1>
             <div class="hero-rule hero-anim"></div>
-            <p class="hero-obj hero-anim">Récupérer jusqu’à <span class="euro">[X €]</span> de CA par mois et transformer votre entreprise en une machine qui tourne sans vous — pilotée depuis votre téléphone.</p>
-            <p class="hero-sans hero-anim">Sans acheter un lead · Sans pub · Sans recruter</p>
+            <p class="hero-obj hero-anim">Récupérer jusqu’à <span class="euro">[X €]</span> de CA par mois<br>et transformer votre entreprise en <span class="obj-strong">une machine qui tourne sans vous</span> — <span class="obj-gold">pilotée depuis votre téléphone</span>.</p>
+            <div class="hero-chips hero-anim">
+              <span class="hero-chip">Sans acheter un lead</span>
+              <span class="hero-chip">Sans pub</span>
+              <span class="hero-chip">Sans recruter</span>
+            </div>
           </div>
           <div class="hero-right hero-anim">
             <div class="media-frame">
@@ -249,41 +261,37 @@
                   </video>
                 <!-- EMPLACEMENT PHOTO OPTIONNEL : dépose "vente/assets/hero-roipilot.jpg" pour remplacer l'illustration -->
                 <img class="hero-photo" src="assets/hero-roipilot.jpg" alt="" style="display:none;" onerror="this.remove();" onload="this.style.display='block'; var s=this.parentNode.querySelector('.hero-illu'); if(s){s.style.display='none';}">
-                <svg class="hero-illu" viewBox="0 0 460 580" width="100%" role="img" aria-label="Pilotage du business depuis le téléphone">
+                <svg class="hero-illu" viewBox="0 0 520 600" width="100%" role="img" aria-label="Tableau de bord ROI Pilot en direct">
                   <defs>
-                    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stop-color="#F8EFC8"/><stop offset="0.5" stop-color="#C9A84C"/><stop offset="1" stop-color="#A88736"/>
-                    </linearGradient>
-                    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stop-color="#C9A84C" stop-opacity="0.55"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/>
-                    </linearGradient>
-                    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-                      <stop offset="0" stop-color="#C9A84C" stop-opacity="0.30"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/>
-                    </radialGradient>
+                    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F8EFC8"/><stop offset="0.5" stop-color="#C9A84C"/><stop offset="1" stop-color="#A88736"/></linearGradient>
+                    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9A84C" stop-opacity="0.5"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/></linearGradient>
+                    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#C9A84C" stop-opacity="0.28"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/></radialGradient>
                   </defs>
-                  <circle class="glow-pulse" cx="230" cy="290" r="220" fill="url(#halo)"/>
-                  <g class="orbit" opacity="0.35"><circle cx="230" cy="290" r="200" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="2 10"/></g>
-                  <g class="orbit rev" opacity="0.25"><circle cx="230" cy="290" r="168" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="1 14"/></g>
-                  <g class="node-pop n1"><circle cx="60" cy="170" r="6" fill="url(#gold)"/><circle cx="60" cy="170" r="13" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.5"/></g>
-                  <g class="node-pop n2"><circle cx="406" cy="210" r="6" fill="url(#gold)"/><circle cx="406" cy="210" r="13" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.5"/></g>
-                  <g class="node-pop n3"><circle cx="392" cy="430" r="6" fill="url(#gold)"/><circle cx="392" cy="430" r="13" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.5"/></g>
-                  <rect x="140" y="70" width="180" height="440" rx="30" fill="#15140F" stroke="url(#gold)" stroke-width="2"/>
-                  <rect x="152" y="86" width="156" height="408" rx="20" fill="#0B0B0B"/>
-                  <rect x="205" y="96" width="50" height="7" rx="3.5" fill="#222"/>
-                  <text x="170" y="140" fill="#7d7d7d" font-family="Inter, sans-serif" font-size="11" letter-spacing="1">CA CE MOIS</text>
-                  <text x="170" y="174" fill="#C9A84C" font-family="Inter, sans-serif" font-size="30" font-weight="800">+38 400 €</text>
-                  <text x="170" y="196" fill="#34D399" font-family="Inter, sans-serif" font-size="11" font-weight="600">&#9650; +27 % vs mois dernier</text>
-                  <path class="chart-area" d="M168 330 L168 300 L196 290 L224 296 L252 268 L280 250 L292 240 L292 330 Z" fill="url(#area)"/>
-                  <polyline class="chart-line" points="168,300 196,290 224,296 252,268 280,250 292,240" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                  <rect x="168" y="360" width="30" height="40" rx="3" fill="#C9A84C" opacity="0.85"/>
-                  <rect x="206" y="350" width="30" height="50" rx="3" fill="#C9A84C" opacity="0.6"/>
-                  <rect x="244" y="372" width="30" height="28" rx="3" fill="#C9A84C" opacity="0.45"/>
-                  <text x="168" y="416" fill="#666" font-family="Inter, sans-serif" font-size="9">Leads</text>
-                  <text x="206" y="416" fill="#666" font-family="Inter, sans-serif" font-size="9">Devis</text>
-                  <text x="244" y="416" fill="#666" font-family="Inter, sans-serif" font-size="9">Signés</text>
-                  <rect x="168" y="440" width="128" height="30" rx="15" fill="none" stroke="#34D399" stroke-width="1"/>
-                  <circle class="glow-pulse" cx="184" cy="455" r="4" fill="#34D399"/>
-                  <text x="196" y="459" fill="#34D399" font-family="Inter, sans-serif" font-size="11" font-weight="600">Pilotage automatique</text>
+                  <circle class="glow-pulse" cx="260" cy="300" r="225" fill="url(#halo)"/>
+                  <g class="orbit" opacity="0.32"><circle cx="260" cy="300" r="205" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="2 11"/></g>
+                  <g class="orbit rev" opacity="0.22"><circle cx="260" cy="300" r="172" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="1 15"/></g>
+                  <rect x="155" y="64" width="210" height="476" rx="36" fill="#15140F" stroke="url(#gold)" stroke-width="2"/>
+                  <rect x="171" y="82" width="178" height="440" rx="24" fill="#0B0B0B"/>
+                  <rect x="240" y="94" width="40" height="6" rx="3" fill="#2a2a2a"/>
+                  <text x="189" y="146" fill="#8a8a8a" font-family="Inter, sans-serif" font-size="12" letter-spacing="1.5">CA CE MOIS</text>
+                  <text id="mf-num" x="189" y="182" fill="#C9A84C" font-family="Inter, sans-serif" font-size="30" font-weight="800">38 400 €</text>
+                  <text id="mf-delta" x="189" y="206" fill="#34D399" font-family="Inter, sans-serif" font-size="12" font-weight="700">&#9650; +27 % ce mois</text>
+                  <path id="mf-area" d="M189 300 L189 276 L221 268 L253 274 L285 250 L317 232 L331 224 L331 300 Z" fill="url(#area)"/>
+                  <polyline id="mf-chartline" points="189,276 221,268 253,274 285,250 317,232 331,224" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <rect id="mf-bar1" x="189" y="350" width="34" height="58" rx="4" fill="#C9A84C" opacity="0.9"/>
+                  <rect id="mf-bar2" x="233" y="350" width="34" height="58" rx="4" fill="#C9A84C" opacity="0.6"/>
+                  <rect id="mf-bar3" x="277" y="350" width="34" height="58" rx="4" fill="#C9A84C" opacity="0.4"/>
+                  <text x="189" y="424" fill="#777" font-family="Inter, sans-serif" font-size="10">Leads</text>
+                  <text x="233" y="424" fill="#777" font-family="Inter, sans-serif" font-size="10">Devis</text>
+                  <text x="277" y="424" fill="#777" font-family="Inter, sans-serif" font-size="10">Signés</text>
+                  <g id="mf-toast">
+                    <rect x="189" y="446" width="142" height="34" rx="8" fill="#0f2a1d" stroke="#34D399" stroke-width="1"/>
+                    <circle cx="205" cy="463" r="4" fill="#34D399"/>
+                    <text x="217" y="467" fill="#34D399" font-family="Inter, sans-serif" font-size="11" font-weight="700">Nouveau devis signé</text>
+                  </g>
+                  <rect x="189" y="490" width="142" height="22" rx="11" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.6"/>
+                  <circle class="glow-pulse" cx="203" cy="501" r="3.5" fill="#C9A84C"/>
+                  <text x="214" y="505" fill="#C9A84C" font-family="Inter, sans-serif" font-size="10" font-weight="600" opacity="0.9">Pilotage automatique</text>
                 </svg>
                 </div>
                 <span class="scanline"></span>
@@ -753,6 +761,7 @@
         intro.classList.add('hidden');
         startAmbient();
         startFloat();
+        startHeroFilm();
         // Re-trigger l'animation du hero si on revient dessus
         try { Reveal.slide(0); } catch (e) {}
         setTimeout(function(){ if (intro && intro.parentNode) intro.style.display = 'none'; }, 1000);
@@ -764,6 +773,36 @@
         if (!window.gsap) return;
         try {
           gsap.to('.media-frame', { y: -14, duration: 3.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+        } catch (e) {}
+      }
+
+      // Mini-film motion-design du dashboard (boucle GSAP)
+      function startHeroFilm() {
+        if (!window.gsap) return;
+        var num = document.getElementById('mf-num');
+        var line = document.getElementById('mf-chartline');
+        if (!num || !line) return;
+        var len = 300; try { len = line.getTotalLength(); } catch (e) {}
+        var nf = new Intl.NumberFormat('fr-FR');
+        var counter = { v: 0 };
+        try {
+          var tl = gsap.timeline({ repeat: -1, repeatDelay: 1.8, defaults: { ease: 'power2.out' } });
+          tl.set(counter, { v: 0 }, 0);
+          tl.set(line, { strokeDasharray: len, strokeDashoffset: len }, 0);
+          tl.set('#mf-area', { opacity: 0 }, 0);
+          tl.set(['#mf-bar1', '#mf-bar2', '#mf-bar3'], { scaleY: 0, transformOrigin: '50% 100%' }, 0);
+          tl.set('#mf-delta', { opacity: 0, y: 6 }, 0);
+          tl.set('#mf-toast', { opacity: 0, x: 26 }, 0);
+          tl.call(function(){ num.textContent = '0 €'; }, null, 0);
+          tl.to(counter, { v: 38400, duration: 1.7, onUpdate: function(){ num.textContent = nf.format(Math.round(counter.v)) + ' €'; } }, 0.15);
+          tl.to(line, { strokeDashoffset: 0, duration: 1.5, ease: 'power1.inOut' }, 0.5);
+          tl.to('#mf-delta', { opacity: 1, y: 0, duration: 0.5 }, 1.0);
+          tl.to('#mf-area', { opacity: 1, duration: 0.8 }, 1.3);
+          tl.to('#mf-bar1', { scaleY: 1, duration: 0.5 }, 1.5);
+          tl.to('#mf-bar2', { scaleY: 1, duration: 0.5 }, 1.65);
+          tl.to('#mf-bar3', { scaleY: 1, duration: 0.5 }, 1.8);
+          tl.to('#mf-toast', { opacity: 1, x: 0, duration: 0.5 }, 2.3);
+          tl.to('#mf-toast', { opacity: 0, duration: 0.5 }, 4.0);
         } catch (e) {}
       }
 

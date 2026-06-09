@@ -338,6 +338,33 @@
     .reveal .da-slide .fragment { opacity:0; transform: translateY(46px) scale(0.92); filter: blur(8px); transition: opacity .55s ease, transform .7s cubic-bezier(.16,1.5,.3,1), filter .55s ease; }
     .reveal .da-slide .fragment.visible { opacity:1 !important; transform: translateY(0) scale(1) !important; filter: blur(0) !important; }
 
+    /* --- composants DA additionnels --- */
+    .reveal section.da-slide.da-center { display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height:900px; }
+    .da-center .da-h2, .da-center .da-kicker { text-align:center; }
+    .da-big { font-size:120px !important; }
+    .da-cols { display:flex; gap:28px; width:100%; margin-top:54px; }
+    .da-col { flex:1; text-align:center; padding:44px 26px; border-top:3px solid #C9A84C; background:linear-gradient(180deg,rgba(26,24,18,0.92),rgba(26,24,18,0.4)); border-radius:14px; box-shadow:0 14px 40px rgba(0,0,0,0.45); }
+    .da-col-num { font-family:'Cinzel',serif; color:#F4D67A; font-size:58px; line-height:1; text-shadow:0 0 28px rgba(201,168,76,0.5); }
+    .da-col-name { font-family:'Cinzel',serif; color:#fff; font-size:30px; margin:16px 0 10px; }
+    .da-col-tag { font-family:'Inter',sans-serif; color:#9a9a9a; font-size:17px; }
+    .da-hero { display:flex; align-items:center; gap:64px; min-height:740px; }
+    .da-hero-txt { flex:1 1 50%; min-width:0; }
+    .da-hero .hero-stage { flex:1 1 50%; }
+    .da-hero .da-h2 { font-size:90px; }
+    .da-chip { display:inline-block; font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.16em; font-size:14px; color:var(--or); border:1px solid rgba(201,168,76,0.5); border-radius:999px; padding:11px 22px; margin-top:26px; background:rgba(201,168,76,0.06); }
+    .da-list { margin-top:32px; display:flex; flex-direction:column; gap:16px; }
+    .da-li { font-family:'Inter',sans-serif; font-size:25px; color:#dcdcdc; padding:18px 24px; border-left:3px solid #C9A84C; background:rgba(255,255,255,0.025); border-radius:0 8px 8px 0; }
+    .da-li strong { color:#F4D67A; }
+    .da-li.neg { border-left-color:#D9685E; }
+    .da-li.neg strong { color:#E8857B; }
+    .da-step { font-family:'Cinzel',serif; color:#F4D67A; font-size:42px; line-height:1; margin-bottom:14px; text-shadow:0 0 24px rgba(201,168,76,0.45); }
+    .da-flow .da-card { border-top:none; border-left:4px solid #C9A84C; }
+    .da-card.res .da-ico { width:46px; height:46px; margin-bottom:16px; display:block; }
+    .da-mini { display:inline-block; margin-top:8px; color:#C9A84C; font-size:14px; font-style:italic; }
+    .da-gold { margin-top:14px; font-family:'Cinzel',serif; color:#F4D67A; letter-spacing:0.06em; font-size:18px; }
+    .da-val.gold-xl { color:#F4D67A; font-size:74px; text-shadow:0 0 34px rgba(201,168,76,0.6); }
+    .da-foot { margin-top:34px; font-family:'Inter',sans-serif; color:#C9A84C; font-size:21px; }
+
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
@@ -442,264 +469,219 @@
         </div>
       </section>
 
-      <!-- 3 — TRANSITION 3 PILIERS -->
-      <section class="stat">
-        <div class="big-number" style="font-size:4em;">3 piliers</div>
-        <p class="stat-label" style="margin-top: 24px;">Chacun colmate une des 3 fuites qu’on vient de voir ensemble dans votre audit.</p>
+            <!-- 3 — TRANSITION 3 PILIERS -->
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">Le système se décompose en</p>
+        <h2 class="da-h2 da-big">3 piliers</h2>
+        <p class="da-sub" style="text-align:center; margin:18px auto 0;">Chacun colmate une des 3 fuites qu’on vient de voir ensemble dans votre audit.</p>
+        <div class="da-cols">
+          <div class="da-col fragment" data-fragment-index="0"><div class="da-col-num">01</div><div class="da-col-name">La Mine d’Or</div><div class="da-col-tag">Réveiller le cash dormant</div></div>
+          <div class="da-col fragment" data-fragment-index="1"><div class="da-col-num">02</div><div class="da-col-name">La Machine à Chantiers</div><div class="da-col-tag">Capter 100 % des leads &amp; devis</div></div>
+          <div class="da-col fragment" data-fragment-index="2"><div class="da-col-num">03</div><div class="da-col-name">Le ROI Pilot</div><div class="da-col-tag">Piloter depuis votre téléphone</div></div>
+        </div>
       </section>
 
-      <!-- ===== PILIER 1 — LA MINE D’OR ===== -->
-
       <!-- 4 — TITRE PILIER 1 -->
-      <section class="numbered">
-        <div class="num">01</div>
-        <div class="num-title">La Mine d’Or</div>
-        <p class="num-detail">Récupérer en 30 jours le cash qui dort au fond de votre entreprise depuis 10 ans — sans lever le petit doigt, sans recruter, sans acheter un lead, sans dépenser un centime en pub.</p>
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="da-hero-txt">
+            <p class="da-kicker">Pilier 01</p>
+            <h2 class="da-h2">La Mine d’Or</h2>
+            <p class="da-sub fragment" data-fragment-index="0">Récupérer en 30 jours le cash qui dort dans votre entreprise depuis 10 ans — sans lever le petit doigt, sans recruter, sans acheter un lead.</p>
+            <div class="da-chip fragment" data-fragment-index="1">Quick win · dès le 1<sup>er</sup> mois</div>
+          </div>
+          <div class="hero-stage fragment" data-fragment-index="0">
+            <img class="hero-photo" src="mine-dor.png" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
+          </div>
+        </div>
       </section>
 
       <!-- 5 — PARCE QU’AUJOURD’HUI -->
-      <section>
-        <h2>Parce qu’aujourd’hui…</h2>
-        <ul>
-          <li>Des devis non-signés dorment dans votre base</li>
-          <li>Vous avez <strong>payé</strong> pour ces leads — pub, salons, recommandations</li>
-          <li>Ce sont des prospects chauds qui valent encore quelque chose</li>
-          <li>C’est de l’argent qui meurt et refroidit sur la table</li>
-        </ul>
-        <p class="muted" style="margin-top: 24px;">Ce n’est pas de votre faute : vos commerciaux sont saturés, et trier 5 ans de base à la main est mécaniquement impossible.</p>
-      </section>
-
-      <!-- 6 — CONCRÈTEMENT, LE SYSTÈME -->
-      <section>
-        <h2>Concrètement, le système</h2>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num">01</div>
-            <div class="card-title">Extrait votre base, nettoie, segmente avec l’IA — chauds / tièdes / froids.</div>
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="hero-stage fragment" data-fragment-index="0">
+            <img class="hero-photo" src="fear.png" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
           </div>
-          <div class="card">
-            <div class="card-num">02</div>
-            <div class="card-title">Lance une séquence multicanale automatique qui réactive 100 % de vos archives.</div>
-          </div>
-          <div class="card">
-            <div class="card-num">03</div>
-            <div class="card-title">Détecte les prospects redevenus chauds et alerte vos équipes avec le contexte.</div>
+          <div class="da-hero-txt">
+            <p class="da-kicker" style="color:#D9685E;">Parce qu’aujourd’hui…</p>
+            <h2 class="da-h2" style="font-size:62px;">L’argent meurt sur la table</h2>
+            <div class="da-list">
+              <div class="da-li neg fragment" data-fragment-index="0">Des <strong>devis non-signés</strong> dorment dans votre base</div>
+              <div class="da-li neg fragment" data-fragment-index="1">Vous avez <strong>payé</strong> pour ces leads — pub, salons, recommandations</div>
+              <div class="da-li neg fragment" data-fragment-index="2">C’est de l’argent qui <strong>refroidit et meurt</strong> chaque jour</div>
+            </div>
           </div>
         </div>
-        <p class="muted" style="margin-top: 24px;">Vous ne touchez à rien. Plusieurs dizaines de milliers d’euros récupérés dès le 1<sup>er</sup> mois. Recyclable tous les 6 mois.</p>
+      </section>
+
+      <!-- 6 — CONCRÈTEMENT P1 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Concrètement, le système</p>
+        <h2 class="da-h2">Il réveille votre base, tout seul</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Extrait &amp; trie avec l’IA</div><div class="da-txt">Toute votre base nettoyée et segmentée : chauds / tièdes / froids.</div></div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Séquence multicanale auto</div><div class="da-txt">Réactive 100 % de vos archives sans que vous touchiez à rien.</div></div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte prospect chaud</div><div class="da-txt">Vos équipes sont prévenues avec le contexte, au bon moment.</div></div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="3">Plusieurs dizaines de milliers d’euros récupérés dès le 1<sup>er</sup> mois.</p>
       </section>
 
       <!-- 7 — RÉSULTATS PILIER 1 -->
-      <section>
-        <h2>Résultats</h2>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Le cash qui dormait depuis 10 ans, récupéré dès les premières semaines.</div>
-          </div>
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">100 % de votre base réactivée — contre 0 aujourd’hui.</div>
-          </div>
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Des prospects chauds remontés à vos équipes, sans rien faire.</div>
-          </div>
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Résultats</p>
+        <h2 class="da-h2">Ce que la Mine d’Or vous rapporte</h2>
+        <div class="da-cards">
+          <div class="da-card res fragment" data-fragment-index="0"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Le cash dormant récupéré</div><div class="da-txt">Dès les premières semaines, sans rien faire.</div></div>
+          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">100 % de votre base réactivée</div><div class="da-txt">Contre 0 aujourd’hui.</div></div>
+          <div class="da-card res fragment" data-fragment-index="2"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Prospects chauds en automatique</div><div class="da-txt">Remontés à vos équipes, prêts à closer.</div></div>
         </div>
       </section>
-
-      <!-- ===== PILIER 2 — LA MACHINE À CHANTIERS ===== -->
 
       <!-- 8 — TITRE PILIER 2 -->
-      <section class="numbered">
-        <div class="num">02</div>
-        <div class="num-title">La Machine à Chantiers</div>
-        <p class="num-detail">Plus aucun lead qui s’échappe, plus aucun devis qui dort — même le week-end, même en vacances. Pour reprendre l’argent que vos concurrents vous volent.</p>
-      </section>
-
-      <!-- 9 — CONCRÈTEMENT, LE SYSTÈME -->
-      <section>
-        <h2>Concrètement, le système</h2>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num">01</div>
-            <div class="card-title">Traite <strong>tous</strong> vos leads en moins de 5 min, 24/7 — qualifie, planifie le RDV.</div>
-            <div style="color: var(--or); font-family: var(--font-serif); letter-spacing: 0.1em; font-size: 0.7em; margin-top: 12px;">Conversion ×4 vs un rappel sous 24 h</div>
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="hero-stage fragment" data-fragment-index="0">
+            <img class="hero-photo" src="machine.png" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
           </div>
-          <div class="card">
-            <div class="card-num">02</div>
-            <div class="card-title">Relance tous vos devis automatiquement et intelligemment.</div>
-          </div>
-          <div class="card">
-            <div class="card-num">03</div>
-            <div class="card-title">Envoie une alerte à vos équipes dès qu’un prospect est chaud.</div>
+          <div class="da-hero-txt">
+            <p class="da-kicker">Pilier 02</p>
+            <h2 class="da-h2">La Machine à Chantiers</h2>
+            <p class="da-sub fragment" data-fragment-index="0">Plus aucun lead qui s’échappe, plus aucun devis qui dort — même le week-end, même en vacances. Pour reprendre l’argent que vos concurrents vous volent.</p>
+            <div class="da-chip fragment" data-fragment-index="1">24h/24 · week-ends compris</div>
           </div>
         </div>
-        <p class="muted" style="margin-top: 24px;">Vos commerciaux ne traitent plus que du chaud qualifié. Coûts d’acquisition divisés, marge augmentée.</p>
+      </section>
+
+      <!-- 9 — CONCRÈTEMENT P2 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Concrètement, le système</p>
+        <h2 class="da-h2">Plus rien ne s’échappe, jamais</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Traite TOUS vos leads &lt; 5 min</div><div class="da-txt">24/7 — qualifie et planifie le RDV.<br><span class="da-mini">Conversion ×4 vs un rappel sous 24 h</span></div></div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Relance tous vos devis</div><div class="da-txt">Automatiquement et intelligemment, jusqu’à signature.</div></div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte dès qu’un prospect est chaud</div><div class="da-txt">Vos équipes appellent au moment exact où il faut.</div></div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="3">Vos commerciaux ne traitent plus que du chaud qualifié.</p>
       </section>
 
       <!-- 10 — RÉSULTATS PILIER 2 -->
-      <section>
-        <h2>Résultats</h2>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Plus aucun lead ni devis ne vous échappe — 24h/24, week-ends compris.</div>
-          </div>
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Vos commerciaux ne traitent plus que du chaud qualifié.</div>
-          </div>
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Coût d’acquisition divisé, marge augmentée.</div>
-          </div>
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Résultats</p>
+        <h2 class="da-h2">Ce que la Machine vous rapporte</h2>
+        <div class="da-cards">
+          <div class="da-card res fragment" data-fragment-index="0"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Plus aucun lead ni devis ne fuit</div><div class="da-txt">24h/24, week-ends compris.</div></div>
+          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Que du chaud qualifié</div><div class="da-txt">Vos commerciaux arrêtent de perdre du temps.</div></div>
+          <div class="da-card res fragment" data-fragment-index="2"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Coût d’acquisition divisé</div><div class="da-txt">Marge augmentée, mécaniquement.</div></div>
         </div>
       </section>
-
-      <!-- ===== PILIER 3 — LE ROI PILOT ===== -->
 
       <!-- 11 — TITRE PILIER 3 -->
-      <section class="numbered">
-        <div class="num">03</div>
-        <div class="num-title">Le ROI Pilot</div>
-        <p class="num-detail">Récupérer du temps pour vous et libérer vos équipes, et piloter l’ensemble de votre business depuis votre téléphone, en 30 secondes par jour. Partout, tout le temps.</p>
-      </section>
-
-      <!-- 12 — CONCRÈTEMENT, LE SYSTÈME -->
-      <section>
-        <h2>Concrètement, le système</h2>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num">01</div>
-            <div class="card-title">Génère vos devis en dictée vocale depuis le téléphone — envoyés sous 1 h, avant le concurrent.</div>
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="da-hero-txt">
+            <p class="da-kicker">Pilier 03</p>
+            <h2 class="da-h2">Le ROI Pilot</h2>
+            <p class="da-sub fragment" data-fragment-index="0">Récupérer du temps pour vous, libérer vos équipes, et piloter tout votre business depuis votre téléphone — en 30 secondes par jour.</p>
+            <div class="da-chip fragment" data-fragment-index="1">Vos dimanches récupérés</div>
           </div>
-          <div class="card">
-            <div class="card-num">02</div>
-            <div class="card-title">Dashboard temps réel sur votre téléphone : leads, devis, signatures, CA. 30 sec/jour.</div>
-          </div>
-          <div class="card">
-            <div class="card-num">03</div>
-            <div class="card-title">Des alertes intelligentes qui surveillent vos KPIs et vous préviennent au bon moment.</div>
+          <div class="hero-stage fragment" data-fragment-index="0">
+            <img class="hero-photo" src="roipilot.png" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
           </div>
         </div>
-        <p class="muted" style="margin-top: 24px;">Se branche directement sur vos outils existants. Vous reprenez le contrôle — vos équipes vous disent merci.</p>
+      </section>
+
+      <!-- 12 — CONCRÈTEMENT P3 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Concrètement, le système</p>
+        <h2 class="da-h2">Vous reprenez le contrôle</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Devis en dictée vocale</div><div class="da-txt">Générés et envoyés sous 1 h — avant le concurrent.</div></div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Dashboard temps réel</div><div class="da-txt">Leads, devis, signatures, CA — sur votre téléphone, 30 s/jour.</div></div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alertes intelligentes</div><div class="da-txt">Surveillent vos KPIs et vous préviennent au bon moment.</div></div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="3">Se branche directement sur vos outils existants.</p>
       </section>
 
       <!-- 13 — RÉSULTATS PILIER 3 -->
-      <section>
-        <h2>Résultats</h2>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Vos devis partent avant le concurrent, en moins d’une heure.</div>
-          </div>
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Toute votre boîte pilotée en 30 secondes par jour, depuis votre téléphone.</div>
-          </div>
-          <div class="card">
-            <div class="card-num" style="color: var(--or);">✓</div>
-            <div class="card-title">Vous reprenez du temps — vos équipes vous disent merci.</div>
-          </div>
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Résultats</p>
+        <h2 class="da-h2">Ce que le ROI Pilot vous rapporte</h2>
+        <div class="da-cards">
+          <div class="da-card res fragment" data-fragment-index="0"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Devis partis avant le concurrent</div><div class="da-txt">En moins d’une heure.</div></div>
+          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Toute votre boîte pilotée</div><div class="da-txt">En 30 secondes par jour, depuis votre téléphone.</div></div>
+          <div class="da-card res fragment" data-fragment-index="2"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Vous reprenez du temps</div><div class="da-txt">Vos équipes vous disent merci.</div></div>
         </div>
       </section>
 
-      <!-- ===== VALUE STACKING ===== -->
-
       <!-- 14 — INTRO VALUE STACK -->
-      <section>
-        <h2>Avant de vous parler du prix</h2>
-        <p style="font-size: 1em; max-width: 800px;">Je vais vous récapituler exactement <strong>tout ce que vous recevez</strong> quand vous signez.</p>
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">Avant de vous parler du prix</p>
+        <h2 class="da-h2 da-big">Tout ce que vous recevez</h2>
+        <p class="da-sub" style="text-align:center; margin:18px auto 0;">Le récapitulatif complet de ce que vous obtenez en signant.</p>
       </section>
 
       <!-- 15 — BLOC 1 — LE SYSTÈME COMPLET -->
-      <section>
-        <h2>1. Le système IA complet</h2>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num">La Mine d’Or</div>
-            <div class="card-title" style="margin-bottom: 12px;">Base dormante réveillée en 30 jours, prospects chauds remontés automatiquement.</div>
-            <div style="color: var(--or); font-family: var(--font-serif); letter-spacing: 0.1em; font-size: 0.75em;">Jusqu’à [X €] dès le 1<sup>er</sup> mois</div>
-          </div>
-          <div class="card">
-            <div class="card-num">La Machine à Chantiers</div>
-            <div class="card-title" style="margin-bottom: 12px;">100 % leads capturés en &lt;5 min, 100 % devis relancés, alertes commerciales temps réel.</div>
-            <div style="color: var(--or); font-family: var(--font-serif); letter-spacing: 0.1em; font-size: 0.75em;">Jusqu’à [X €] par mois</div>
-          </div>
-          <div class="card">
-            <div class="card-num">Le ROI Pilot</div>
-            <div class="card-title" style="margin-bottom: 12px;">Devis automatiques sous 24 h, dashboard temps réel complet.</div>
-            <div style="color: var(--or); font-family: var(--font-serif); letter-spacing: 0.1em; font-size: 0.75em;">Jusqu’à [X €]/mois + vos dimanches</div>
-          </div>
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">1 · Le système IA complet</p>
+        <h2 class="da-h2">Les 3 piliers, livrés clé en main</h2>
+        <div class="da-cards">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-lab">La Mine d’Or</div><div class="da-val">Base dormante réveillée</div><div class="da-txt">Prospects chauds remontés automatiquement.</div><div class="da-gold">Jusqu’à [X €] dès le 1<sup>er</sup> mois</div></div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-lab">La Machine à Chantiers</div><div class="da-val">100 % capté &amp; relancé</div><div class="da-txt">Leads en &lt;5 min, devis relancés, alertes temps réel.</div><div class="da-gold">Jusqu’à [X €] par mois</div></div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-lab">Le ROI Pilot</div><div class="da-val">Devis &amp; pilotage auto</div><div class="da-txt">Devis sous 1 h, dashboard temps réel complet.</div><div class="da-gold">Jusqu’à [X €]/mois + vos dimanches</div></div>
         </div>
       </section>
 
-      <!-- 16 — BLOC 2 — DÉPLOIEMENT CLÉ EN MAIN -->
-      <section>
-        <h2>2. Déploiement clé en main en 30 jours</h2>
-        <p style="margin-bottom: 24px;">Tout le système est déployé chez vous, clé en main, en moins de 30 jours. Vous donnez vos accès, on s’occupe du reste.</p>
-        <div class="card-grid">
-          <div class="card">
-            <div class="card-num">Phase 1</div>
-            <div class="card-title">Vous signez, on démarre la collaboration.</div>
-          </div>
-          <div class="card">
-            <div class="card-num">Phase 2</div>
-            <div class="card-title">Déploiement en 30 jours, avec votre validation à chaque étape.</div>
-          </div>
-          <div class="card">
-            <div class="card-num">Phase 3</div>
-            <div class="card-title">Système opérationnel A à Z, vous rapporte du cash dès le 1<sup>er</sup> mois.</div>
-          </div>
+      <!-- 16 — BLOC 2 — DÉPLOIEMENT -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">2 · Déploiement clé en main</p>
+        <h2 class="da-h2">Opérationnel en 30 jours</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">1</div><div class="da-val">Vous signez</div><div class="da-txt">On démarre la collaboration.</div></div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">2</div><div class="da-val">On déploie</div><div class="da-txt">30 jours, avec votre validation à chaque étape.</div></div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">3</div><div class="da-val">Ça rapporte</div><div class="da-txt">Système opérationnel A à Z, du cash dès le 1<sup>er</sup> mois.</div></div>
         </div>
+        <p class="da-foot fragment" data-fragment-index="3">Vous donnez vos accès — on s’occupe de tout le reste.</p>
       </section>
 
       <!-- 17 — BLOC 3 — 4 MOIS OFFERTS -->
-      <section>
-        <h2>3. 4 mois de gestion offerts</h2>
-        <p style="margin-bottom: 24px;">Après le déploiement, on vous offre <strong>4 mois complets de gestion</strong> — équivalent à <strong>12 000 € de prestation offerte</strong>.</p>
-        <ul>
-          <li>Maintenance technique 24/7 — correction des bugs urgents en moins de 24 h</li>
-          <li>Optimisation continue du système — scripts voicebots, A/B testing, calibrage IA</li>
-          <li>1 réunion mensuelle de pilotage pour vos ajustements</li>
-          <li>Tous les outils tiers offerts — aucun frais mensuel supplémentaire</li>
-        </ul>
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">3 · Gestion offerte</p>
+        <h2 class="da-h2 da-big">4 mois offerts</h2>
+        <p class="da-sub fragment" data-fragment-index="0" style="text-align:center;margin:14px auto 22px;">Soit <strong style="color:#F4D67A;">12 000 €</strong> de prestation incluse, sans aucun frais mensuel de votre côté.</p>
+        <div class="da-list" style="max-width:980px;margin:0 auto;text-align:left;">
+          <div class="da-li fragment" data-fragment-index="1">Maintenance technique 24/7 — bugs urgents corrigés en &lt; 24 h</div>
+          <div class="da-li fragment" data-fragment-index="2">Optimisation continue : scripts voicebots, A/B testing, calibrage IA</div>
+          <div class="da-li fragment" data-fragment-index="3">1 réunion mensuelle de pilotage + tous les outils tiers offerts</div>
+        </div>
       </section>
 
       <!-- 18 — PRIX + GARANTIE -->
-      <section>
-        <h2>Investissement &amp; garantie</h2>
-        <div style="margin: 24px 0; padding: 24px; background: var(--noir-card); border: 0.5px solid var(--or); border-radius: 4px;">
-          <div style="font-family: var(--font-serif); color: var(--or); letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.8em; margin-bottom: 8px;">Investissement total</div>
-          <div style="font-family: var(--font-serif); color: var(--blanc); font-size: 2.2em; letter-spacing: 0.05em;">16 000 €</div>
-          <div style="color: var(--gris-clair); font-size: 0.7em; margin-top: 4px;">Setup complet du système + 4 mois de gestion offerts</div>
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Investissement &amp; garantie</p>
+        <h2 class="da-h2">Un risque nul, un retour garanti</h2>
+        <div class="da-cards">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-lab">Investissement total</div><div class="da-val gold-xl">16 000 €</div><div class="da-txt">Setup complet du système + 4 mois de gestion offerts.</div></div>
+          <div class="da-card res fragment" data-fragment-index="1" style="border-top-color:#34D399;"><div class="da-lab" style="color:#34D399;">Garantie contractuelle</div><div class="da-val" style="color:#4BE6A0;">+50 000 € de CA</div><div class="da-txt">Minimum additionnel attribuable sur 4 mois — <strong>sinon remboursement intégral</strong>.</div></div>
         </div>
-        <div style="margin: 16px 0; padding: 20px 24px; background: var(--noir-card); border-left: 3px solid var(--or); border-radius: 4px;">
-          <div style="font-family: var(--font-serif); color: var(--or); letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.7em; margin-bottom: 6px;">Garantie contractuelle</div>
-          <div style="color: var(--blanc); font-size: 0.95em; line-height: 1.5;"><strong>Minimum 50 000 €</strong> de CA additionnel attribuable sur 4 mois — sinon <strong>remboursement intégral</strong>.</div>
-        </div>
-        <p class="muted" style="margin-top: 16px;">À l’issue des 4 mois : retainer 3 000 €/mois (optionnel).</p>
+        <p class="da-foot fragment" data-fragment-index="2">À l’issue des 4 mois : retainer 3 000 €/mois (optionnel).</p>
       </section>
 
       <!-- 19 — FINALE -->
-      <section class="cover">
-        <div class="logo-scalia">
-          <span class="scalia">SCALIA</span>
-          <span class="rule"></span>
-          <span class="btp">BTP</span>
+      <section class="da-slide da-center" data-transition="fade">
+        <div class="logo-scalia" style="font-size:54px; margin-bottom:40px;">
+          <span class="scalia">SCALIA</span><span class="rule"></span><span class="btp">BTP</span>
         </div>
-        <p class="cover-title">Prêt à récupérer ce qui vous échappe ?</p>
-        <p class="cover-sub">scaliabtp.fr</p>
+        <h2 class="da-h2 da-big" style="font-size:96px;">Prêt à récupérer<br>ce qui vous échappe ?</h2>
+        <p class="da-sub" style="text-align:center; margin:24px auto 0; color:#C9A84C; letter-spacing:0.3em; text-transform:uppercase; font-family:Cinzel,serif;">scaliabtp.fr</p>
       </section>
 
     </div>
   </div>
 
-  <!-- ============================================================ -->
-  <!-- PANNEAU NOTES DIAGNOSTIC — flottant, toggle avec 'N'         -->
-  <!-- Apparaît uniquement quand ?session=SLUG est dans l'URL       -->
-  <!-- ============================================================ -->
   <div id="notes-panel" style="display:none; position:fixed; top:80px; right:24px; width:340px; max-height:75vh; overflow-y:auto; background:rgba(13,13,13,0.96); border:1px solid #C9A84C; border-radius:6px; padding:18px 20px; z-index:1000; font-family:'Inter',sans-serif; color:#FFFFFF; box-shadow:0 12px 40px rgba(0,0,0,0.6); backdrop-filter:blur(10px);">
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #2A2A2A;">
       <span style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.25em; color:#C9A84C; text-transform:uppercase;">Notes prospect</span>

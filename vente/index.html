@@ -18,8 +18,157 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
   <link rel="stylesheet" href="../theme.css">
+
+  <!-- ============================================================ -->
+  <!-- DA PITCH — direction artistique "waouh" (prototype slide 1)  -->
+  <!-- ============================================================ -->
+  <style id="da-pitch">
+    :root {
+      --vert: #34D399;          /* accent gains / résultats */
+      --vert-fonce: #0F5132;
+      --or-glow: rgba(201,168,76,0.55);
+    }
+
+    /* ===================== ÉCRAN DE DÉMARRAGE ===================== */
+    .da-intro {
+      position: fixed; inset: 0; z-index: 100000;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(201,168,76,0.10) 0%, rgba(13,13,13,0) 45%),
+        radial-gradient(circle at 50% 40%, #1a1a1a 0%, #0D0D0D 55%, #000 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+      overflow: hidden;
+    }
+    .da-intro::before {
+      /* grille futuriste discrète */
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%);
+    }
+    .da-intro.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .da-intro .da-mark {
+      font-family:'Cinzel',serif; color: var(--or); letter-spacing:0.55em;
+      font-size: 13px; text-transform:uppercase; margin-bottom: 14px; opacity:0.85;
+      position: relative;
+    }
+    .da-intro .da-sys {
+      font-family:'Cinzel',serif; color:#fff; letter-spacing:0.32em;
+      font-size: 26px; text-transform:uppercase; margin-bottom: 64px; position:relative;
+    }
+    .da-start-btn {
+      position: relative;
+      font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.26em;
+      font-size: 17px; font-weight:600;
+      color:#0D0D0D; background: linear-gradient(135deg,#F4E3A8 0%,#C9A84C 55%,#A88736 100%);
+      border:none; border-radius: 999px; padding: 24px 54px; cursor:pointer;
+      box-shadow: 0 0 40px rgba(201,168,76,0.35);
+      animation: pulseBtn 2.4s infinite ease-out;
+      transition: transform 0.2s;
+    }
+    .da-start-btn:hover { transform: scale(1.05); }
+    @keyframes pulseBtn {
+      0%   { box-shadow: 0 0 30px rgba(201,168,76,0.35), 0 0 0 0 rgba(201,168,76,0.45); }
+      70%  { box-shadow: 0 0 30px rgba(201,168,76,0.35), 0 0 0 30px rgba(201,168,76,0); }
+      100% { box-shadow: 0 0 30px rgba(201,168,76,0.35), 0 0 0 0 rgba(201,168,76,0); }
+    }
+    .da-intro .da-hint { margin-top: 30px; color:#555; font-size:12px; letter-spacing:0.12em; position:relative; }
+
+    /* ===================== SLIDE 1 — HERO ===================== */
+    .reveal section.hero-roi { text-align:left; padding:0 40px; }
+    .hero-wrap { display:flex; align-items:center; gap:56px; width:100%; }
+    .hero-left  { flex: 1 1 55%; min-width:0; }
+    .hero-right { flex: 1 1 45%; display:flex; align-items:center; justify-content:center; position:relative; }
+
+    .hero-kicker {
+      font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.3em;
+      color: var(--gris-leg); font-size: 19px; margin: 0 0 22px 0;
+    }
+    .hero-title {
+      font-family:'Cinzel',serif; font-weight:600; text-transform:uppercase;
+      letter-spacing: 0.04em; line-height: 0.92; white-space: nowrap;
+      font-size: 118px; margin: 0 0 26px 0;
+      background: linear-gradient(135deg, #F8EFC8 0%, #E9CE7A 30%, #C9A84C 60%, #A88736 100%);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 6px 34px var(--or-glow));
+    }
+    .hero-rule { height:3px; width:0; background: linear-gradient(90deg, var(--or), rgba(201,168,76,0)); margin-bottom: 30px; border-radius:2px; }
+    .hero-obj {
+      font-family:'Inter',sans-serif; color:#F2F2F2; font-size: 30px; line-height:1.45;
+      max-width: 820px; font-weight: 400; margin: 0;
+    }
+    .hero-obj .euro {
+      color: var(--or); font-weight: 800; font-size: 1.3em; white-space: nowrap;
+      text-shadow: 0 0 24px var(--or-glow);
+    }
+    .hero-sans {
+      margin: 34px 0 0 0; font-family:'Cinzel',serif; text-transform:uppercase;
+      letter-spacing:0.16em; color:#fff; font-size:18px; opacity:0.85;
+    }
+    .hero-visual { width:100%; max-width:540px; position:relative; }
+    .hero-photo { width:100%; border-radius:18px; display:block; box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+
+    /* ===================== ANIMATIONS D'ENTRÉE ===================== */
+    .hero-anim { opacity: 0; }
+    body.da-started .reveal section.hero-roi.present .hero-kicker { animation: daUp .7s ease forwards .15s; }
+    body.da-started .reveal section.hero-roi.present .hero-title  { animation: daPop 1.0s cubic-bezier(.2,.85,.2,1) forwards .45s; }
+    body.da-started .reveal section.hero-roi.present .hero-rule   { animation: daRule .85s ease forwards 1.15s; }
+    body.da-started .reveal section.hero-roi.present .hero-obj    { animation: daUp .7s ease forwards 1.3s; }
+    body.da-started .reveal section.hero-roi.present .hero-sans   { animation: daUp .7s ease forwards 1.65s; }
+    body.da-started .reveal section.hero-roi.present .hero-right  { animation: daFloat 1.0s ease forwards .7s; }
+
+    @keyframes daUp   { from {opacity:0; transform: translateY(26px);} to {opacity:1; transform:translateY(0);} }
+    @keyframes daFloat{ from {opacity:0; transform: translateY(40px) scale(.96);} to {opacity:1; transform:translateY(0) scale(1);} }
+    @keyframes daPop  {
+      0%   { opacity:0; transform: scale(.72); filter: blur(10px) drop-shadow(0 6px 34px var(--or-glow)); }
+      60%  { opacity:1; filter: blur(0) drop-shadow(0 6px 44px var(--or-glow)); }
+      100% { opacity:1; transform: scale(1); }
+    }
+    @keyframes daRule { to { width: 240px; } }
+
+    /* SVG dashboard animé */
+    .chart-line { stroke-dasharray: 620; stroke-dashoffset: 620; }
+    body.da-started .reveal section.hero-roi.present .chart-line { animation: drawLine 1.7s ease forwards 1.2s; }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+    .chart-area { opacity: 0; }
+    body.da-started .reveal section.hero-roi.present .chart-area { animation: fadeArea 1.2s ease forwards 1.9s; }
+    @keyframes fadeArea { to { opacity: 1; } }
+    .orbit { transform-origin: 230px 290px; animation: spin 26s linear infinite; }
+    .orbit.rev { animation: spin 34s linear infinite reverse; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .glow-pulse { animation: glowPulse 3.2s ease-in-out infinite; transform-origin:center; }
+    @keyframes glowPulse { 0%,100%{opacity:.35;} 50%{opacity:.9;} }
+    .node-pop { opacity:0; }
+    body.da-started .reveal section.hero-roi.present .node-pop { animation: nodePop .5s ease forwards; }
+    body.da-started .reveal section.hero-roi.present .node-pop.n1 { animation-delay: 2.0s; }
+    body.da-started .reveal section.hero-roi.present .node-pop.n2 { animation-delay: 2.2s; }
+    body.da-started .reveal section.hero-roi.present .node-pop.n3 { animation-delay: 2.4s; }
+    @keyframes nodePop { from{opacity:0; transform:scale(.4);} to{opacity:1; transform:scale(1);} }
+
+    /* plein écran dramatique : header/footer masqués sur le hero */
+    body:has(.reveal section.present.hero-roi) .persistent-header,
+    body:has(.reveal section.present.hero-roi) .persistent-footer,
+    body:has(.reveal section.present.hero-roi) .reveal .slide-number { opacity: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-anim, .chart-area, .node-pop { opacity: 1 !important; animation: none !important; }
+      .chart-line { stroke-dashoffset: 0 !important; }
+    }
+  </style>
 </head>
 <body>
+  <!-- ===================== ÉCRAN DE DÉMARRAGE ===================== -->
+  <div class="da-intro" id="da-intro">
+    <div class="da-mark">Scalia BTP</div>
+    <div class="da-sys">Système ROI Pilot</div>
+    <button class="da-start-btn" id="da-start">▶ Démarrer la présentation</button>
+    <div class="da-hint">Plein écran automatique · → ou Espace pour avancer</div>
+  </div>
+
   <div class="persistent-header">
     <div class="logo-scalia">
       <span class="scalia">SCALIA</span>
@@ -32,12 +181,59 @@
   <div class="reveal">
     <div class="slides">
 
-      <!-- 1 — CONTEXTE : ROI PILOT + OBJECTIF -->
-      <section class="cover">
-        <p style="font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 0.28em; color: var(--gris-leg); font-size: 0.42em; margin-bottom: 28px;">Le système que je vais vous présenter</p>
-        <p class="cover-title" style="font-size: 2.8em; color: var(--or); margin-bottom: 36px;">ROI PILOT</p>
-        <p class="cover-sub" style="max-width: 1040px; font-size: 0.78em; line-height: 1.5;">Récupérer jusqu’à <span style="color: var(--or); font-weight: 600;">[X €]</span> de CA par mois et transformer votre entreprise en une machine qui tourne sans vous — pilotée depuis votre téléphone.</p>
-        <p style="font-family: var(--font-serif); text-transform: uppercase; letter-spacing: 0.18em; color: var(--blanc); font-size: 0.5em; margin-top: 28px;">Sans acheter un lead de plus · Sans pub · Sans recruter</p>
+      <!-- 1 — CONTEXTE : ROI PILOT + OBJECTIF (HERO) -->
+      <section class="hero-roi" data-transition="fade">
+        <div class="hero-wrap">
+          <div class="hero-left">
+            <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
+            <h1 class="hero-title hero-anim">ROI PILOT</h1>
+            <div class="hero-rule hero-anim"></div>
+            <p class="hero-obj hero-anim">Récupérer jusqu’à <span class="euro">[X €]</span> de CA par mois et transformer votre entreprise en une machine qui tourne sans vous — pilotée depuis votre téléphone.</p>
+            <p class="hero-sans hero-anim">Sans acheter un lead · Sans pub · Sans recruter</p>
+          </div>
+          <div class="hero-right hero-anim">
+            <div class="hero-visual">
+              <!-- EMPLACEMENT PHOTO OPTIONNEL : dépose "vente/assets/hero-roipilot.jpg" pour remplacer l'illustration -->
+              <img class="hero-photo" src="assets/hero-roipilot.jpg" alt="" style="display:none;" onerror="this.remove();" onload="this.style.display='block'; var s=this.parentNode.querySelector('.hero-illu'); if(s){s.style.display='none';}">
+              <svg class="hero-illu" viewBox="0 0 460 580" width="100%" role="img" aria-label="Pilotage du business depuis le téléphone">
+                <defs>
+                  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#F8EFC8"/><stop offset="0.5" stop-color="#C9A84C"/><stop offset="1" stop-color="#A88736"/>
+                  </linearGradient>
+                  <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#C9A84C" stop-opacity="0.55"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/>
+                  </linearGradient>
+                  <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+                    <stop offset="0" stop-color="#C9A84C" stop-opacity="0.30"/><stop offset="1" stop-color="#C9A84C" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+                <circle class="glow-pulse" cx="230" cy="290" r="220" fill="url(#halo)"/>
+                <g class="orbit" opacity="0.35"><circle cx="230" cy="290" r="200" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="2 10"/></g>
+                <g class="orbit rev" opacity="0.25"><circle cx="230" cy="290" r="168" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="1 14"/></g>
+                <g class="node-pop n1"><circle cx="60" cy="170" r="6" fill="url(#gold)"/><circle cx="60" cy="170" r="13" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.5"/></g>
+                <g class="node-pop n2"><circle cx="406" cy="210" r="6" fill="url(#gold)"/><circle cx="406" cy="210" r="13" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.5"/></g>
+                <g class="node-pop n3"><circle cx="392" cy="430" r="6" fill="url(#gold)"/><circle cx="392" cy="430" r="13" fill="none" stroke="#C9A84C" stroke-width="1" opacity="0.5"/></g>
+                <rect x="140" y="70" width="180" height="440" rx="30" fill="#15140F" stroke="url(#gold)" stroke-width="2"/>
+                <rect x="152" y="86" width="156" height="408" rx="20" fill="#0B0B0B"/>
+                <rect x="205" y="96" width="50" height="7" rx="3.5" fill="#222"/>
+                <text x="170" y="140" fill="#7d7d7d" font-family="Inter, sans-serif" font-size="11" letter-spacing="1">CA CE MOIS</text>
+                <text x="170" y="174" fill="#C9A84C" font-family="Inter, sans-serif" font-size="30" font-weight="800">+38 400 €</text>
+                <text x="170" y="196" fill="#34D399" font-family="Inter, sans-serif" font-size="11" font-weight="600">&#9650; +27 % vs mois dernier</text>
+                <path class="chart-area" d="M168 330 L168 300 L196 290 L224 296 L252 268 L280 250 L292 240 L292 330 Z" fill="url(#area)"/>
+                <polyline class="chart-line" points="168,300 196,290 224,296 252,268 280,250 292,240" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="168" y="360" width="30" height="40" rx="3" fill="#C9A84C" opacity="0.85"/>
+                <rect x="206" y="350" width="30" height="50" rx="3" fill="#C9A84C" opacity="0.6"/>
+                <rect x="244" y="372" width="30" height="28" rx="3" fill="#C9A84C" opacity="0.45"/>
+                <text x="168" y="416" fill="#666" font-family="Inter, sans-serif" font-size="9">Leads</text>
+                <text x="206" y="416" fill="#666" font-family="Inter, sans-serif" font-size="9">Devis</text>
+                <text x="244" y="416" fill="#666" font-family="Inter, sans-serif" font-size="9">Signés</text>
+                <rect x="168" y="440" width="128" height="30" rx="15" fill="none" stroke="#34D399" stroke-width="1"/>
+                <circle class="glow-pulse" cx="184" cy="455" r="4" fill="#34D399"/>
+                <text x="196" y="459" fill="#34D399" font-family="Inter, sans-serif" font-size="11" font-weight="600">Pilotage automatique</text>
+              </svg>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- 2 — SYSTÈME IA -->
@@ -479,6 +675,28 @@
       height: 1080,
       margin: 0.05
     });
+
+    // ============================================================
+    // 3) ÉCRAN DE DÉMARRAGE → ouverture animée
+    // ============================================================
+    (function initStartScreen() {
+      var intro = document.getElementById('da-intro');
+      var btn = document.getElementById('da-start');
+      if (!intro || !btn) return;
+      function launch() {
+        try {
+          var el = document.documentElement;
+          if (el.requestFullscreen) el.requestFullscreen();
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        } catch (e) {}
+        document.body.classList.add('da-started');
+        intro.classList.add('hidden');
+        // Re-trigger l'animation du hero si on revient dessus
+        try { Reveal.slide(0); } catch (e) {}
+        setTimeout(function(){ if (intro && intro.parentNode) intro.style.display = 'none'; }, 1000);
+      }
+      btn.addEventListener('click', launch);
+    })();
   </script>
 </body>
 </html>

@@ -273,10 +273,7 @@
     .media-overlays { display:none !important; }
     /* UN SEUL fond cinématique sur tout le viewport */
     .reveal {
-      background:
-        radial-gradient(56% 50% at 50% 2%, rgba(201,168,76,0.15), transparent 60%),
-        radial-gradient(120% 100% at 50% 100%, rgba(14,11,7,0.55), transparent 72%),
-        #060504 !important;
+      background: radial-gradient(115% 80% at 50% 36%, #120d07 0%, #070504 70%) !important;
     }
     .reveal section.hero-roi {
       background: transparent !important;
@@ -342,6 +339,31 @@
     /* fragments : état caché propre */
     .reveal .fragment.fade-up { transform: translateY(28px); }
 
+    /* ===== HERO v8 — gros, espacé, animation qui claque ===== */
+    .reveal section.hero-roi { background: transparent !important; }
+    .hero-body { gap: 80px !important; align-items: center !important; }
+    .hero-benefits { display:flex; flex-direction:column; gap: 12px; }
+    .bn { padding: 30px 0 !important; gap: 26px !important; align-items:center !important; border-top: 1px solid rgba(201,168,76,0.14) !important; }
+    .bn1 { border-top: none !important; padding: 26px 22px !important; }
+    .bn-idx { font-size: 22px !important; min-width: 40px !important; }
+    .bn-num { font-size: 86px !important; }
+    .bn-num .bn-per { font-size: 30px !important; }
+    .bn-cap { font-size: 18px !important; margin-top: 8px !important; }
+    .bn-big { font-size: 44px !important; line-height: 1.06 !important; }
+    .hero-chips { margin-top: 34px !important; gap: 14px !important; }
+    .hero-chip { font-size: 14px !important; padding: 10px 18px !important; }
+
+    /* animation qui CLAQUE */
+    .reveal .hero-benefits .fragment,
+    .reveal .hero-chips.fragment {
+      opacity: 0; transform: translateX(-64px) scale(0.9); filter: blur(8px);
+      transition: opacity .45s ease, transform .6s cubic-bezier(.16,1.6,.3,1), filter .45s ease;
+    }
+    .reveal .hero-benefits .fragment.visible,
+    .reveal .hero-chips.fragment.visible {
+      opacity: 1 !important; transform: translateX(0) scale(1) !important; filter: blur(0) !important;
+    }
+
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
@@ -383,22 +405,22 @@
         </div>
         <div class="hero-body">
           <div class="hero-benefits">
-            <div class="bn bn1 fragment fade-up">
+            <div class="bn bn1 fragment">
               <span class="bn-idx">01</span>
               <div class="bn-main">
                 <span class="bn-num"><span id="roi-ca">38 400</span> €<span class="bn-per"> / mois</span></span>
                 <span class="bn-cap">de chiffre d’affaires récupéré</span>
               </div>
             </div>
-            <div class="bn bn2 fragment fade-up">
+            <div class="bn bn2 fragment">
               <span class="bn-idx">02</span>
               <div class="bn-main"><span class="bn-big">Une machine qui tourne <span class="g">sans vous</span></span></div>
             </div>
-            <div class="bn bn3 fragment fade-up">
+            <div class="bn bn3 fragment">
               <span class="bn-idx">03</span>
               <div class="bn-main"><span class="bn-big">Pilotée depuis votre <span class="g">téléphone</span></span></div>
             </div>
-            <div class="hero-chips fragment fade-up">
+            <div class="hero-chips fragment">
               <span class="hero-chip">Sans acheter un lead</span>
               <span class="hero-chip">Sans pub</span>
               <span class="hero-chip">Sans recruter</span>

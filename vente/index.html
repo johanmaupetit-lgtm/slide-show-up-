@@ -365,6 +365,18 @@
     .da-val.gold-xl { color:#F4D67A; font-size:74px; text-shadow:0 0 34px rgba(201,168,76,0.6); }
     .da-foot { margin-top:34px; font-family:'Inter',sans-serif; color:#C9A84C; font-size:21px; }
 
+    /* teaser curiosité (slide 3) */
+    .da-teaser { margin:20px auto 16px; width:100%; height:96px; border-radius:12px; background:linear-gradient(135deg, rgba(201,168,76,0.14), rgba(201,168,76,0.02)); border:1px solid rgba(201,168,76,0.22); display:flex; align-items:center; justify-content:center; font-family:'Cinzel',serif; font-size:52px; color:#C9A84C; filter: blur(2px); opacity:0.75; animation: teaserPulse 2.8s ease-in-out infinite; }
+    @keyframes teaserPulse { 0%,100%{opacity:.55; filter:blur(2.5px);} 50%{opacity:.9; filter:blur(1.5px);} }
+    /* flèche de flux entre les étapes */
+    .da-flow { position:relative; }
+    .da-flow .da-card { position:relative; }
+    .da-flow .da-card:not(:last-child)::after { content:'→'; position:absolute; right:-30px; top:50%; transform:translateY(-50%); color:#C9A84C; font-size:30px; opacity:0.7; }
+    /* coche des résultats : halo qui respire */
+    .da-card.res .da-ico { animation: icoGlow 2.6s ease-in-out infinite; transform-origin:center; }
+    @keyframes icoGlow { 0%,100%{filter:drop-shadow(0 0 4px rgba(201,168,76,0.3));} 50%{filter:drop-shadow(0 0 14px rgba(201,168,76,0.8));} }
+    .da-step { animation: icoGlow 3s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
@@ -475,9 +487,9 @@
         <h2 class="da-h2 da-big">3 piliers</h2>
         <p class="da-sub" style="text-align:center; margin:18px auto 0;">Chacun colmate une des 3 fuites qu’on vient de voir ensemble dans votre audit.</p>
         <div class="da-cols">
-          <div class="da-col fragment" data-fragment-index="0"><div class="da-col-num">01</div><div class="da-col-name">La Mine d’Or</div><div class="da-col-tag">Réveiller le cash dormant</div></div>
-          <div class="da-col fragment" data-fragment-index="1"><div class="da-col-num">02</div><div class="da-col-name">La Machine à Chantiers</div><div class="da-col-tag">Capter 100 % des leads &amp; devis</div></div>
-          <div class="da-col fragment" data-fragment-index="2"><div class="da-col-num">03</div><div class="da-col-name">Le ROI Pilot</div><div class="da-col-tag">Piloter depuis votre téléphone</div></div>
+          <div class="da-col fragment" data-fragment-index="0"><div class="da-col-num">01</div><div class="da-col-name">La Mine d’Or</div><div class="da-teaser">?</div><div class="da-col-tag">Réveiller le cash dormant</div></div>
+          <div class="da-col fragment" data-fragment-index="1"><div class="da-col-num">02</div><div class="da-col-name">La Machine à Chantiers</div><div class="da-teaser">?</div><div class="da-col-tag">Capter 100 % des leads &amp; devis</div></div>
+          <div class="da-col fragment" data-fragment-index="2"><div class="da-col-num">03</div><div class="da-col-name">Le ROI Pilot</div><div class="da-teaser">?</div><div class="da-col-tag">Piloter depuis votre téléphone</div></div>
         </div>
       </section>
 
@@ -488,7 +500,6 @@
             <p class="da-kicker">Pilier 01</p>
             <h2 class="da-h2">La Mine d’Or</h2>
             <p class="da-sub fragment" data-fragment-index="0">Récupérer en 30 jours le cash qui dort dans votre entreprise depuis 10 ans — sans lever le petit doigt, sans recruter, sans acheter un lead.</p>
-            <div class="da-chip fragment" data-fragment-index="1">Quick win · dès le 1<sup>er</sup> mois</div>
           </div>
           <div class="hero-stage fragment" data-fragment-index="0">
             <img class="hero-photo" src="mine-dor.png" alt="" onerror="this.style.opacity=0;">
@@ -562,9 +573,9 @@
         <div class="da-cards da-flow">
           <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Traite TOUS vos leads &lt; 5 min</div><div class="da-txt">24/7 — qualifie et planifie le RDV.<br><span class="da-mini">Conversion ×4 vs un rappel sous 24 h</span></div></div>
           <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Relance tous vos devis</div><div class="da-txt">Automatiquement et intelligemment, jusqu’à signature.</div></div>
-          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte dès qu’un prospect est chaud</div><div class="da-txt">Vos équipes appellent au moment exact où il faut.</div></div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte dès qu’un prospect est chaud</div><div class="da-txt">Vos équipes appellent au moment opportun.</div></div>
         </div>
-        <p class="da-foot fragment" data-fragment-index="3">Vos commerciaux ne traitent plus que du chaud qualifié.</p>
+        <p class="da-foot fragment" data-fragment-index="3">Vos équipes ne traitent plus que des leads qualifiés, prêts à signer.</p>
       </section>
 
       <!-- 10 — RÉSULTATS PILIER 2 -->
@@ -573,7 +584,7 @@
         <h2 class="da-h2">Ce que la Machine vous rapporte</h2>
         <div class="da-cards">
           <div class="da-card res fragment" data-fragment-index="0"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Plus aucun lead ni devis ne fuit</div><div class="da-txt">24h/24, week-ends compris.</div></div>
-          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Que du chaud qualifié</div><div class="da-txt">Vos commerciaux arrêtent de perdre du temps.</div></div>
+          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Que des leads qualifiés</div><div class="da-txt">Vos équipes arrêtent de perdre du temps.</div></div>
           <div class="da-card res fragment" data-fragment-index="2"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Coût d’acquisition divisé</div><div class="da-txt">Marge augmentée, mécaniquement.</div></div>
         </div>
       </section>

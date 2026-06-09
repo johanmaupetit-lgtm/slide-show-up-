@@ -317,8 +317,156 @@
     </div>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- PANNEAU NOTES DIAGNOSTIC — flottant, toggle avec 'N'         -->
+  <!-- Apparaît uniquement quand ?session=SLUG est dans l'URL       -->
+  <!-- ============================================================ -->
+  <div id="notes-panel" style="display:none; position:fixed; top:80px; right:24px; width:340px; max-height:75vh; overflow-y:auto; background:rgba(13,13,13,0.96); border:1px solid #C9A84C; border-radius:6px; padding:18px 20px; z-index:1000; font-family:'Inter',sans-serif; color:#FFFFFF; box-shadow:0 12px 40px rgba(0,0,0,0.6); backdrop-filter:blur(10px);">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #2A2A2A;">
+      <span style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.25em; color:#C9A84C; text-transform:uppercase;">Notes prospect</span>
+      <button onclick="window.__toggleNotes()" style="background:none; border:none; color:#666; cursor:pointer; font-size:18px; line-height:1; padding:0;" title="Masquer (N)">×</button>
+    </div>
+    <div id="notes-body"></div>
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid #2A2A2A; font-size:10px; color:#666; line-height:1.5;">
+      Raccourci : <strong style="color:#C9A84C;">N</strong> pour masquer/afficher · Espace ou → pour slide suivante
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
   <script>
+    // ============================================================
+    // 1) LECTURE DE LA SESSION DEPUIS ?session=SLUG
+    // ============================================================
+    (function loadSessionContext() {
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get('session');
+      if (!slug) return;
+
+      let state = null;
+      try { state = JSON.parse(localStorage.getItem('scalia-roi-app-state') || '{"sessions":[]}'); }
+      catch (e) { console.warn('storage parse failed', e); return; }
+      const session = (state.sessions || []).find(s => s.slug === slug);
+      if (!session) { console.warn('session not found:', slug); return; }
+
+      const diag = session.diagnostic || {};
+      const inputs = session.inputs || {};
+
+      // ====== Helpers de calcul (taux marché ELCIA/MIT) ======
+      const MARKET = { leadTraite: 1.00, leadRdv: 0.35, rdvHonore: 0.95, devisSignature: 0.43, devisDormants: 0.04 };
+      const n = (k) => +inputs[k] || 0;
+      const leadsRecus = n('leadsRecus'), leadsTraites = n('leadsTraites'), rdvPris = n('rdvPris'),
+            rdvHonores = n('rdvHonores'), signatures = n('signatures'), ticket = n('ticket'),
+            devisDormants = n('devisDormants');
+
+      const pTraite = leadsRecus > 0 ? leadsTraites / leadsRecus : 0;
+      const pLeadRdv = leadsTraites > 0 ? rdvPris / leadsTraites : 0;
+      const pHonore = rdvPris > 0 ? rdvHonores / rdvPris : 0;
+      const pSign = rdvHonores > 0 ? signatures / rdvHonores : 0;
+      const baseSig = leadsRecus * pTraite * pLeadRdv * pHonore * pSign;
+
+      const stepLoss = (key, pVal) => {
+        if (pVal >= MARKET[key]) return 0;
+        const r = { leadTraite: pTraite, leadRdv: pLeadRdv, rdvHonore: pHonore, devisSignature: pSign };
+        r[key] = MARKET[key];
+        const newSigs = leadsRecus * r.leadTraite * r.leadRdv * r.rdvHonore * r.devisSignature;
+        return (newSigs - baseSig) * ticket;
+      };
+      const lossTraite = stepLoss('leadTraite', pTraite);
+      const lossLeadRdv = stepLoss('leadRdv', pLeadRdv);
+      const lossHonore = stepLoss('rdvHonore', pHonore);
+      const lossSign = stepLoss('devisSignature', pSign);
+      const monthly = lossTraite + lossLeadRdv + lossHonore + lossSign;
+      const annual = monthly * 12;
+      const oneShot = devisDormants * MARKET.devisDormants * 0.33 * ticket;
+
+      const fmtEUR = (v) => v == null || isNaN(v) ? '—' : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(v)) + ' €';
+      const fmtPct = (v) => v == null || isNaN(v) ? '—' : Math.round(v * 100) + ' %';
+      const fmtNum = (v) => v == null || isNaN(v) ? '—' : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(v));
+
+      // ====== Remplacement des crochets dans le DOM ======
+      // Stratégie : on n'écrase pas si la valeur source est vide — le crochet
+      // reste affiché et c'est plus propre que "vide".
+      const replacements = [
+        { rx: /\[DOULEUR 1\]/g, val: diag.douleur1 },
+        { rx: /\[DOULEUR 2\]/g, val: diag.douleur2 },
+        { rx: /\[OBJECTIF 1\]/g, val: diag.objectif1 },
+        { rx: /\[OBJECTIF 2\]/g, val: diag.objectif2 },
+      ];
+      function replaceTextNodes(node) {
+        if (node.nodeType === 3) {
+          let txt = node.nodeValue;
+          let changed = false;
+          for (const r of replacements) {
+            if (r.val && r.rx.test(txt)) {
+              txt = txt.replace(r.rx, r.val);
+              changed = true;
+            }
+          }
+          if (changed) node.nodeValue = txt;
+        } else if (node.nodeType === 1 && !['SCRIPT','STYLE','TEXTAREA'].includes(node.tagName)) {
+          for (const child of Array.from(node.childNodes)) replaceTextNodes(child);
+        }
+      }
+      replaceTextNodes(document.querySelector('.slides'));
+
+      // ====== Populate notes panel ======
+      const panel = document.getElementById('notes-panel');
+      const body = document.getElementById('notes-body');
+      const row = (label, value, color) => value
+        ? `<div style="margin-bottom:10px;"><div style="font-size:9px; letter-spacing:0.18em; color:${color || '#888'}; text-transform:uppercase; margin-bottom:2px;">${label}</div><div style="font-size:13px; color:#FFFFFF; line-height:1.4;">${value}</div></div>`
+        : '';
+      const num = (label, value) => `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1A1A1A; font-size:12px;"><span style="color:#888;">${label}</span><span style="color:#C9A84C; font-weight:700; font-variant-numeric:tabular-nums;">${value}</span></div>`;
+
+      let html = '';
+      html += `<div style="font-family:'Cinzel',serif; font-size:14px; color:#FFFFFF; margin-bottom:4px;">${session.companyName || 'Sans nom'}</div>`;
+      html += `<div style="font-size:11px; color:#888; margin-bottom:14px;">${session.dirigeantName || ''}${session.dirigeantName ? ' · ' : ''}${new Date(session.meetingDate).toLocaleDateString('fr-FR')}</div>`;
+
+      html += '<div style="background:#0D0D0D; padding:10px 12px; border-radius:4px; border-left:2px solid #8B1A1A; margin-bottom:12px;">';
+      html += '<div style="font-size:9px; letter-spacing:0.2em; color:#8B1A1A; text-transform:uppercase; margin-bottom:8px; font-weight:700;">Douleurs</div>';
+      html += row('1', diag.douleur1, '#8B1A1A');
+      html += row('2', diag.douleur2, '#8B1A1A');
+      if (!diag.douleur1 && !diag.douleur2) html += '<div style="color:#666; font-size:11px; font-style:italic;">— vide —</div>';
+      html += '</div>';
+
+      html += '<div style="background:#0D0D0D; padding:10px 12px; border-radius:4px; border-left:2px solid #3A8A3A; margin-bottom:12px;">';
+      html += '<div style="font-size:9px; letter-spacing:0.2em; color:#3A8A3A; text-transform:uppercase; margin-bottom:8px; font-weight:700;">Objectifs</div>';
+      html += row('1', diag.objectif1, '#3A8A3A');
+      html += row('2', diag.objectif2, '#3A8A3A');
+      if (!diag.objectif1 && !diag.objectif2) html += '<div style="color:#666; font-size:11px; font-style:italic;">— vide —</div>';
+      html += '</div>';
+
+      if (leadsRecus > 0 || signatures > 0 || ticket > 0) {
+        html += '<div style="background:#0D0D0D; padding:10px 12px; border-radius:4px; border-left:2px solid #C9A84C; margin-bottom:12px;">';
+        html += '<div style="font-size:9px; letter-spacing:0.2em; color:#C9A84C; text-transform:uppercase; margin-bottom:8px; font-weight:700;">Chiffres à dire</div>';
+        if (monthly > 0) html += num('Pertes / mois', fmtEUR(monthly));
+        if (annual > 0) html += num('Pertes / an', fmtEUR(annual));
+        if (oneShot > 0) html += num('One-shot dormants', fmtEUR(oneShot));
+        if (devisDormants > 0) html += num('Devis dormants', fmtNum(devisDormants));
+        if (lossLeadRdv > 0) html += num('% leads non rappelés', fmtPct(1 - pTraite));
+        if (ticket > 0) html += num('Ticket moyen', fmtEUR(ticket));
+        html += '</div>';
+      }
+
+      body.innerHTML = html;
+      panel.style.display = 'block';
+
+      // Toggle avec touche 'N'
+      window.__toggleNotes = function() {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      };
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'n' || e.key === 'N') {
+          const tag = (e.target.tagName || '').toLowerCase();
+          if (tag === 'input' || tag === 'textarea') return;
+          window.__toggleNotes();
+          e.preventDefault();
+        }
+      });
+    })();
+
+    // ============================================================
+    // 2) REVEAL INIT
+    // ============================================================
     Reveal.initialize({
       hash: true,
       slideNumber: 'c/t',

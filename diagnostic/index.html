@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALIA BTP — Cockpit Diagnostic Phase A</title>
+
+  <script>
+    (function(){
+      if(sessionStorage.getItem('scalia-auth')==='ok')return;
+      var p=prompt('Mot de passe SCALIA BTP :');
+      if(p==='scalia2026'){sessionStorage.setItem('scalia-auth','ok');}
+      else{document.documentElement.innerHTML='<body style="background:#0D0D0D;color:#C9A84C;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;letter-spacing:0.3em;text-transform:uppercase;font-size:12px;">Accès refusé</body>';throw new Error('denied');}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            noir: '#0D0D0D',
+            'noir-card': '#1A1A1A',
+            or: '#C9A84C',
+            'or-fonce': '#A88736',
+            rouge: '#8B1A1A',
+            'vert-go': '#3A8A3A',
+            anthracite: '#2A2A2A',
+          },
+          fontFamily: {
+            serif: ['Cinzel', 'Georgia', 'serif'],
+            sans: ['Inter', 'Helvetica Neue', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body { background: #0D0D0D; color: #FFFFFF; font-family: 'Inter', sans-serif; }
+    .logo-scalia { display: inline-block; text-align: center; font-family: 'Cinzel', serif; font-weight: 400; color: #C9A84C; text-transform: uppercase; line-height: 1; }
+    .logo-scalia .scalia { display: block; font-size: 1em; letter-spacing: 0.55em; padding-left: 0.55em; }
+    .logo-scalia .rule { display: block; width: 100%; height: 1px; background: #C9A84C; opacity: 0.7; margin: 0.25em 0; }
+    .logo-scalia .btp { display: block; font-size: 0.37em; letter-spacing: 0.95em; padding-left: 0.95em; }
+
+    @keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fade-in 0.3s ease forwards; }
+
+    /* Inputs */
+    .form-input {
+      width: 100%;
+      background: #0D0D0D;
+      border: 1px solid #2A2A2A;
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: #FFFFFF;
+      font-size: 14px;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus { outline: none; border-color: #C9A84C; }
+    textarea.form-input { resize: vertical; min-height: 64px; font-family: inherit; line-height: 1.5; }
+
+    /* Big checkbox for critères */
+    .chk {
+      appearance: none; -webkit-appearance: none;
+      width: 28px; height: 28px;
+      border: 2px solid #2A2A2A;
+      border-radius: 4px;
+      background: #0D0D0D;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .chk:hover { border-color: #C9A84C; }
+    .chk:checked { background: #3A8A3A; border-color: #3A8A3A; }
+    .chk:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .chk.chk-pref:checked { background: #C9A84C; border-color: #C9A84C; }
+    .chk.chk-pref:checked::after { color: #0D0D0D; }
+
+    /* Sticky header */
+    .sticky-header {
+      position: sticky; top: 0; z-index: 30;
+      background: rgba(13,13,13,0.97);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #2A2A2A;
+    }
+
+    /* Tab navigation */
+    .tab-btn {
+      padding: 14px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #888;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #C9A84C; }
+    .tab-btn.active { color: #C9A84C; border-bottom-color: #C9A84C; }
+
+    /* Critère row */
+    .crit-row {
+      background: #1A1A1A;
+      border: 1px solid #2A2A2A;
+      border-radius: 6px;
+      padding: 20px 22px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .crit-row.obligatoire { border-left: 3px solid #8B1A1A; }
+    .crit-row.obligatoire.coche { border-left-color: #3A8A3A; background: rgba(58,138,58,0.06); }
+    .crit-row.preferable { border-left: 3px solid #2A2A2A; }
+    .crit-row.preferable.coche { border-left-color: #C9A84C; background: rgba(201,168,76,0.04); }
+
+    .crit-code {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: #C9A84C;
+      margin-bottom: 4px;
+    }
+    .crit-title { font-size: 16px; font-weight: 700; color: #FFFFFF; line-height: 1.35; }
+    .crit-label-type {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      padding: 2px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .crit-label-type.oblig { background: #8B1A1A; color: #FFFFFF; }
+    .crit-label-type.pref { background: #2A2A2A; color: #C9A84C; }
+    .crit-question {
+      margin-top: 10px;
+      padding: 12px 14px;
+      background: #0D0D0D;
+      border-left: 2px solid #C9A84C;
+      border-radius: 0 4px 4px 0;
+      font-style: italic;
+      color: #DDDDDD;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .crit-justif {
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: #888;
+      line-height: 1.55;
+    }
+
+    /* Score badge */
+    .score-go { background: #3A8A3A; color: #FFFFFF; }
+    .score-nogo { background: #8B1A1A; color: #FFFFFF; }
+    .score-partial { background: #C9A84C; color: #0D0D0D; }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #0D0D0D; }
+    ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #C9A84C; }
+
+    /* Section anchor offset for sticky header */
+    .bloc-section { scroll-margin-top: 140px; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0D0D0D;color:#C9A84C;font-family:'Cinzel',Georgia,serif;letter-spacing:0.3em;font-size:13px;text-transform:uppercase;">
+      Chargement<span class="dot1">.</span><span class="dot2">.</span><span class="dot3">.</span>
+    </div>
+  </div>
+  <style>
+    @keyframes blink { 0%, 60%, 100% { opacity: 0; } 30% { opacity: 1; } }
+    .dot1 { animation: blink 1.4s infinite 0s; }
+    .dot2 { animation: blink 1.4s infinite 0.2s; }
+    .dot3 { animation: blink 1.4s infinite 0.4s; }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.3.1",
+      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
+    }
+  }
+  </script>
+  <script type="module">
+    import React, { useState, useEffect, useRef, useMemo, useCallback, createContext, useContext } from 'react';
+    import { createRoot } from 'react-dom/client';
+    window.React = React;
+    window.ReactHooks = { useState, useEffect, useRef, useMemo, useCallback, createContext, useContext };
+    window.createRoot = createRoot;
+    window.dispatchEvent(new Event('react-ready'));
+  </script>
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+  <script type="text/babel" data-presets="react">
+    (async function bootApp() {
+      await new Promise(resolve => {
+        if (window.React) return resolve();
+        window.addEventListener('react-ready', resolve, { once: true });
+      });
+      const React = window.React;
+      const { useState, useEffect, useRef, useMemo, useCallback, createContext, useContext } = window.ReactHooks;
+      const createRoot = window.createRoot;
+
+      // ============================================================
+      // CONSTANTES — STORAGE PARTAGÉ AVEC LE CALCULATEUR
+      // ============================================================
+
+      const STORAGE_KEY = 'scalia-roi-app-state';
+
+      // ====== STRUCTURE DES BLOCS A/B/C/D — FIDÈLE AU BRIEF ======
+
+      const BLOC_A = [
+        {
+          id: 'A1', type: 'oblig',
+          title: 'Logiciel de devis avec clé API en lecture + écriture',
+          question: '« Quel logiciel vous utilisez pour faire vos devis ? »',
+          justif: 'Si ProDevis, Codial ou HerculePro : validé. Si autre logiciel : « il a une API ou une option d\'intégration ? ». Si Excel/Word/papier : la brique 2 est cassée — signal rouge. La synchro bidirectionnelle est l\'épine dorsale du système.',
+        },
+        {
+          id: 'A2', type: 'oblig',
+          title: 'Historique de devis non-signés exportable',
+          question: '« Vos anciens devis sont tous dans votre logiciel ? Vous pouvez les exporter facilement ? Sur combien d\'années ? »',
+          justif: 'Champs minimums requis : nom, email OU téléphone, date d\'émission, montant, statut. Si historique papier ou Excel éclatés sans contact numérique → brique 4 désactivée, principale source de gain one-shot perdue.',
+        },
+        {
+          id: 'A3', type: 'oblig',
+          title: 'Volume de leads digitaux entrants suffisant',
+          question: '« Par mois, vous recevez à peu près combien de demandes de devis par le digital — formulaires web, pubs en ligne, plateformes type Habitatpresto ? »',
+          justif: 'Détermine la rentabilité de la brique 1 (voicebot + capture). Minimum viable PME 2-15 M€ menuiserie : 80-100 leads digitaux/mois. Alimente aussi directement le Bloc B (chiffre B1).',
+        },
+        {
+          id: 'A4', type: 'oblig',
+          title: 'Numéro téléphonique dédié au voicebot',
+          question: '« Vous êtes ouvert à ce qu\'un assistant vocal automatique prenne en charge vos appels manqués ? »',
+          justif: 'Deux options viables : nouveau numéro Twilio dédié OU transfert du numéro existant. Si refus catégorique : moitié de la brique 1 désactivée — réduction de scope à acter explicitement.',
+        },
+        {
+          id: 'A5', type: 'oblig',
+          title: 'Accès admin DNS du domaine pro pour configuration email',
+          question: '« Vous avez une boîte email pro à votre nom de domaine ? Et vous savez qui gère votre nom de domaine — vous-même ou un prestataire ? »',
+          justif: 'Sans SPF/DKIM/DMARC : 70-90% des emails de relance partent en spam, briques 3 et 4 annihilées. Accès admin OVH/Gandi/Cloudflare suffit. Si Gmail/Free comme adresse pro → point d\'attention bloquant.',
+        },
+        {
+          id: 'A6', type: 'pref',
+          title: 'Catalogue de prix fournisseurs structuré',
+          question: '« Vos tarifs fournisseurs sont structurés quelque part — Excel, CSV, ou intégrés au logiciel devis ? »',
+          justif: 'Sert la brique 2 (génération auto par dictée vocale). Sans catalogue structuré, validation manuelle à chaque devis — brique perd 60% de son automatisation. Compensable.',
+        },
+        {
+          id: 'A7', type: 'pref',
+          title: 'WhatsApp Business API ou numéro éligible',
+          question: '« Vous utilisez WhatsApp pour communiquer avec vos clients ? »',
+          justif: 'Démultiplie le rendement des briques 3 et 4 (taux d\'ouverture WhatsApp 85-95% vs email 25-35%). Si non, on fait avec email + SMS — fonctionne mais rendement inférieur.',
+        },
+        {
+          id: 'A8', type: 'pref',
+          title: 'Commercial disponible pour traiter les alertes prospect chaud',
+          question: '« Quand un prospect montre un signal d\'achat fort, vous avez quelqu\'un qui peut le rappeler dans l\'heure ? »',
+          justif: 'Sert la brique 3 (scoring + alerte). Sans commercial dispo dans l\'heure, alertes partent dans le vide. Compensable en remontant les seuils, mais brique perd en finesse.',
+        },
+        {
+          id: 'A9', type: 'pref',
+          title: 'Calendrier d\'équipe accessible via API',
+          question: '« Vous prenez vos RDV sur Google Calendar, Outlook, ou un autre outil ? »',
+          justif: 'Sert prise de RDV (brique 1) et alertes (brique 3). Sans calendrier API, impossible d\'automatiser totalement — on tombe sur du « rappel-moi pour fixer » qui casse l\'instantanéité.',
+        },
+        {
+          id: 'A10', type: 'pref',
+          title: 'Smartphones professionnels par commercial terrain',
+          question: '« Vos commerciaux ont chacun un smartphone pro fourni par l\'entreprise ? »',
+          justif: 'Sert dictée vocale (brique 2) et dashboard mobile (brique 5). Sans smartphone pro : RGPD si perso, ou pas de dictée. Dégradation modérée.',
+        },
+      ];
+
+      const BLOC_B_FIELDS = [
+        { id: 'leadsRecus',    code: 'B1', label: 'Leads digitaux entrants / mois', crucial: true,  unit: '', question: '« Combien de demandes de devis par mois via le digital — formulaires web, plateformes type Habitatpresto, pubs Meta ou Google ? »' },
+        { id: 'rdvPris',       code: 'B2', label: 'RDV pris / mois',                crucial: true,  unit: '', question: '« Sur ces leads, combien arrivent à transformer en RDV chaque mois ? »' },
+        { id: 'rdvHonores',    code: 'B3', label: 'RDV honorés / mois',             crucial: true,  unit: '', question: '« Et sur ces RDV pris, combien se passent réellement — sans no-show, sans annulation ? »' },
+        { id: 'signatures',    code: 'B4', label: 'Signatures / mois',              crucial: true,  unit: '', question: '« Au final, combien aboutissent à un devis signé chaque mois ? »' },
+        { id: 'ticket',        code: 'B5', label: 'Ticket moyen chantier signé',    crucial: true,  unit: '€', question: '« Votre panier moyen sur un chantier signé, c\'est combien à peu près ? »' },
+        { id: 'delaiRappel',   code: 'B6', label: 'Délai moyen de rappel d\'un lead', crucial: false, unit: 'min/h', question: '« Quand un lead arrive, en moyenne vous le rappelez sous combien de temps ? »', diag: true },
+        { id: 'devisDormants', code: 'B7', label: 'Total devis non-signés (historique)', crucial: true,  unit: '', question: '« Sur les 5 à 10 dernières années, combien de devis émis mais jamais signés ? »' },
+        { id: 'ticketHistorique', code: 'B8', label: 'Ticket moyen historique', crucial: false, unit: '€', question: '« Sur ces anciens devis, le panier moyen était similaire à aujourd\'hui ? »', diag: true },
+      ];
+
+      const BLOC_C = [
+        { id: 'processLeads',    code: 'C1', label: 'Traitement des leads entrants', question: '« Quand un lead arrive, comment ça se passe chez vous ? Qui le rappelle, à quel moment de la journée ? »', justif: 'Tu cherches le goulot d\'étranglement : dirigeant en soirée ? Assistante ? Commercial dédié ?' },
+        { id: 'processRDV',      code: 'C2', label: 'Prise de RDV et anti no-show',  question: '« Et la prise de RDV elle-même, vous le calez sous combien de jours ? Vous envoyez un rappel avant ? »', justif: 'Délai prise→tenue (DETECTOUR : > 4 sem = no-show > 30%) + présence séquence anti no-show.' },
+        { id: 'processDevis',    code: 'C3', label: 'Création et envoi des devis',   question: '« Vos devis, qui les chiffre, et en combien de temps en moyenne ils partent chez le client après le RDV ? »', justif: 'ELCIA 2025 : 58,75% envoient sous 48h. Au-delà = cause documentée d\'attentisme client.' },
+        { id: 'processRelances', code: 'C4', label: 'Relance des devis émis',        question: '« Et les devis envoyés qui ne sont pas signés tout de suite, vous les relancez comment ? Combien de fois ? »', justif: '⚡ QUESTION CRITIQUE. ELCIA : 30% ne relancent JAMAIS, 66% s\'arrêtent à 1-2 relances. Yumens : 80% des ventes se font après la 4ème relance.' },
+        { id: 'processDormants', code: 'C5', label: 'Recyclage des devis dormants',  question: '« Vos anciens devis non-signés des années précédentes, vous faites quelque chose avec ? Des campagnes ponctuelles ? »', justif: 'Si base vierge : potentiel one-shot intact (argument fort Phase F). Si déjà exploitée : calibrer la promesse à la baisse.' },
+      ];
+
+      const BLOC_D = [
+        { id: 'douleurPrincipale',  code: 'D1', label: 'Frein principal à la croissance', question: '« Aujourd\'hui, votre frein numéro un à la croissance, ce serait quoi ? »', justif: 'Écoute, ne complète pas, rebondis. Détermine l\'axe d\'appui en Phase D.' },
+        { id: 'objectifPrincipal',  code: 'D2', label: 'Quantification de la douleur',    question: '« Si vous pouviez résoudre UN truc spécifique dans votre process commercial, ce serait quoi en priorité ? »', justif: 'Affine D1 sur le process commercial. Tu peux demander « ça représente quoi en perte de temps/argent ? » pour quantifier.' },
+      ];
+
+      // ============================================================
+      // UTILS
+      // ============================================================
+
+      const slugify = (s) => (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const dateSlug = (d) => { const date = new Date(d); const months = ['jan','fev','mar','avr','mai','jun','jul','aou','sep','oct','nov','dec']; return date.getDate() + months[date.getMonth()]; };
+
+      const loadState = () => {
+        try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : { sessions: [] }; }
+        catch { return { sessions: [] }; }
+      };
+      const saveState = (state) => {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        catch (e) { console.error('Save failed', e); }
+      };
+
+      // S'assure que la session a la structure diagnostic. Migration douce.
+      const ensureDiagShape = (s) => {
+        if (!s) return s;
+        const fais = {};
+        BLOC_A.forEach(c => { fais[c.id] = s.diagnostic?.faisabilite?.[c.id] || { coche: false, note: '' }; });
+        const updated = {
+          ...s,
+          inputs: s.inputs || { leadsRecus:'', leadsTraites:'', rdvPris:'', rdvHonores:'', signatures:'', ticket:'', devisDormants:'' },
+          diagnostic: {
+            faisabilite: fais,
+            delaiRappel: s.diagnostic?.delaiRappel || '',
+            ticketHistorique: s.diagnostic?.ticketHistorique || '',
+            processLeads: s.diagnostic?.processLeads || '',
+            processRDV: s.diagnostic?.processRDV || '',
+            processDevis: s.diagnostic?.processDevis || '',
+            processRelances: s.diagnostic?.processRelances || '',
+            processDormants: s.diagnostic?.processDormants || '',
+            douleurPrincipale: s.diagnostic?.douleurPrincipale || '',
+            objectifPrincipal: s.diagnostic?.objectifPrincipal || '',
+            douleur1: s.diagnostic?.douleur1 || '',
+            douleur2: s.diagnostic?.douleur2 || '',
+            objectif1: s.diagnostic?.objectif1 || '',
+            objectif2: s.diagnostic?.objectif2 || '',
+          },
+        };
+        return updated;
+      };
+
+      // ============================================================
+      // ROUTER (hash)
+      // ============================================================
+
+      const parseHash = (hash) => {
+        const clean = (hash || '#/').replace(/^#/, '');
+        const parts = clean.split('/').filter(Boolean);
+        if (parts.length === 0) return { name: 'home' };
+        if (parts[0] === 'session' && parts[1]) return { name: 'session', slug: parts[1] };
+        return { name: 'home' };
+      };
+      const useHashRoute = () => {
+        const [route, setRoute] = useState(() => parseHash(window.location.hash));
+        useEffect(() => {
+          const onHash = () => setRoute(parseHash(window.location.hash));
+          window.addEventListener('hashchange', onHash);
+          return () => window.removeEventListener('hashchange', onHash);
+        }, []);
+        return route;
+      };
+      const navigate = (p) => { window.location.hash = p; };
+
+      // ============================================================
+      // CONTEXT (multi-pages share storage)
+      // ============================================================
+
+      const AppContext = createContext(null);
+
+      const AppProvider = ({ children }) => {
+        const [state, setState] = useState(loadState);
+        const saveTimer = useRef(null);
+        useEffect(() => {
+          clearTimeout(saveTimer.current);
+          saveTimer.current = setTimeout(() => saveState(state), 350);
+        }, [state]);
+
+        const createSession = (data) => {
+          const baseSlug = slugify(data.companyName || 'prospect');
+          const ds = dateSlug(data.meetingDate || new Date().toISOString().slice(0,10));
+          const slug = `${baseSlug}-${ds}`;
+          const newSession = ensureDiagShape({
+            slug,
+            dirigeantName: data.dirigeantName || '',
+            companyName: data.companyName || '',
+            clientWebsite: data.clientWebsite || '',
+            meetingDate: data.meetingDate || new Date().toISOString().slice(0,10),
+            inputs: { leadsRecus:'', leadsTraites:'', rdvPris:'', rdvHonores:'', signatures:'', ticket:'', devisDormants:'' },
+            marketRatesOverrides: {},
+            causes: {},
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+          setState(s => ({ ...s, sessions: [...s.sessions, newSession] }));
+          return slug;
+        };
+
+        const updateSession = (slug, patch) => {
+          setState(s => ({
+            ...s,
+            sessions: s.sessions.map(ss => ss.slug === slug
+              ? { ...ss, ...patch, updatedAt: new Date().toISOString() }
+              : ss),
+          }));
+        };
+        const updateDiag = (slug, diagPatch) => {
+          setState(s => ({
+            ...s,
+            sessions: s.sessions.map(ss => ss.slug === slug
+              ? { ...ss, diagnostic: { ...ss.diagnostic, ...diagPatch }, updatedAt: new Date().toISOString() }
+              : ss),
+          }));
+        };
+        const updateInputs = (slug, inputsPatch) => {
+          setState(s => ({
+            ...s,
+            sessions: s.sessions.map(ss => ss.slug === slug
+              ? { ...ss, inputs: { ...ss.inputs, ...inputsPatch }, updatedAt: new Date().toISOString() }
+              : ss),
+          }));
+        };
+        const updateFais = (slug, critId, patch) => {
+          setState(s => ({
+            ...s,
+            sessions: s.sessions.map(ss => {
+              if (ss.slug !== slug) return ss;
+              const fais = { ...(ss.diagnostic?.faisabilite || {}) };
+              fais[critId] = { ...(fais[critId] || { coche: false, note: '' }), ...patch };
+              return { ...ss, diagnostic: { ...ss.diagnostic, faisabilite: fais }, updatedAt: new Date().toISOString() };
+            }),
+          }));
+        };
+        const deleteSession = (slug) => {
+          if (!confirm('Supprimer cette session définitivement ?')) return;
+          setState(s => ({ ...s, sessions: s.sessions.filter(ss => ss.slug !== slug) }));
+        };
+        const getSession = (slug) => {
+          const s = state.sessions.find(ss => ss.slug === slug);
+          return s ? ensureDiagShape(s) : null;
+        };
+
+        return (
+          <AppContext.Provider value={{ state, createSession, updateSession, updateDiag, updateInputs, updateFais, getSession, deleteSession }}>
+            {children}
+          </AppContext.Provider>
+        );
+      };
+      const useApp = () => useContext(AppContext);
+
+      // ============================================================
+      // HOME PAGE — liste sessions + créer
+      // ============================================================
+
+      const HomePage = () => {
+        const { state, createSession, deleteSession } = useApp();
+        const [showForm, setShowForm] = useState(state.sessions.length === 0);
+        const sorted = [...state.sessions].sort((a,b) => new Date(b.meetingDate) - new Date(a.meetingDate));
+
+        return (
+          <div className="min-h-screen">
+            <div className="max-w-5xl mx-auto px-8 py-10">
+              <div className="flex items-center justify-between mb-10">
+                <div className="logo-scalia" style={{fontSize:'40px'}}>
+                  <span className="scalia">SCALIA</span>
+                  <span className="rule"></span>
+                  <span className="btp">BTP</span>
+                </div>
+                <div className="text-right">
+                  <p className="font-serif uppercase tracking-[0.25em] text-or text-xs">Cockpit Diagnostic</p>
+                  <p className="text-gray-400 text-sm mt-1">Phase A — Avant audit & pitch</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-serif uppercase tracking-[0.18em] text-white text-lg">Sessions prospect</h2>
+                <button onClick={() => setShowForm(s => !s)} className="bg-or text-noir px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+                  {showForm ? 'Annuler' : '+ Nouvelle session'}
+                </button>
+              </div>
+
+              {showForm && <NewSessionForm onCreate={(data) => { const slug = createSession(data); setShowForm(false); navigate(`/session/${slug}`); }} onCancel={() => setShowForm(false)} />}
+
+              {sorted.length === 0
+                ? <div className="bg-noir-card border border-anthracite rounded-lg p-12 text-center text-gray-500 mt-6">Aucune session encore. Crée la première pour commencer un diagnostic.</div>
+                : <div className="space-y-2 mt-4">
+                    {sorted.map(s => <SessionRow key={s.slug} session={ensureDiagShape(s)} onDelete={() => deleteSession(s.slug)} />)}
+                  </div>
+              }
+
+              <div className="mt-16 pt-8 border-t border-anthracite text-xs text-gray-500">
+                Les sessions sont partagées entre Diagnostic · Calculateur ROI · Pitch de vente. Stockage local — pense à exporter depuis le calculateur pour sauvegarde.
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const SessionRow = ({ session, onDelete }) => {
+        const totalOblig = BLOC_A.filter(c => c.type === 'oblig').length;
+        const cochesOblig = BLOC_A.filter(c => c.type === 'oblig').filter(c => session.diagnostic?.faisabilite?.[c.id]?.coche).length;
+        const ok = cochesOblig === totalOblig;
+        const slug = session.slug;
+        return (
+          <div className="bg-noir-card border border-anthracite rounded-lg p-5 flex items-center justify-between hover:border-or/40 transition">
+            <div className="flex-1">
+              <p className="font-semibold text-white">{session.companyName || <span className="text-gray-500 italic">Sans nom</span>}</p>
+              <p className="text-sm text-gray-400 mt-0.5">{session.dirigeantName || '—'} · {new Date(session.meetingDate).toLocaleDateString('fr-FR')}</p>
+              <p className="text-xs text-gray-600 mt-1">Critères obligatoires : <span className={ok ? 'text-vert-go' : (cochesOblig === 0 ? 'text-gray-500' : 'text-or')}>{cochesOblig}/{totalOblig}</span></p>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => navigate(`/session/${slug}`)} className="px-4 py-2 text-xs text-noir bg-or rounded font-semibold uppercase tracking-wider hover:bg-or-fonce transition">
+                Ouvrir diag
+              </button>
+              <a href={`../vente/calculateur-roi/#/session/${slug}`} className="px-3 py-2 text-xs text-or border border-or/40 rounded font-semibold uppercase tracking-wider hover:border-or transition no-underline">
+                Audit
+              </a>
+              <a href={`../vente/?session=${slug}`} className="px-3 py-2 text-xs text-gray-300 border border-anthracite rounded font-semibold uppercase tracking-wider hover:border-or/40 transition no-underline">
+                Pitch
+              </a>
+              <button onClick={onDelete} className="px-3 py-2 text-xs text-rouge border border-rouge/40 rounded hover:bg-rouge hover:text-white transition">
+                Suppr.
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      const NewSessionForm = ({ onCreate, onCancel }) => {
+        const [data, setData] = useState({
+          dirigeantName: '',
+          companyName: '',
+          clientWebsite: '',
+          meetingDate: new Date().toISOString().slice(0, 10),
+        });
+        const submit = (e) => {
+          e.preventDefault();
+          if (!data.companyName.trim()) { alert('Nom de l\'entreprise requis pour générer le slug.'); return; }
+          onCreate(data);
+        };
+        return (
+          <form onSubmit={submit} className="bg-noir-card border border-anthracite rounded-lg p-6 mb-6 fade-in">
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-or mb-2">Nom du dirigeant</label>
+                <input value={data.dirigeantName} onChange={e => setData(d => ({...d, dirigeantName: e.target.value}))} className="form-input" placeholder="Ex : Pierre Martin" autoFocus />
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-or mb-2">Nom de l'entreprise *</label>
+                <input required value={data.companyName} onChange={e => setData(d => ({...d, companyName: e.target.value}))} className="form-input" placeholder="Ex : Menuiserie Martin" />
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-or mb-2">Site web (optionnel)</label>
+                <input value={data.clientWebsite} onChange={e => setData(d => ({...d, clientWebsite: e.target.value}))} className="form-input" placeholder="ex : menuiserie-martin.fr" />
+              </div>
+              <div>
+                <label className="block text-xs uppercase tracking-wider text-or mb-2">Date du RDV</label>
+                <input type="date" value={data.meetingDate} onChange={e => setData(d => ({...d, meetingDate: e.target.value}))} className="form-input" />
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button type="button" onClick={onCancel} className="px-4 py-2 text-gray-400 hover:text-white transition text-sm">Annuler</button>
+              <button type="submit" className="bg-or text-noir px-6 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+                Créer & ouvrir le diag
+              </button>
+            </div>
+          </form>
+        );
+      };
+
+      // ============================================================
+      // DIAG PAGE
+      // ============================================================
+
+      const DiagPage = ({ slug }) => {
+        const { getSession, updateSession, updateDiag, updateInputs, updateFais } = useApp();
+        const session = getSession(slug);
+        const [activeTab, setActiveTab] = useState('A');
+
+        if (!session) {
+          return (
+            <div className="min-h-screen flex items-center justify-center text-gray-400">
+              <div className="text-center">
+                <p>Session introuvable.</p>
+                <button onClick={() => navigate('/')} className="mt-4 text-or underline">Retour à la liste</button>
+              </div>
+            </div>
+          );
+        }
+
+        // Calcul du score critères obligatoires
+        const obligs = BLOC_A.filter(c => c.type === 'oblig');
+        const cochesOblig = obligs.filter(c => session.diagnostic?.faisabilite?.[c.id]?.coche).length;
+        const goNoGo = cochesOblig === obligs.length ? 'GO' : (cochesOblig === 0 ? 'NO-GO' : 'PARTIEL');
+
+        // Bloc B : minimum 4 chiffres cruciaux
+        const cruciauxB = BLOC_B_FIELDS.filter(f => f.crucial);
+        const remplisB = cruciauxB.filter(f => {
+          const val = f.diag ? session.diagnostic?.[f.id] : session.inputs?.[f.id];
+          return val !== '' && val !== undefined && val !== null;
+        }).length;
+
+        return (
+          <div>
+            {/* === HEADER STICKY === */}
+            <div className="sticky-header">
+              <div className="max-w-6xl mx-auto px-8 py-4">
+                <div className="flex items-center justify-between gap-6">
+                  <div className="flex items-center gap-5">
+                    <button onClick={() => navigate('/')} className="text-or hover:text-or-fonce transition text-sm">← Liste</button>
+                    <div className="logo-scalia" style={{fontSize:'22px'}}>
+                      <span className="scalia">SCALIA</span>
+                      <span className="rule"></span>
+                      <span className="btp">BTP</span>
+                    </div>
+                    <div className="border-l border-anthracite pl-5">
+                      <p className="font-semibold text-white text-lg leading-tight">{session.companyName || 'Sans nom'}</p>
+                      <p className="text-xs text-gray-400">{session.dirigeantName || '—'} · {new Date(session.meetingDate).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider ${goNoGo === 'GO' ? 'score-go' : (goNoGo === 'NO-GO' ? 'score-nogo' : 'score-partial')}`}>
+                      {goNoGo === 'GO' ? '✓ GO' : goNoGo === 'NO-GO' ? '✗ NO-GO' : `${cochesOblig}/${obligs.length} obligatoires`}
+                    </div>
+                    <a href={`../vente/calculateur-roi/#/session/${slug}`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-xs bg-or text-noir rounded font-bold uppercase tracking-wider hover:bg-or-fonce transition no-underline">
+                      → Audit ROI
+                    </a>
+                    <a href={`../vente/?session=${slug}`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-xs border border-or text-or rounded font-bold uppercase tracking-wider hover:bg-or hover:text-noir transition no-underline">
+                      → Pitch
+                    </a>
+                  </div>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex gap-1 mt-4 overflow-x-auto -mx-1 px-1">
+                  <button className={`tab-btn ${activeTab === 'A' ? 'active' : ''}`} onClick={() => setActiveTab('A')}>
+                    A · Faisabilité <span className={`ml-2 text-[10px] ${cochesOblig === obligs.length ? 'text-vert-go' : 'text-gray-500'}`}>{cochesOblig}/{obligs.length}</span>
+                  </button>
+                  <button className={`tab-btn ${activeTab === 'B' ? 'active' : ''}`} onClick={() => setActiveTab('B')}>
+                    B · Chiffres <span className={`ml-2 text-[10px] ${remplisB >= 4 ? 'text-vert-go' : 'text-gray-500'}`}>{remplisB}/{cruciauxB.length}</span>
+                  </button>
+                  <button className={`tab-btn ${activeTab === 'C' ? 'active' : ''}`} onClick={() => setActiveTab('C')}>C · Process</button>
+                  <button className={`tab-btn ${activeTab === 'D' ? 'active' : ''}`} onClick={() => setActiveTab('D')}>D · Douleur · Objectifs</button>
+                  <button className={`tab-btn ${activeTab === 'R' ? 'active' : ''}`} onClick={() => setActiveTab('R')}>Récap & Pitch</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="max-w-6xl mx-auto px-8 py-8 fade-in">
+              {activeTab === 'A' && <BlocA session={session} updateFais={(id, p) => updateFais(slug, id, p)} />}
+              {activeTab === 'B' && <BlocB session={session} updateInputs={(p) => updateInputs(slug, p)} updateDiag={(p) => updateDiag(slug, p)} />}
+              {activeTab === 'C' && <BlocC session={session} updateDiag={(p) => updateDiag(slug, p)} />}
+              {activeTab === 'D' && <BlocD session={session} updateDiag={(p) => updateDiag(slug, p)} />}
+              {activeTab === 'R' && <RecapBloc session={session} slug={slug} cochesOblig={cochesOblig} totalOblig={obligs.length} remplisB={remplisB} cruciauxB={cruciauxB} />}
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================================
+      // BLOC A
+      // ============================================================
+
+      const BlocA = ({ session, updateFais }) => {
+        const obligs = BLOC_A.filter(c => c.type === 'oblig');
+        const prefs = BLOC_A.filter(c => c.type === 'pref');
+        return (
+          <div>
+            <BlocHeader code="A" title="Faisabilité technique" subtitle="5 critères obligatoires (go/no-go) + 5 critères préférables. Coche au fur et à mesure de la conversation, prends une note rapide si pertinent." />
+
+            <div className="mb-4 mt-8">
+              <p className="font-serif uppercase tracking-[0.2em] text-rouge text-xs mb-3">Obligatoires — Go / No-Go</p>
+              <div className="space-y-3">
+                {obligs.map(c => <CritereRow key={c.id} crit={c} value={session.diagnostic?.faisabilite?.[c.id] || { coche: false, note: '' }} onUpdate={(p) => updateFais(c.id, p)} />)}
+              </div>
+            </div>
+
+            <div className="mb-4 mt-12">
+              <p className="font-serif uppercase tracking-[0.2em] text-or text-xs mb-3">Préférables — Signaux de fluidité</p>
+              <div className="space-y-3">
+                {prefs.map(c => <CritereRow key={c.id} crit={c} value={session.diagnostic?.faisabilite?.[c.id] || { coche: false, note: '' }} onUpdate={(p) => updateFais(c.id, p)} />)}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      const CritereRow = ({ crit, value, onUpdate }) => {
+        return (
+          <div className={`crit-row ${crit.type === 'oblig' ? 'obligatoire' : 'preferable'} ${value.coche ? 'coche' : ''}`}>
+            <div className="flex items-start gap-4">
+              <input type="checkbox" className={`chk ${crit.type === 'pref' ? 'chk-pref' : ''}`} checked={!!value.coche} onChange={e => onUpdate({ coche: e.target.checked })} />
+              <div className="flex-1 min-w-0">
+                <div className="crit-code">{crit.id}</div>
+                <div className="crit-title">
+                  {crit.title}
+                  <span className={`crit-label-type ${crit.type === 'oblig' ? 'oblig' : 'pref'}`}>{crit.type === 'oblig' ? 'Obligatoire' : 'Préférable'}</span>
+                </div>
+                <div className="crit-question">{crit.question}</div>
+                <div className="crit-justif">{crit.justif}</div>
+                <textarea
+                  value={value.note || ''}
+                  onChange={e => onUpdate({ note: e.target.value })}
+                  placeholder="Note rapide (réponse, contexte, remarque)…"
+                  className="form-input mt-3"
+                  rows={1}
+                  style={{ minHeight: '40px' }}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================================
+      // BLOC B — chiffres
+      // ============================================================
+
+      const BlocB = ({ session, updateInputs, updateDiag }) => {
+        const setField = (f, val) => {
+          if (f.diag) updateDiag({ [f.id]: val });
+          else updateInputs({ [f.id]: val });
+        };
+        const getField = (f) => f.diag ? (session.diagnostic?.[f.id] ?? '') : (session.inputs?.[f.id] ?? '');
+        return (
+          <div>
+            <BlocHeader code="B" title="Volumes commerciaux" subtitle="8 chiffres pour alimenter le calculateur. Si le prospect ne sait pas, mets une estimation ou laisse vide — minimum acceptable : 4 cruciaux sur 5 (leads, RDV pris, signatures, ticket). Ces champs synchronisent en direct avec le calculateur." />
+            <div className="space-y-4 mt-8">
+              {BLOC_B_FIELDS.map(f => (
+                <div key={f.id} className="bg-noir-card border border-anthracite rounded-lg p-5">
+                  <div className="flex flex-wrap items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="crit-code">{f.code} {f.crucial && <span className="text-rouge ml-2 text-[10px]">CRUCIAL</span>}</div>
+                      <div className="crit-title">{f.label}</div>
+                      <div className="crit-question">{f.question}</div>
+                    </div>
+                    <div style={{ width: '220px' }}>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type={f.id === 'delaiRappel' ? 'text' : 'number'}
+                          value={getField(f)}
+                          onChange={e => setField(f, e.target.value)}
+                          placeholder={f.id === 'delaiRappel' ? 'ex: 30 min, 2h, jour J+1' : '0'}
+                          className="form-input"
+                          style={{ fontSize: '20px', fontWeight: 700, textAlign: 'right' }}
+                        />
+                        {f.unit && f.unit !== '' && <span className="text-or text-sm font-semibold whitespace-nowrap">{f.unit}</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================================
+      // BLOC C — process
+      // ============================================================
+
+      const BlocC = ({ session, updateDiag }) => {
+        return (
+          <div>
+            <BlocHeader code="C" title="Process actuels" subtitle="Questions ouvertes — note les réponses clés du prospect. Pas besoin d'écrire tout, juste les éléments qui te serviront en Phase C (explication des causes) et au pitch." />
+            <div className="space-y-5 mt-8">
+              {BLOC_C.map(c => (
+                <div key={c.id} className="bg-noir-card border border-anthracite rounded-lg p-5">
+                  <div className="crit-code">{c.code}</div>
+                  <div className="crit-title">{c.label}</div>
+                  <div className="crit-question">{c.question}</div>
+                  <div className="crit-justif">{c.justif}</div>
+                  <textarea
+                    value={session.diagnostic?.[c.id] || ''}
+                    onChange={e => updateDiag({ [c.id]: e.target.value })}
+                    placeholder="Réponse / observations…"
+                    className="form-input mt-3"
+                    rows={3}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================================
+      // BLOC D — douleur + objectifs (avec champs structurés pour pitch)
+      // ============================================================
+
+      const BlocD = ({ session, updateDiag }) => {
+        return (
+          <div>
+            <BlocHeader code="D" title="Douleur principale & objectifs" subtitle="Ouvre la conversation par ces 2 questions. Note la réponse libre, puis distille en haut les 2 douleurs principales et 2 objectifs prioritaires — ils alimentent automatiquement le pitch de vente." />
+
+            <div className="bg-or/10 border border-or/40 rounded-lg p-5 mt-8">
+              <p className="font-serif uppercase tracking-[0.2em] text-or text-xs mb-4">→ Distillé pour le pitch</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-rouge mb-2">Douleur 1</label>
+                  <input value={session.diagnostic?.douleur1 || ''} onChange={e => updateDiag({ douleur1: e.target.value })} className="form-input" placeholder="ex : devis qui partent jamais relancés" />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-rouge mb-2">Douleur 2</label>
+                  <input value={session.diagnostic?.douleur2 || ''} onChange={e => updateDiag({ douleur2: e.target.value })} className="form-input" placeholder="ex : 80% des leads non rappelés" />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-vert-go mb-2">Objectif 1</label>
+                  <input value={session.diagnostic?.objectif1 || ''} onChange={e => updateDiag({ objectif1: e.target.value })} className="form-input" placeholder="ex : doubler le taux de signature" />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-vert-go mb-2">Objectif 2</label>
+                  <input value={session.diagnostic?.objectif2 || ''} onChange={e => updateDiag({ objectif2: e.target.value })} className="form-input" placeholder="ex : récupérer mes weekends" />
+                </div>
+              </div>
+              <p className="text-[11px] text-gray-400 mt-3 italic">Ces 4 champs remplacent automatiquement les crochets [DOULEUR 1/2] et [OBJECTIF 1/2] dans le pitch de vente quand tu cliques "→ Pitch".</p>
+            </div>
+
+            <div className="space-y-5 mt-8">
+              {BLOC_D.map(d => (
+                <div key={d.id} className="bg-noir-card border border-anthracite rounded-lg p-5">
+                  <div className="crit-code">{d.code}</div>
+                  <div className="crit-title">{d.label}</div>
+                  <div className="crit-question">{d.question}</div>
+                  <div className="crit-justif">{d.justif}</div>
+                  <textarea
+                    value={session.diagnostic?.[d.id] || ''}
+                    onChange={e => updateDiag({ [d.id]: e.target.value })}
+                    placeholder="Réponse complète (libre)…"
+                    className="form-input mt-3"
+                    rows={3}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================================
+      // RECAP
+      // ============================================================
+
+      const RecapBloc = ({ session, slug, cochesOblig, totalOblig, remplisB, cruciauxB }) => {
+        const goNoGo = cochesOblig === totalOblig ? 'GO' : (cochesOblig === 0 ? 'NO-GO' : 'PARTIEL');
+        const obligs = BLOC_A.filter(c => c.type === 'oblig');
+        const prefs = BLOC_A.filter(c => c.type === 'pref');
+        const prefsCoches = prefs.filter(c => session.diagnostic?.faisabilite?.[c.id]?.coche).length;
+        const douleurOK = !!(session.diagnostic?.douleur1 && session.diagnostic?.objectif1);
+
+        const checks = [
+          { ok: cochesOblig === totalOblig, label: `5 critères obligatoires Bloc A validés (${cochesOblig}/${totalOblig})` },
+          { ok: remplisB >= 4, label: `Au moins 4 chiffres cruciaux Bloc B remplis (${remplisB}/${cruciauxB.length})` },
+          { ok: !!(session.diagnostic?.processLeads && session.diagnostic?.processRelances), label: 'Au moins 2 process clés en Bloc C (traitement leads + relances)' },
+          { ok: douleurOK, label: 'Douleur 1 + Objectif 1 remplis pour le pitch (Bloc D distillé)' },
+        ];
+        const allOk = checks.every(c => c.ok);
+
+        return (
+          <div>
+            <BlocHeader code="R" title="Récapitulatif & passage au pitch" subtitle="Vérifie que tu as tout avant de basculer sur le calculateur ROI puis le pitch de vente." />
+
+            <div className={`mt-8 p-6 rounded-lg border-2 ${goNoGo === 'GO' ? 'border-vert-go bg-vert-go/10' : (goNoGo === 'NO-GO' ? 'border-rouge bg-rouge/10' : 'border-or bg-or/10')}`}>
+              <p className="font-serif uppercase tracking-[0.25em] text-xs mb-2" style={{ color: goNoGo === 'GO' ? '#3A8A3A' : (goNoGo === 'NO-GO' ? '#8B1A1A' : '#C9A84C') }}>Faisabilité technique</p>
+              <p className="text-4xl font-bold mb-2" style={{ color: goNoGo === 'GO' ? '#3A8A3A' : (goNoGo === 'NO-GO' ? '#8B1A1A' : '#C9A84C') }}>
+                {goNoGo === 'GO' ? '✓ GO' : goNoGo === 'NO-GO' ? '✗ NO-GO' : 'PARTIEL'}
+              </p>
+              <p className="text-gray-300 text-sm">
+                {cochesOblig}/{totalOblig} critères obligatoires · {prefsCoches}/{prefs.length} préférables
+              </p>
+            </div>
+
+            <div className="mt-6 bg-noir-card border border-anthracite rounded-lg p-6">
+              <p className="font-serif uppercase tracking-[0.2em] text-or text-xs mb-4">Checklist transition vers Phase B</p>
+              <div className="space-y-3">
+                {checks.map((c, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span className={`mt-0.5 ${c.ok ? 'text-vert-go' : 'text-rouge'}`}>{c.ok ? '✓' : '✗'}</span>
+                    <span className={c.ok ? 'text-gray-200' : 'text-gray-400'}>{c.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {allOk && (
+              <div className="mt-8 p-6 bg-vert-go/10 border border-vert-go/40 rounded-lg text-center">
+                <p className="font-serif uppercase tracking-[0.18em] text-vert-go text-sm mb-3">✓ Prêt à enchaîner</p>
+                <p className="text-gray-200 italic mb-6">« OK, on a fait le tour. Je vais maintenant vous montrer en direct, basé sur vos chiffres et les benchmarks réels du marché menuiserie, combien vous perdez chaque mois. »</p>
+                <div className="flex gap-3 justify-center">
+                  <a href={`../vente/calculateur-roi/#/session/${slug}`} target="_blank" rel="noopener noreferrer" className="bg-or text-noir px-6 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or-fonce transition no-underline">
+                    → Lancer l'audit (Mode Pertes)
+                  </a>
+                  <a href={`../vente/?session=${slug}`} target="_blank" rel="noopener noreferrer" className="border border-or text-or px-6 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or hover:text-noir transition no-underline">
+                    → Lancer le pitch
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Récap des notes distillées (pour relecture rapide) */}
+            <div className="mt-10 bg-noir-card border border-anthracite rounded-lg p-6">
+              <p className="font-serif uppercase tracking-[0.2em] text-or text-xs mb-4">Notes distillées pour le pitch</p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-rouge font-semibold uppercase text-xs tracking-wider mb-1">Douleur 1</p>
+                  <p className="text-gray-200 italic">{session.diagnostic?.douleur1 || <span className="text-gray-600">— vide —</span>}</p>
+                </div>
+                <div>
+                  <p className="text-rouge font-semibold uppercase text-xs tracking-wider mb-1">Douleur 2</p>
+                  <p className="text-gray-200 italic">{session.diagnostic?.douleur2 || <span className="text-gray-600">— vide —</span>}</p>
+                </div>
+                <div>
+                  <p className="text-vert-go font-semibold uppercase text-xs tracking-wider mb-1">Objectif 1</p>
+                  <p className="text-gray-200 italic">{session.diagnostic?.objectif1 || <span className="text-gray-600">— vide —</span>}</p>
+                </div>
+                <div>
+                  <p className="text-vert-go font-semibold uppercase text-xs tracking-wider mb-1">Objectif 2</p>
+                  <p className="text-gray-200 italic">{session.diagnostic?.objectif2 || <span className="text-gray-600">— vide —</span>}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================================
+      // BLOC HEADER
+      // ============================================================
+
+      const BlocHeader = ({ code, title, subtitle }) => (
+        <div className="mb-2">
+          <p className="font-serif uppercase tracking-[0.25em] text-or text-xs mb-1">Bloc {code}</p>
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
+          <p className="text-gray-400 text-sm mt-2 max-w-3xl leading-relaxed">{subtitle}</p>
+        </div>
+      );
+
+      // ============================================================
+      // APP ROOT
+      // ============================================================
+
+      const App = () => {
+        const route = useHashRoute();
+        return (
+          <AppProvider>
+            {route.name === 'home' && <HomePage />}
+            {route.name === 'session' && <DiagPage slug={route.slug} />}
+          </AppProvider>
+        );
+      };
+
+      createRoot(document.getElementById('root')).render(<App />);
+    })();
+  </script>
+</body>
+</html>

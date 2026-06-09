@@ -13,39 +13,16 @@
       if(sessionStorage.getItem('scalia-auth')==='ok')return;
       var p=prompt('Mot de passe SCALIA BTP :');
       if(p==='scalia2026'){sessionStorage.setItem('scalia-auth','ok');}
-      else{document.documentElement.innerHTML='<body style="background:#0D0D0D;color:#C9A84C;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;letter-spacing:0.3em;text-transform:uppercase;font-size:12px;">Accès refusé  <script>
-    /* ============================================================ */
-    /* >>> CHIFFRE À MODIFIER : CA mensuel récupérable du prospect  */
-    /*     (le grand chiffre doré sous l'image de la slide 1)        */
-    var ROI_CA = (window.ROI_CA != null ? window.ROI_CA : 38400);
-    /* ============================================================ */
-    (function(){
-      var el = document.getElementById('roi-ca');
-      if (!el) return;
-      var nf = new Intl.NumberFormat('fr-FR');
-      el.textContent = nf.format(ROI_CA);
-      function countUp(){
-        if (!window.gsap) { el.textContent = nf.format(ROI_CA); return; }
-        var o = { v: 0 };
-        try { gsap.fromTo(o, { v: 0 }, { v: ROI_CA, duration: 1.6, ease: 'power2.out', onUpdate: function(){ el.textContent = nf.format(Math.round(o.v)); } }); } catch(e){ el.textContent = nf.format(ROI_CA); }
-      }
-      if (window.Reveal && Reveal.on) {
-        Reveal.on('fragmentshown', function(ev){
-          if (ev.fragment && ev.fragment.querySelector && ev.fragment.querySelector('#roi-ca')) countUp();
-        });
-      }
-    })();
-  </script>
-</body>';throw new Error('denied');}
+      else{document.documentElement.innerHTML='<body style="background:#0D0D0D;color:#C9A84C;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;letter-spacing:0.3em;text-transform:uppercase;font-size:12px;">Acces refuse</body>';throw new Error('denied');}
     })();
   </script>
 
   <script>
     /* ===========================================================
-       >>> CA MENSUEL À MODIFIER (grand chiffre doré de la slide 1)
-       Mets ici le chiffre du dirigeant, puis sauvegarde.
+       >>> CA MENSUEL A MODIFIER (grand chiffre dore de la slide 1)
+       Change le nombre ci-dessous  OU  ajoute ?ca=52000 a l'URL.
        =========================================================== */
-    window.ROI_CA = 38400;   /* ex : 30000 · 52000 · 75000 ... */
+    window.ROI_CA = 38400;   /* ex : 30000, 52000, 75000 ... */
   </script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
@@ -289,15 +266,15 @@
     .hero-kicker { font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.34em; color:#C9A84C; font-size:19px; margin:0 0 14px 0; }
     .hero-title {
       font-family:'Cinzel',serif; font-weight:600; text-transform:uppercase; white-space:nowrap;
-      font-size:150px; line-height:0.94; letter-spacing:0.05em; margin:0;
+      font-size:168px; line-height:0.94; letter-spacing:0.07em; margin:0;
       background: linear-gradient(135deg,#F8EFC8 0%,#E9CE7A 30%,#C9A84C 60%,#A88736 100%);
       background-size:220% auto; -webkit-background-clip:text; background-clip:text;
       color:transparent; -webkit-text-fill-color:transparent;
       filter: drop-shadow(0 8px 56px rgba(201,168,76,0.85));
+      animation: shimmer 7s ease-in-out infinite;
     }
     .hero-tl { height:3px; width:0; margin:20px auto 0; background:linear-gradient(90deg,transparent,#C9A84C,transparent); border-radius:2px; }
     body.da-started .reveal section.hero-roi.present .hero-kicker { animation: daUp .7s ease forwards .15s; }
-    body.da-started .reveal section.hero-roi.present .hero-title  { animation: daPop 1.0s cubic-bezier(.2,.85,.2,1) forwards .4s, shimmer 7s ease-in-out 1.7s infinite; }
     body.da-started .reveal section.hero-roi.present .hero-tl     { animation: heroTl 1s ease forwards 1.0s; }
     @keyframes heroTl { to { width: 340px; } }
 
@@ -326,6 +303,8 @@
     .reveal .hero-roi .fragment { opacity:0; transform: translateX(-72px); transition: opacity .7s ease, transform .9s cubic-bezier(.22,.68,.24,1); }
     .reveal .hero-roi .fragment.visible { opacity:1 !important; transform: none !important; }
     .reveal .hero-roi .hero-stage.fragment { transform: translateX(60px) scale(0.97); }
+    .reveal .hero-roi .hero-title.fragment { opacity:0; transform: scale(0.5); filter: blur(16px); transition: opacity .8s ease, transform 1.15s cubic-bezier(.16,1,.3,1), filter .8s ease; }
+    .reveal .hero-roi .hero-title.fragment.visible { transform: none !important; filter: blur(0) !important; }
 
     @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
@@ -363,30 +342,30 @@
       <section class="hero-roi" data-transition="fade">
         <div class="hero-top">
           <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
-          <h1 class="hero-title hero-anim">ROI PILOT</h1>
-          <div class="hero-tl hero-anim"></div>
+          <h1 class="hero-title fragment" data-fragment-index="0">ROI PILOT</h1>
+          <div class="hero-tl fragment" data-fragment-index="0"></div>
         </div>
         <div class="hero-body">
           <div class="hero-benefits">
-            <div class="bcard fragment" data-fragment-index="0">
+            <div class="bcard fragment" data-fragment-index="1">
               <div class="bcard-label">CA récupéré chaque mois</div>
               <div class="bcard-value gold"><span id="roi-ca">38 400</span> €<span class="bcard-per"> / mois</span></div>
             </div>
-            <div class="bcard fragment" data-fragment-index="1">
+            <div class="bcard fragment" data-fragment-index="2">
               <div class="bcard-label">Votre liberté</div>
               <div class="bcard-value">Une machine qui tourne <span class="g">sans vous</span></div>
             </div>
-            <div class="bcard fragment" data-fragment-index="2">
+            <div class="bcard fragment" data-fragment-index="3">
               <div class="bcard-label">Le contrôle</div>
               <div class="bcard-value">Piloté depuis votre <span class="g">téléphone</span></div>
             </div>
-            <div class="hero-chips fragment" data-fragment-index="3">
+            <div class="hero-chips fragment" data-fragment-index="4">
               <span class="hero-chip">Sans lead</span>
               <span class="hero-chip">Sans pub</span>
               <span class="hero-chip">Sans recruter</span>
             </div>
           </div>
-          <div class="hero-stage fragment" data-fragment-index="0">
+          <div class="hero-stage fragment" data-fragment-index="1">
             <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
                    onloadeddata="this.style.display='block'; var st=this.closest('.hero-stage'); st.querySelectorAll('.hero-photo').forEach(function(e){e.style.display='none';});"
                    onerror="this.remove();">
@@ -950,6 +929,17 @@
           requestAnimationFrame(loop);
         })();
       }
+    })();
+  </script>
+  <script>
+    (function(){
+      try { var q=new URLSearchParams(location.search).get('ca'); if(q){ var n=parseInt(String(q).replace(/[^0-9]/g,''),10); if(!isNaN(n)) window.ROI_CA=n; } } catch(e){}
+      var ROI_CA = (window.ROI_CA != null ? window.ROI_CA : 38400);
+      var el = document.getElementById('roi-ca'); if (!el) return;
+      var nf = new Intl.NumberFormat('fr-FR');
+      el.textContent = nf.format(ROI_CA);
+      function countUp(){ if(!window.gsap){ el.textContent=nf.format(ROI_CA); return; } var o={v:0}; try{ gsap.fromTo(o,{v:0},{v:ROI_CA,duration:1.6,ease:'power2.out',onUpdate:function(){el.textContent=nf.format(Math.round(o.v));}}); }catch(e){ el.textContent=nf.format(ROI_CA);} }
+      if (window.Reveal && Reveal.on) Reveal.on('fragmentshown', function(ev){ if(ev.fragment && ev.fragment.querySelector && ev.fragment.querySelector('#roi-ca')) countUp(); });
     })();
   </script>
 </body>

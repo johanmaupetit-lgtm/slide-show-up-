@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>SCALIA BTP — Système ROI PILOT</title>
 
   <script>
@@ -21,12 +24,16 @@
       if (!el) return;
       var nf = new Intl.NumberFormat('fr-FR');
       el.textContent = nf.format(ROI_CA);
-      var btn = document.getElementById('da-start');
-      if (btn) btn.addEventListener('click', function(){
-        if (!window.gsap) return;
+      function countUp(){
+        if (!window.gsap) { el.textContent = nf.format(ROI_CA); return; }
         var o = { v: 0 };
-        try { gsap.fromTo(o, { v: 0 }, { v: ROI_CA, duration: 1.8, ease: 'power2.out', delay: 1.3, onUpdate: function(){ el.textContent = nf.format(Math.round(o.v)); } }); } catch(e){}
-      });
+        try { gsap.fromTo(o, { v: 0 }, { v: ROI_CA, duration: 1.6, ease: 'power2.out', onUpdate: function(){ el.textContent = nf.format(Math.round(o.v)); } }); } catch(e){ el.textContent = nf.format(ROI_CA); }
+      }
+      if (window.Reveal && Reveal.on) {
+        Reveal.on('fragmentshown', function(ev){
+          if (ev.fragment && ev.fragment.querySelector && ev.fragment.querySelector('#roi-ca')) countUp();
+        });
+      }
     })();
   </script>
 </body>';throw new Error('denied');}
@@ -318,13 +325,24 @@
       background: radial-gradient(120% 120% at 50% 45%, transparent 58%, rgba(6,5,4,0.5) 100%);
     }
     /* entrées en cascade */
-    body.da-started .reveal section.hero-roi.present .bn1        { animation: daUp .7s ease forwards 1.0s; }
-    body.da-started .reveal section.hero-roi.present .bn2        { animation: daUp .7s ease forwards 1.18s; }
-    body.da-started .reveal section.hero-roi.present .bn3        { animation: daUp .7s ease forwards 1.36s; }
-    body.da-started .reveal section.hero-roi.present .hero-chips { animation: daUp .7s ease forwards 1.55s; }
     body.da-started .reveal section.hero-roi.present .hero-stage { animation: daFloat .9s ease forwards .9s; }
 
-    @media (prefers-reduced-motion: reduce) {
+        /* --- ajustements bénéfices : espacement, contraste, symétrie --- */
+    .hero-body { gap: 76px !important; }
+    .bn { padding: 26px 0 !important; gap: 24px !important; align-items: center !important; }
+    .bn-idx { padding-top: 0 !important; font-size: 19px !important; }
+    .bn-num { font-size: 72px !important; }
+    .bn1 {
+      border-top: none !important;
+      background: linear-gradient(90deg, rgba(201,168,76,0.10), rgba(201,168,76,0) 64%);
+      border-radius: 14px; padding: 22px 20px !important; margin-bottom: 8px;
+    }
+    .bn1 .bn-idx { color:#F4D67A !important; opacity:0.9 !important; }
+    .bn-big { font-size: 38px !important; }
+    /* fragments : état caché propre */
+    .reveal .fragment.fade-up { transform: translateY(28px); }
+
+@media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
       .scanline, .media-frame { animation: none !important; }
@@ -365,22 +383,22 @@
         </div>
         <div class="hero-body">
           <div class="hero-benefits">
-            <div class="bn bn1 hero-anim">
+            <div class="bn bn1 fragment fade-up">
               <span class="bn-idx">01</span>
               <div class="bn-main">
                 <span class="bn-num"><span id="roi-ca">38 400</span> €<span class="bn-per"> / mois</span></span>
                 <span class="bn-cap">de chiffre d’affaires récupéré</span>
               </div>
             </div>
-            <div class="bn bn2 hero-anim">
+            <div class="bn bn2 fragment fade-up">
               <span class="bn-idx">02</span>
               <div class="bn-main"><span class="bn-big">Une machine qui tourne <span class="g">sans vous</span></span></div>
             </div>
-            <div class="bn bn3 hero-anim">
+            <div class="bn bn3 fragment fade-up">
               <span class="bn-idx">03</span>
               <div class="bn-main"><span class="bn-big">Pilotée depuis votre <span class="g">téléphone</span></span></div>
             </div>
-            <div class="hero-chips hero-anim">
+            <div class="hero-chips fragment fade-up">
               <span class="hero-chip">Sans acheter un lead</span>
               <span class="hero-chip">Sans pub</span>
               <span class="hero-chip">Sans recruter</span>

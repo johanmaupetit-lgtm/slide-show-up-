@@ -10,7 +10,26 @@
       if(sessionStorage.getItem('scalia-auth')==='ok')return;
       var p=prompt('Mot de passe SCALIA BTP :');
       if(p==='scalia2026'){sessionStorage.setItem('scalia-auth','ok');}
-      else{document.documentElement.innerHTML='<body style="background:#0D0D0D;color:#C9A84C;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;letter-spacing:0.3em;text-transform:uppercase;font-size:12px;">Accès refusé</body>';throw new Error('denied');}
+      else{document.documentElement.innerHTML='<body style="background:#0D0D0D;color:#C9A84C;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;letter-spacing:0.3em;text-transform:uppercase;font-size:12px;">Accès refusé  <script>
+    /* ============================================================ */
+    /* >>> CHIFFRE À MODIFIER : CA mensuel récupérable du prospect  */
+    /*     (le grand chiffre doré sous l'image de la slide 1)        */
+    var ROI_CA = 38400;          /* ex : 52000  (mets le chiffre du dirigeant) */
+    /* ============================================================ */
+    (function(){
+      var el = document.getElementById('roi-ca');
+      if (!el) return;
+      var nf = new Intl.NumberFormat('fr-FR');
+      el.textContent = nf.format(ROI_CA);
+      var btn = document.getElementById('da-start');
+      if (btn) btn.addEventListener('click', function(){
+        if (!window.gsap) return;
+        var o = { v: 0 };
+        try { gsap.fromTo(o, { v: 0 }, { v: ROI_CA, duration: 1.8, ease: 'power2.out', delay: 1.3, onUpdate: function(){ el.textContent = nf.format(Math.round(o.v)); } }); } catch(e){}
+      });
+    })();
+  </script>
+</body>';throw new Error('denied');}
     })();
   </script>
 
@@ -243,37 +262,52 @@
     .reveal { position: relative; z-index: 1; }
     .persistent-header, .persistent-footer { z-index: 2; }
 
-    /* ===================== HERO v5 — plein cadre, image XL ===================== */
+    /* ===================== HERO v6 — centré, image claire 16:9 ===================== */
     .media-overlays { display:none !important; }
     .reveal section.hero-roi {
-      padding: 0 0 0 90px;
-      background: radial-gradient(58% 82% at 72% 50%, rgba(201,168,76,0.12), transparent 72%), #080705;
+      text-align:center; padding: 24px 60px;
+      background:
+        radial-gradient(52% 46% at 50% 15%, rgba(201,168,76,0.18), transparent 70%),
+        radial-gradient(95% 95% at 50% 62%, rgba(18,15,10,0.92), #060504 82%);
     }
-    .reveal section.hero-roi .hero-wrap { gap: 0; align-items: center; }
-    .reveal section.hero-roi .hero-left  { flex: 1 1 52%; padding-right: 48px; z-index: 2; }
-    .reveal section.hero-roi .hero-right { flex: 1 1 48%; }
-    .hero-kicker { font-size: 22px !important; letter-spacing: 0.32em !important; color: #C9A84C !important; margin: 0 0 30px 0 !important; }
-    .hero-title { font-size: 140px !important; margin: 0 0 38px 0 !important; filter: drop-shadow(0 10px 52px rgba(201,168,76,0.8)) !important; }
-    .hero-rule  { margin-bottom: 44px !important; height: 4px !important; }
-    .hero-obj   { font-size: 38px !important; line-height: 1.5 !important; color: #DADADA !important; max-width: none !important; }
-    .hero-obj .euro { font-size: 1.35em !important; }
-    .hero-chips { margin-top: 52px !important; gap: 18px !important; }
-    .hero-chip  { font-size: 15px !important; padding: 11px 22px !important; }
+    .hero-center { width:100%; max-width:1120px; margin:0 auto; display:flex; flex-direction:column; align-items:center; }
+    .hero-center .hero-kicker { font-size:19px !important; letter-spacing:0.34em !important; color:#C9A84C !important; margin:0 0 14px 0 !important; text-align:center; }
+    .hero-center .hero-title {
+      font-size:108px !important; margin:0 0 16px 0 !important; line-height:0.95 !important; text-align:center; white-space:nowrap;
+      filter: drop-shadow(0 8px 52px rgba(201,168,76,0.85)) !important;
+    }
+    .hero-sub { font-family:'Inter',sans-serif; font-weight:300; font-size:27px; color:#CFCFCF; line-height:1.4; margin:0 0 26px 0; max-width:940px; }
+    .hero-sub b { color:#FFFFFF; font-weight:700; }
+    .hero-sub .g { color:#E9C75A; font-weight:600; }
     .hero-stage {
-      position: relative; height: 900px; width: 100%;
-      border-radius: 18px; overflow: hidden;
-      box-shadow: 0 30px 90px rgba(0,0,0,0.65), 0 0 0 1px rgba(201,168,76,0.28);
+      position:relative; width:900px; max-width:100%; aspect-ratio:16/9;
+      border-radius:16px; overflow:hidden;
+      box-shadow: 0 34px 100px rgba(0,0,0,0.72), 0 0 0 1px rgba(201,168,76,0.30), 0 0 80px rgba(201,168,76,0.12);
     }
     .hero-stage .hero-media, .hero-stage .hero-photo {
-      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
-      animation: kenburns 24s ease-in-out infinite alternate;
+      position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
+      animation: kenburns 26s ease-in-out infinite alternate;
     }
     .hero-stage-scrim {
-      position: absolute; inset: 0; pointer-events: none;
-      background:
-        linear-gradient(90deg, rgba(8,7,5,0.92) 0%, rgba(8,7,5,0.45) 20%, rgba(8,7,5,0) 46%),
-        linear-gradient(0deg, rgba(8,7,5,0.45) 0%, transparent 28%);
+      position:absolute; inset:0; pointer-events:none;
+      background: radial-gradient(120% 120% at 50% 45%, transparent 58%, rgba(6,5,4,0.55) 100%);
     }
+    .hero-benefit {
+      display:flex; align-items:center; gap:22px; margin-top:30px;
+      background: rgba(201,168,76,0.06); border:1px solid rgba(201,168,76,0.38);
+      border-radius:18px; padding:18px 36px;
+      box-shadow: 0 0 40px rgba(201,168,76,0.08);
+    }
+    .ben-chart { width:54px; height:54px; flex-shrink:0; filter: drop-shadow(0 0 10px rgba(201,168,76,0.5)); }
+    .ben-text { display:flex; flex-direction:column; align-items:flex-start; line-height:1.05; }
+    .ben-label { font-family:'Inter',sans-serif; font-size:14px; letter-spacing:0.16em; text-transform:uppercase; color:#9a9a9a; }
+    .ben-num { font-family:'Inter',sans-serif; font-weight:800; font-size:58px; color:#F4D67A; text-shadow:0 0 36px rgba(201,168,76,0.8); line-height:1; margin-top:2px; }
+    .ben-num .ben-per { font-size:23px; font-weight:600; color:#E9C75A; }
+    .ben-sub { font-family:'Cinzel',serif; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:#9a9a9a; margin-top:8px; }
+    /* entrées */
+    body.da-started .reveal section.hero-roi.present .hero-sub     { animation: daUp .7s ease forwards 1.0s; }
+    body.da-started .reveal section.hero-roi.present .hero-stage   { animation: daUp .9s ease forwards 1.25s; }
+    body.da-started .reveal section.hero-roi.present .hero-benefit { animation: daUp .7s ease forwards 1.75s; }
 
     @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
@@ -307,29 +341,30 @@
   <div class="reveal">
     <div class="slides">
 
-      <!-- 1 — CONTEXTE : ROI PILOT + OBJECTIF (HERO plein cadre) -->
+      <!-- 1 — CONTEXTE : ROI PILOT (HERO centré) -->
       <section class="hero-roi" data-transition="fade">
-        <div class="hero-wrap">
-          <div class="hero-left">
-            <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
-            <h1 class="hero-title hero-anim">ROI PILOT</h1>
-            <div class="hero-rule hero-anim"></div>
-            <p class="hero-obj hero-anim">Récupérer jusqu’à <span class="euro">[X €]</span> de CA par mois et transformer votre entreprise en <span class="obj-strong">une machine qui tourne sans vous</span> — <span class="obj-gold">pilotée depuis votre téléphone</span>.</p>
-            <div class="hero-chips hero-anim">
-              <span class="hero-chip">Sans acheter un lead</span>
-              <span class="hero-chip">Sans pub</span>
-              <span class="hero-chip">Sans recruter</span>
-            </div>
+        <div class="hero-center">
+          <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
+          <h1 class="hero-title hero-anim">ROI PILOT</h1>
+          <p class="hero-sub hero-anim">Transformez votre entreprise en <b>une machine qui tourne sans vous</b> — <span class="g">pilotée depuis votre téléphone</span></p>
+          <div class="hero-stage hero-anim">
+            <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
+                   onloadeddata="this.style.display='block'; var st=this.closest('.hero-stage'); st.querySelectorAll('.hero-photo').forEach(function(e){e.style.display='none';});"
+                   onerror="this.remove();">
+              <source src="hero-roipilot.mp4" type="video/mp4">
+            </video>
+            <img class="hero-photo" src="ChatGPT%20Image%209%20juin%202026,%2020_18_32.png" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
           </div>
-          <div class="hero-right hero-anim">
-            <div class="hero-stage">
-              <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
-                     onloadeddata="this.style.display='block'; var st=this.closest('.hero-stage'); st.querySelectorAll('.hero-photo').forEach(function(e){e.style.display='none';});"
-                     onerror="this.remove();">
-                <source src="hero-roipilot.mp4" type="video/mp4">
-              </video>
-              <img class="hero-photo" src="ChatGPT%20Image%209%20juin%202026,%2020_18_32.png" alt="" onerror="this.style.opacity=0;">
-              <div class="hero-stage-scrim"></div>
+          <div class="hero-benefit hero-anim">
+            <svg class="ben-chart" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+              <polyline points="6,46 20,34 32,38 46,18 54,9" stroke="#E9C75A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="45,9 54,9 54,18" stroke="#E9C75A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="ben-text">
+              <span class="ben-label">Jusqu’à</span>
+              <span class="ben-num"><span id="roi-ca">38 400</span> € <span class="ben-per">/ mois de CA</span></span>
+              <span class="ben-sub">Sans acheter un lead · Sans pub · Sans recruter</span>
             </div>
           </div>
         </div>

@@ -180,6 +180,41 @@
     .media-inner .hero-media,
     .media-inner .hero-photo,
     .media-inner .hero-illu { display:block; width:100%; }
+    /* Mouvement cinématique (Ken Burns) sur image/vidéo IA */
+    .media-inner.has-media .hero-media,
+    .media-inner.has-media .hero-photo { animation: kenburns 22s ease-in-out infinite alternate; }
+    @keyframes kenburns { from { transform: scale(1.05); } to { transform: scale(1.16) translate(-2%, -2%); } }
+    .media-inner.has-media::after {
+      content:''; position:absolute; inset:0; pointer-events:none; z-index:2;
+      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0) 42%, rgba(13,11,8,0.55) 100%);
+    }
+    /* Overlays dorés de données (superposés sur la scène) */
+    .media-overlays { position:absolute; inset:0; z-index:4; pointer-events:none; opacity:0; transition:opacity .6s ease; }
+    .media-inner.has-media .media-overlays { opacity:1; }
+    .ov-ca {
+      position:absolute; top:18px; left:18px; display:flex; flex-direction:column; gap:3px;
+      background: rgba(13,12,9,0.62); backdrop-filter: blur(8px);
+      border:1px solid rgba(201,168,76,0.5); border-radius:14px; padding:12px 16px;
+      box-shadow:0 10px 32px rgba(0,0,0,0.45);
+    }
+    .ov-ca-label { font-family:'Inter',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#bcbcbc; }
+    .ov-ca-num { font-family:'Inter',sans-serif; font-size:30px; font-weight:800; color:#F4D67A; text-shadow:0 0 22px rgba(201,168,76,0.7); line-height:1; }
+    .ov-ca-delta { font-family:'Inter',sans-serif; font-size:12px; font-weight:700; color:#4BE6A0; }
+    .ov-toast {
+      position:absolute; right:18px; bottom:58px; display:flex; align-items:center; gap:8px;
+      background: rgba(15,42,29,0.80); backdrop-filter: blur(8px);
+      border:1px solid #4BE6A0; border-radius:999px; padding:9px 16px;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:700; color:#CFF6E6;
+      box-shadow:0 8px 26px rgba(0,0,0,0.45);
+    }
+    .ov-pill {
+      position:absolute; left:18px; bottom:18px; display:flex; align-items:center; gap:8px;
+      background: rgba(13,12,9,0.62); backdrop-filter: blur(8px);
+      border:1px solid rgba(201,168,76,0.45); border-radius:999px; padding:8px 14px;
+      font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:#E9C75A;
+    }
+    .ov-dot { width:8px; height:8px; border-radius:50%; background:#4BE6A0; box-shadow:0 0 10px #4BE6A0; }
+    .ov-dot.gold { background:#E9C75A; box-shadow:0 0 10px #E9C75A; }
     .hud { position:absolute; width:28px; height:28px; border:2px solid var(--or); opacity:0; z-index:3; }
     .hud.tl { top:6px; left:6px; border-right:none; border-bottom:none; border-radius:8px 0 0 0; }
     .hud.tr { top:6px; right:6px; border-left:none; border-bottom:none; border-radius:0 8px 0 0; }
@@ -260,12 +295,12 @@
               <div class="media-inner">
                 <div class="reveal-clip">
                   <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
-                         onloadeddata="this.style.display='block'; this.parentNode.querySelectorAll('.hero-photo,.hero-illu').forEach(function(e){e.style.display='none';});"
+                         onloadeddata="this.style.display='block'; var mi=this.closest('.media-inner'); mi.querySelectorAll('.hero-photo,.hero-illu').forEach(function(e){e.style.display='none';}); mi.classList.add('has-media'); if(window.__heroOverlays)window.__heroOverlays();"
                          onerror="this.remove();">
                     <source src="assets/hero-roipilot.mp4" type="video/mp4">
                   </video>
                 <!-- EMPLACEMENT PHOTO OPTIONNEL : dépose "vente/assets/hero-roipilot.jpg" pour remplacer l'illustration -->
-                <img class="hero-photo" src="assets/hero-roipilot.jpg" alt="" style="display:none;" onerror="this.remove();" onload="this.style.display='block'; var s=this.parentNode.querySelector('.hero-illu'); if(s){s.style.display='none';}">
+                <img class="hero-photo" src="assets/hero-roipilot.jpg" alt="" style="display:none;" onerror="this.remove();" onload="this.style.display='block'; var mi=this.closest('.media-inner'); var s=mi.querySelector('.hero-illu'); if(s){s.style.display='none';} mi.classList.add('has-media'); if(window.__heroOverlays)window.__heroOverlays();">
                 <svg class="hero-illu" viewBox="0 0 600 560" width="100%" role="img" aria-label="Tableau de bord ROI Pilot en direct">
                   <defs>
                     <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBEFC0"/><stop offset="0.5" stop-color="#E9C75A"/><stop offset="1" stop-color="#C9A84C"/></linearGradient>
@@ -326,6 +361,15 @@
                     <text x="452" y="432" fill="#4BE6A0" font-family="Inter, sans-serif" font-size="12" font-weight="700">+6 400 €</text>
                   </g>
                 </svg>
+                </div>
+<div class="media-overlays">
+                  <div class="ov-ca">
+                    <span class="ov-ca-label">CA ce mois</span>
+                    <span class="ov-ca-num" id="ov-num">38 400 €</span>
+                    <span class="ov-ca-delta">&#9650; +27 % ce mois</span>
+                  </div>
+                  <div class="ov-toast"><span class="ov-dot"></span>Devis signé · +6 400 €</div>
+                  <div class="ov-pill"><span class="ov-dot gold"></span>Pilotage automatique 24/7</div>
                 </div>
                 <span class="scanline"></span>
               </div>
@@ -842,6 +886,20 @@
           tl.to('#ev4', { opacity: 1, duration: 0.45 }, 3.05);
         } catch (e) {}
       }
+
+      // Overlays dorés posés sur la scène photo/vidéo IA
+      function startHeroOverlays() {
+        var el = document.getElementById('ov-num');
+        if (!el || !window.gsap) return;
+        try {
+          var nf = new Intl.NumberFormat('fr-FR'); var c = { v: 0 };
+          gsap.fromTo(c, { v: 0 }, { v: 38400, duration: 1.8, ease: 'power2.out', onUpdate: function(){ el.textContent = nf.format(Math.round(c.v)) + ' €'; } });
+          gsap.fromTo('.ov-ca', { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.2 });
+          gsap.fromTo('.ov-pill', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.6 });
+          gsap.fromTo('.ov-toast', { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, delay: 1.4, ease: 'back.out(1.6)' });
+        } catch (e) {}
+      }
+      window.__heroOverlays = startHeroOverlays;
 
       // Poussière d'or ambiante en continu (canvas léger)
       var ambientStarted = false;

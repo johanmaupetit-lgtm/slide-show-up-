@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>SCALIA BTP — Calculateur ROI PILOT</title>
 
   <script>
@@ -903,14 +906,15 @@
             <div className="text-center py-8">
               <p className="text-rouge text-lg mb-3">⚠ Erreur</p>
               <p className="text-gray-300 mb-6 text-sm whitespace-pre-line">{error}</p>
-              <div className="flex items-center justify-center gap-4">
-                <button onClick={resetAndRetry} className="bg-or text-noir px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                <button onClick={continueWithoutCapture} className="bg-or text-noir px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+                  ✓ Créer la session quand même
+                </button>
+                <button onClick={resetAndRetry} className="border border-or/50 text-or px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or hover:text-noir transition">
                   Recommencer
                 </button>
-                <button onClick={continueWithoutCapture} className="border border-or/50 text-or px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or hover:text-noir transition">
-                  Créer quand même (sans capture)
-                </button>
               </div>
+              <p className="text-gray-500 text-xs mt-4">La session sera créée avec la charte Scalia par défaut — tu pourras renseigner le nom de l'entreprise manuellement.</p>
             </div>
           )}
         </div>

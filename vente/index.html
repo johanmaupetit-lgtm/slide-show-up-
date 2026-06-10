@@ -485,6 +485,72 @@
     .gar-pt b{ color:#4BE6A0; }
     .gar-foot{ margin-top:28px; font-family:'Cinzel',serif; color:#4BE6A0; font-size:25px; letter-spacing:.03em; }
 
+    /* cadre or animé autour des hero-stages des piliers (4, 8, 11) */
+    .da-hero .hero-stage{ position:relative; }
+    .da-hero .hero-stage::after{
+      content:''; position:absolute; inset:-7px; border-radius:22px; pointer-events:none;
+      padding:2px;
+      background: conic-gradient(from 0deg, rgba(201,168,76,0) 0deg, #F4D67A 70deg, rgba(201,168,76,0.2) 150deg, #C9A84C 230deg, rgba(201,168,76,0) 320deg);
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      animation: goldRing 9s linear infinite;
+    }
+    @keyframes goldRing { to { transform: rotate(360deg); } }
+
+    /* pilier hero : texte plus aéré / majestueux */
+    .da-hero-txt .da-kicker{ font-size:19px; letter-spacing:0.36em; margin-bottom:22px; }
+    .pillar-obj{ margin-top:30px; font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:.32em; text-transform:uppercase; font-size:13px; }
+    .pillar-rule{ width:120px; height:1px; background:linear-gradient(90deg,#C9A84C, transparent); margin:14px 0 22px; }
+    .pillar-line{ font-family:'Cormorant Garamond','Times New Roman',serif; font-style:italic; font-weight:300; font-size:31px; line-height:1.55; color:#ECECEC; letter-spacing:.012em; }
+    .pillar-line strong{ font-style:normal; font-weight:600; color:#F4D67A; letter-spacing:.02em; }
+
+    /* slide 5 — texte plus aéré */
+    .da-list.airy{ gap:24px; margin-top:38px; }
+    .da-list.airy .da-li{ font-size:27px; padding:22px 28px; line-height:1.4; }
+
+    /* mini animation sous chaque carte résultat */
+    .da-card.res .res-anim{ margin-top:18px; height:96px; }
+    .da-card.res .res-anim svg{ width:100%; height:100%; display:block; overflow:visible; }
+
+    /* slide 14 — value stack plus impactant */
+    .stack-cards{ display:flex; gap:30px; margin-top:46px; }
+    .stack-card{ flex:1; min-width:0; background:linear-gradient(180deg, rgba(26,24,18,0.95), rgba(26,24,18,0.40)); border-top:4px solid #C9A84C; border-radius:14px; padding:34px 30px; box-shadow:0 18px 50px rgba(0,0,0,0.5); display:flex; flex-direction:column; }
+    .stack-lab{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:.2em; text-transform:uppercase; font-size:14px; margin-bottom:10px; }
+    .stack-val{ font-family:'Cinzel',serif; color:#fff; font-size:34px; line-height:1.12; margin-bottom:12px; }
+    .stack-txt{ font-family:'Inter',sans-serif; color:#cfcfcf; font-size:19px; line-height:1.45; }
+    .stack-gold{ margin-top:18px; font-family:'Cinzel',serif; color:#F4D67A; letter-spacing:.05em; font-size:21px; }
+    .stack-anim{ margin-top:auto; padding-top:22px; height:170px; }
+    .stack-anim svg{ width:100%; height:100%; display:block; overflow:visible; }
+
+    /* slide bonus headline */
+    .bonus-wrap{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:760px; gap:34px; }
+    .bonus-line{ font-family:'Cinzel',serif; color:#ECECEC; font-size:42px; letter-spacing:.06em; text-align:center; }
+    .bonus-line .dots{ color:#C9A84C; letter-spacing:.4em; }
+    .bonus-huge{ font-family:'Cinzel',serif; font-weight:700; text-transform:uppercase; letter-spacing:.04em; line-height:1.02;
+      font-size:128px; text-align:center;
+      background: linear-gradient(135deg,#F8EFC8 0%,#E9CE7A 35%,#C9A84C 70%,#A88736 100%);
+      background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 6px 36px rgba(201,168,76,0.6));
+    }
+    .bonus-eq{ font-family:'Cinzel',serif; color:#F4D67A; letter-spacing:.05em; font-size:34px; text-align:center; }
+    .bonus-eq .sep{ color:#8a6f2e; padding:0 14px; }
+    .bonus-deco{ width:340px; height:1px; background:linear-gradient(90deg,transparent,#C9A84C,transparent); margin:6px auto 0; }
+    .bonus-zero{ font-family:'Inter',sans-serif; color:#cfcfcf; font-size:26px; text-align:center; font-weight:300; }
+    .bonus-zero b{ color:#4BE6A0; font-weight:600; }
+
+    /* ia2-scene plus grand pour la slide 16 cartes */
+    .ia2-card.lg .ia2-scene{ height:240px; }
+    .ia2-card.lg .ia2-txt{ font-size:24px; }
+
+    /* garantie plus aérée */
+    .gar-figs.airy{ gap:46px; margin-top:46px; }
+    .gar-figs.airy .gar-fig{ padding:38px 36px 42px; }
+    .gar-figs.airy .gar-big{ font-size:116px; }
+    .gar-figs.airy .gar-sub{ margin-top:18px; font-size:18px; }
+    .gar-points.airy{ gap:22px; margin-top:42px; }
+    .gar-points.airy .gar-pt{ font-size:19px; padding:15px 26px; }
+    .gar-foot.lg{ margin-top:40px; font-size:30px; letter-spacing:.06em; }
+
 @media (prefers-reduced-motion: reduce) {
       .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
       .chart-line { stroke-dashoffset: 0 !important; }
@@ -604,12 +670,12 @@
                 <rect x="58" y="110" width="9" height="6" rx="2" fill="#F4D67A"/>
               </g>
               <g font-family="Cinzel,serif" font-size="11" fill="#C9A84C">
-                <rect x="104" y="20" width="150" height="26" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="37">CRM</text>
-                <path class="fa-draw" d="M226 33 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                <rect x="104" y="54" width="150" height="26" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="71">Téléphonie IA</text>
-                <path class="fa-draw" style="animation-delay:.5s" d="M226 67 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                <rect x="104" y="88" width="150" height="26" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="105">Relances auto</text>
-                <path class="fa-draw" style="animation-delay:1s" d="M226 101 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="104" y="22" width="150" height="28" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="40">CRM</text>
+                <path class="fa-draw" d="M226 36 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="104" y="58" width="150" height="28" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="76">Intégré à vos outils</text>
+                <path class="fa-draw" style="animation-delay:.5s" d="M226 72 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="104" y="94" width="150" height="28" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="106" font-size="9">Aucune gestion / config</text>
+                <path class="fa-draw" style="animation-delay:1s" d="M226 108 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
               </g>
               <rect x="104" y="128" width="150" height="10" rx="5" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/>
               <rect class="fa-grow" x="104" y="128" width="150" height="10" rx="5" fill="#F4D67A"/>
@@ -663,7 +729,6 @@
       <section class="da-slide da-center" data-transition="fade">
         <p class="da-kicker">Le système se décompose en</p>
         <h2 class="da-h2 da-big">3 piliers</h2>
-        <p class="da-sub" style="text-align:center; margin:18px auto 0;">Chacun colmate une des 3 fuites qu’on vient de voir ensemble dans votre audit.</p>
         <div class="da-cols">
           <div class="da-col fragment" data-fragment-index="0"><div class="da-col-num">01</div><div class="da-col-name">La Mine d’Or</div><div class="da-teaser">?</div><div class="da-col-tag">Réveiller le cash dormant</div></div>
           <div class="da-col fragment" data-fragment-index="1"><div class="da-col-num">02</div><div class="da-col-name">La Machine à Chantiers</div><div class="da-teaser">?</div><div class="da-col-tag">Capter 100 % des leads &amp; devis</div></div>
@@ -677,7 +742,9 @@
           <div class="da-hero-txt">
             <p class="da-kicker">Pilier 01</p>
             <h2 class="da-h2">La Mine d’Or</h2>
-            <p class="da-sub fragment" data-fragment-index="0">Récupérer en 30 jours le cash qui dort dans votre entreprise depuis 10 ans — sans lever le petit doigt, sans recruter, sans acheter un lead.</p>
+            <p class="pillar-obj fragment" data-fragment-index="0">Objectif</p>
+            <div class="pillar-rule fragment" data-fragment-index="0"></div>
+            <p class="pillar-line fragment" data-fragment-index="0">Récupérer le cash qui <strong>dort dans votre entreprise</strong> depuis 10 ans — <strong>sans lever le petit doigt</strong>, sans recruter, sans acheter un lead.</p>
           </div>
           <div class="hero-stage fragment" data-fragment-index="0">
             <img class="hero-photo" src="mine-dor.png" alt="" onerror="this.style.opacity=0;">
@@ -696,7 +763,7 @@
           <div class="da-hero-txt">
             <p class="da-kicker" style="color:#D9685E;">Parce qu’aujourd’hui…</p>
             <h2 class="da-h2" style="font-size:62px;">L’argent meurt sur la table</h2>
-            <div class="da-list">
+            <div class="da-list airy">
               <div class="da-li neg fragment" data-fragment-index="0">Des <strong>devis non-signés</strong> dorment dans votre base</div>
               <div class="da-li neg fragment" data-fragment-index="1">Vous avez <strong>payé</strong> pour ces leads — pub, salons, recommandations</div>
               <div class="da-li neg fragment" data-fragment-index="2">Ce sont des <strong>prospects chauds</strong> qui valent encore quelque chose</div>
@@ -771,9 +838,42 @@
         <p class="da-kicker">Résultats</p>
         <h2 class="da-h2">Ce que la Mine d’Or vous rapporte</h2>
         <div class="da-cards">
-          <div class="da-card res fragment" data-fragment-index="0"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Le cash dormant récupéré</div><div class="da-txt">Dès les premières semaines, sans rien faire.</div></div>
-          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">100 % de votre base réactivée</div><div class="da-txt">Contre 0 aujourd’hui.</div></div>
-          <div class="da-card res fragment" data-fragment-index="2"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Prospects chauds en automatique</div><div class="da-txt">Remontés à vos équipes, prêts à closer.</div></div>
+          <div class="da-card res fragment" data-fragment-index="0">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Le cash dormant récupéré</div><div class="da-txt">Dès les premières semaines, sans rien faire.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#F4D67A" stroke-width="2.4" fill="#16140e"><ellipse cx="44" cy="22" rx="22" ry="7"/><path d="M22 22 L22 66 a22 7 0 0 0 44 0 L66 22"/><path d="M22 44 a22 7 0 0 0 44 0" fill="none"/></g>
+              <text class="mc-zzz" x="68" y="20" font-family="Cinzel,serif" font-size="14" fill="#C9A84C">z</text>
+              <line class="fa-flow" x1="80" y1="46" x2="138" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:170px 46px"><circle cx="170" cy="46" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><text x="170" y="51" text-anchor="middle" font-family="Cinzel,serif" font-size="18" fill="#F4D67A">€</text></g>
+              <line class="fa-flow" x1="194" y1="46" x2="246" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bob"><rect x="258" y="22" width="38" height="48" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <line x1="266" y1="34" x2="288" y2="34" stroke="#C9A84C" stroke-width="2"/><line x1="266" y1="44" x2="288" y2="44" stroke="#C9A84C" stroke-width="2"/>
+              <text x="277" y="62" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="1">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">100 % de votre base réactivée</div><div class="da-txt">Contre 0 aujourd’hui.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g opacity=".55"><circle cx="36" cy="30" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="36" cy="60" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="66" cy="30" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="66" cy="60" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="96" cy="30" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="96" cy="60" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/></g>
+              <g><circle class="fa-pop" cx="36" cy="30" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.15s" cx="36" cy="60" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.3s" cx="66" cy="30" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.45s" cx="66" cy="60" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.6s" cx="96" cy="30" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.75s" cx="96" cy="60" r="8" fill="#F4D67A"/></g>
+              <rect x="142" y="34" width="120" height="20" rx="10" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/>
+              <rect class="fa-grow" x="142" y="34" width="120" height="20" rx="10" fill="#F4D67A"/>
+              <text x="202" y="78" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">100 %</text>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="2">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Prospects chauds en automatique</div><div class="da-txt">Remontés à vos équipes, prêts à closer.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="fa-pulse" d="M52 16 c-12 14 8 18 0 32 c-16 -4 -18 -20 -6 -26 c0 6 4 9 6 4 c0 -5 0 -6 0 -10 z" fill="#F4D67A"/>
+              <line class="fa-flow" x1="80" y1="40" x2="138" y2="40" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:170px 40px"><rect x="150" y="20" width="40" height="40" rx="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><circle cx="164" cy="36" r="2.8" fill="#F4D67A"/><circle cx="176" cy="36" r="2.8" fill="#F4D67A"/><path d="M163 46 a10 7 0 0 0 16 0" fill="none" stroke="#F4D67A" stroke-width="2"/></g>
+              <line class="fa-flow" x1="200" y1="40" x2="246" y2="40" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bob"><rect x="252" y="18" width="36" height="46" rx="6" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M258 32 a12 12 0 0 1 24 0" fill="none" stroke="#F4D67A" stroke-width="2"/><circle cx="270" cy="44" r="6" fill="#F4D67A"/></g>
+            </svg></div>
+          </div>
         </div>
       </section>
 
@@ -827,7 +927,9 @@
           <div class="da-hero-txt">
             <p class="da-kicker">Pilier 02</p>
             <h2 class="da-h2">La Machine à Chantiers</h2>
-            <p class="da-sub fragment" data-fragment-index="0">Plus aucun lead qui s’échappe, plus aucun devis qui dort — même le week-end, même en vacances. Pour reprendre l’argent que vos concurrents vous volent.</p>
+            <p class="pillar-obj fragment" data-fragment-index="0">Objectif</p>
+            <div class="pillar-rule fragment" data-fragment-index="0"></div>
+            <p class="pillar-line fragment" data-fragment-index="0">Plus <strong>aucun lead</strong> qui s’échappe, plus <strong>aucun devis</strong> qui dort — même le week-end, même en vacances. Pour reprendre l’argent que <strong>vos concurrents vous volent</strong>.</p>
             <div class="da-chip fragment" data-fragment-index="1">24h/24 · week-ends compris</div>
           </div>
         </div>
@@ -862,8 +964,7 @@
               <line x1="34" y1="32" x2="58" y2="32" stroke="#C9A84C" stroke-width="2"/><line x1="34" y1="42" x2="58" y2="42" stroke="#C9A84C" stroke-width="2"/><line x1="34" y1="52" x2="50" y2="52" stroke="#C9A84C" stroke-width="2"/>
               <text x="46" y="68" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">€</text>
               <line class="fa-flow" x1="74" y1="46" x2="120" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
-              <g class="fa-loop" style="transform-origin:170px 46px"><circle cx="170" cy="46" r="20" fill="none" stroke="#F4D67A" stroke-width="3" stroke-dasharray="86 30"/><path d="M186 36 l5 -4 l-1 7" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
-              <path class="fa-pulse" d="M170 38 a8 8 0 0 1 0 16" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <g class="fa-pulse"><rect x="146" y="22" width="48" height="48" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="156" y1="14" x2="156" y2="26" stroke="#F4D67A" stroke-width="2.6"/><line x1="184" y1="14" x2="184" y2="26" stroke="#F4D67A" stroke-width="2.6"/><line x1="146" y1="34" x2="194" y2="34" stroke="#C9A84C" stroke-width="2"/><path d="M156 52 l6 6 l16 -18" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
               <text x="170" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C9A84C">anti no-show</text>
               <line class="fa-flow" x1="200" y1="46" x2="250" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
               <circle cx="288" cy="30" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
@@ -893,9 +994,51 @@
         <p class="da-kicker">Résultats</p>
         <h2 class="da-h2">Ce que la Machine vous rapporte</h2>
         <div class="da-cards">
-          <div class="da-card res fragment" data-fragment-index="0"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Vous traitez tous vos leads avant tout le monde</div><div class="da-txt">Vos concurrents vous envient.</div></div>
-          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Ça produit même pendant vos congés</div><div class="da-txt">Le week-end, en vacances, pendant vos RDV.</div></div>
-          <div class="da-card res fragment" data-fragment-index="2"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Coût d’acquisition divisé</div><div class="da-txt">Marge augmentée, mécaniquement.</div></div>
+          <div class="da-card res fragment" data-fragment-index="0">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Vous traitez tous vos leads avant tout le monde</div><div class="da-txt">Vos concurrents vous envient.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="40" y1="68" x2="270" y2="68" stroke="#C9A84C" stroke-opacity=".5" stroke-width="2"/>
+              <g class="fa-stream"><rect x="58" y="48" width="22" height="14" rx="6" fill="#F4D67A"/><circle cx="64" cy="68" r="5" fill="#F4D67A"/><circle cx="76" cy="68" r="5" fill="#F4D67A"/></g>
+              <g class="fa-stream" style="animation-delay:.7s; opacity:.55"><rect x="58" y="48" width="22" height="14" rx="6" fill="#8a6f2e"/><circle cx="64" cy="68" r="5" fill="#8a6f2e"/><circle cx="76" cy="68" r="5" fill="#8a6f2e"/></g>
+              <g class="fa-stream" style="animation-delay:1.2s; opacity:.4"><rect x="58" y="48" width="22" height="14" rx="6" fill="#8a6f2e"/><circle cx="64" cy="68" r="5" fill="#8a6f2e"/><circle cx="76" cy="68" r="5" fill="#8a6f2e"/></g>
+              <g class="fa-pop" style="transform-origin:260px 40px"><path d="M252 56 l-6 0 l8 -8 l-2 -8 l10 0 l-2 8 l8 8 l-6 0 l-2 6 l-8 0 z" fill="#F4D67A"/></g>
+              <text x="262" y="22" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">#1</text>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="1">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Ça produit même pendant vos congés</div><div class="da-txt">Le week-end, en vacances, pendant vos RDV.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M48 36 a16 16 0 1 0 0 28 a12 12 0 1 1 0 -28 z" fill="#F4D67A"/>
+              <circle cx="58" cy="32" r="2" fill="#E9C75A"/><circle cx="64" cy="44" r="1.4" fill="#E9C75A"/>
+              <line class="fa-flow" x1="76" y1="50" x2="124" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="138" y="22" width="68" height="56" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <rect x="146" y="32" width="52" height="14" rx="4" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.2"/>
+              <text class="fa-pulse" x="172" y="42" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#F4D67A">IA · ON</text>
+              <g class="mc-cog" style="transform-origin:160px 60px"><circle cx="160" cy="60" r="9" fill="none" stroke="#F4D67A" stroke-width="4" stroke-dasharray="3 4"/></g>
+              <g class="mc-cog rev" style="transform-origin:184px 66px"><circle cx="184" cy="66" r="7" fill="none" stroke="#E9C75A" stroke-width="3" stroke-dasharray="2 3"/></g>
+              <line class="fa-flow" x1="216" y1="50" x2="246" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="mc-coin" style="transform-origin:262px 50px"><circle cx="262" cy="50" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="262" y="55" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.8s"><circle cx="262" cy="50" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="262" y="55" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="2">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Coût d’acquisition divisé</div><div class="da-txt">Marge augmentée, mécaniquement.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="36" y1="78" x2="270" y2="78" stroke="#C9A84C" stroke-opacity=".5" stroke-width="2"/>
+              <rect x="44" y="22" width="22" height="56" fill="#8a6f2e" opacity=".5"/>
+              <rect x="80" y="34" width="22" height="44" fill="#a5853d" opacity=".7"/>
+              <rect class="fa-fill" x="116" y="62" width="22" height="16" fill="#C9A84C" style="transform-origin:127px 78px"/>
+              <text x="55" y="20" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#8a6f2e">CAC</text>
+              <text class="fa-pop" x="127" y="56" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">↘</text>
+              <line x1="174" y1="78" x2="264" y2="20" stroke="#F4D67A" stroke-opacity=".25" stroke-width="2" stroke-dasharray="4 4"/>
+              <path class="fa-draw-lg" d="M174 78 l28 -16 l24 -14 l38 -28" stroke="#F4D67A" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <g class="fa-pop" style="transform-origin:264px 20px;animation-delay:1.2s"><path d="M254 20 l16 0 l-6 -12" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <text x="220" y="14" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#F4D67A">Marge</text>
+            </svg></div>
+          </div>
         </div>
       </section>
 
@@ -905,7 +1048,9 @@
           <div class="da-hero-txt">
             <p class="da-kicker">Pilier 03</p>
             <h2 class="da-h2">Le ROI Pilot</h2>
-            <p class="da-sub fragment" data-fragment-index="0">Récupérer du temps pour vous, libérer vos équipes, et piloter tout votre business depuis votre téléphone — en 30 secondes par jour.</p>
+            <p class="pillar-obj fragment" data-fragment-index="0">Objectif</p>
+            <div class="pillar-rule fragment" data-fragment-index="0"></div>
+            <p class="pillar-line fragment" data-fragment-index="0">Récupérer <strong>du temps pour vous</strong>, libérer vos équipes, et piloter <strong>tout votre business</strong> depuis votre téléphone — en 30 secondes par jour.</p>
             <div class="da-chip fragment" data-fragment-index="1">Vos dimanches récupérés</div>
           </div>
           <div class="hero-stage fragment" data-fragment-index="0">
@@ -990,9 +1135,55 @@
         <p class="da-kicker">Résultats</p>
         <h2 class="da-h2">Ce que le ROI Pilot vous rapporte</h2>
         <div class="da-cards">
-          <div class="da-card res fragment" data-fragment-index="0"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Devis partis avant le concurrent</div><div class="da-txt">En moins d’une heure.</div></div>
-          <div class="da-card res fragment" data-fragment-index="1"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Toute votre boîte pilotée</div><div class="da-txt">En 30 secondes par jour, depuis votre téléphone.</div></div>
-          <div class="da-card res fragment" data-fragment-index="2"><svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="da-val">Vous reprenez du temps</div><div class="da-txt">Vos équipes vous disent merci.</div></div>
+          <div class="da-card res fragment" data-fragment-index="0">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Devis partis avant le concurrent</div><div class="da-txt">En moins d’une heure.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="44" y="22" width="38" height="50" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <line x1="52" y1="32" x2="74" y2="32" stroke="#C9A84C" stroke-width="2"/><line x1="52" y1="42" x2="74" y2="42" stroke="#C9A84C" stroke-width="2"/><line x1="52" y1="52" x2="68" y2="52" stroke="#C9A84C" stroke-width="2"/>
+              <text x="63" y="68" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">€</text>
+              <g class="fa-stream"><circle cx="92" cy="46" r="5" fill="#F4D67A"/></g>
+              <g class="fa-stream" style="animation-delay:.4s"><circle cx="92" cy="46" r="5" fill="#F4D67A"/></g>
+              <rect x="166" y="36" width="36" height="22" rx="11" fill="#16140e" stroke="#C9A84C" stroke-width="2"/>
+              <text class="fa-pulse" x="184" y="51" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">1h</text>
+              <rect x="234" y="22" width="38" height="50" rx="4" fill="#16140e" stroke="#8a6f2e" stroke-width="2"/>
+              <line x1="242" y1="32" x2="264" y2="32" stroke="#8a6f2e" stroke-width="2"/><line x1="242" y1="42" x2="264" y2="42" stroke="#8a6f2e" stroke-width="2"/>
+              <g class="mc-zzz"><text x="270" y="20" font-family="Cinzel,serif" font-size="14" fill="#8a6f2e">z</text></g>
+              <text x="252" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#8a6f2e">concurrent</text>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="1">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Toute votre boîte pilotée</div><div class="da-txt">En 30 secondes par jour, depuis votre téléphone.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="124" y="6" width="52" height="80" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <rect x="132" y="16" width="36" height="56" rx="4" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.4"/>
+              <path class="fa-draw" d="M136 50 l8 -10 l8 6 l11 -14" stroke="#E9C75A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="138" y="56" width="6" height="12" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="148" y="56" width="6" height="12" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="158" y="56" width="6" height="12" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <circle cx="58" cy="24" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="58" y="29" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">Leads</text>
+              <circle cx="58" cy="58" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="58" y="63" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">Devis</text>
+              <circle cx="244" cy="24" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="244" y="29" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">Sign.</text>
+              <circle cx="244" cy="58" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="244" y="63" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">CA</text>
+              <line class="fa-flow" x1="72" y1="24" x2="124" y2="24" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="72" y1="58" x2="124" y2="58" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="176" y1="24" x2="230" y2="24" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="176" y1="58" x2="230" y2="58" stroke="#C9A84C" stroke-width="2"/>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="2">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Vous reprenez du temps</div><div class="da-txt">Vos équipes vous disent merci.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="60" cy="45" r="22" fill="none" stroke="#F4D67A" stroke-width="2.6"/>
+              <g class="fa-turn" style="transform-origin:60px 45px"><line x1="60" y1="45" x2="60" y2="28" stroke="#F4D67A" stroke-width="2.8" stroke-linecap="round"/><line x1="60" y1="45" x2="72" y2="45" stroke="#F4D67A" stroke-width="2.8" stroke-linecap="round"/></g>
+              <line class="fa-flow" x1="92" y1="45" x2="128" y2="45" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bob"><circle cx="160" cy="32" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M146 70 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M153 30 a8 6 0 0 0 14 0" fill="none" stroke="#F4D67A" stroke-width="2"/></g>
+              <g class="fa-pop" style="transform-origin:200px 26px"><path d="M186 26 c-2 -10 14 -10 14 0 c0 -10 16 -10 14 0 c0 8 -14 16 -14 16 c0 0 -14 -8 -14 -16 z" fill="#F4D67A"/></g>
+              <g class="fa-bob" style="animation-delay:.5s"><circle cx="246" cy="32" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M232 70 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M239 30 a8 6 0 0 0 14 0" fill="none" stroke="#F4D67A" stroke-width="2"/></g>
+            </svg></div>
+          </div>
         </div>
       </section>
 
@@ -1000,10 +1191,66 @@
       <section class="da-slide" data-transition="fade">
         <p class="da-kicker">1 · Le système IA complet</p>
         <h2 class="da-h2">Les 3 piliers, livrés clé en main</h2>
-        <div class="da-cards">
-          <div class="da-card fragment" data-fragment-index="0"><div class="da-lab">La Mine d’Or</div><div class="da-val">Base dormante réveillée</div><div class="da-txt">Prospects chauds remontés automatiquement.</div><div class="da-gold">Jusqu’à [X €] dès le 1<sup>er</sup> mois</div></div>
-          <div class="da-card fragment" data-fragment-index="1"><div class="da-lab">La Machine à Chantiers</div><div class="da-val">100 % capté &amp; relancé</div><div class="da-txt">Leads en &lt;5 min, devis relancés, alertes temps réel.</div><div class="da-gold">Jusqu’à [X €] par mois</div></div>
-          <div class="da-card fragment" data-fragment-index="2"><div class="da-lab">Le ROI Pilot</div><div class="da-val">Devis &amp; pilotage auto</div><div class="da-txt">Devis sous 1 h, dashboard temps réel complet.</div><div class="da-gold">Jusqu’à [X €]/mois + vos dimanches</div></div>
+        <div class="stack-cards">
+          <div class="stack-card fragment" data-fragment-index="0">
+            <div class="stack-lab">La Mine d’Or</div>
+            <div class="stack-val">Base dormante réveillée</div>
+            <div class="stack-txt">Prospects chauds remontés automatiquement.</div>
+            <div class="stack-gold">Cash récupéré dès le 1<sup>er</sup> mois</div>
+            <div class="stack-anim"><svg viewBox="0 0 320 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#F4D67A" stroke-width="3" fill="#16140e"><ellipse cx="60" cy="38" rx="30" ry="10"/><path d="M30 38 L30 100 a30 10 0 0 0 60 0 L90 38"/><path d="M30 70 a30 10 0 0 0 60 0" fill="none"/></g>
+              <text class="mc-zzz" x="92" y="34" font-family="Cinzel,serif" font-size="18" fill="#C9A84C">z</text>
+              <line class="fa-flow" x1="98" y1="74" x2="156" y2="74" stroke="#C9A84C" stroke-width="2.6"/>
+              <circle class="fa-pulse" cx="190" cy="74" r="34" fill="none" stroke="#C9A84C" stroke-opacity=".4" stroke-width="6"/>
+              <circle cx="190" cy="74" r="24" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <path d="M193 60 l-10 18 l7 0 l-3 14 l12 -20 l-7 0 z" fill="#F4D67A"/>
+              <line class="fa-flow" x1="222" y1="74" x2="266" y2="74" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="fa-pop" style="transform-origin:294px 60px"><circle cx="294" cy="60" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="3"/><text x="294" y="68" text-anchor="middle" font-family="Cinzel,serif" font-size="20" fill="#F4D67A">€</text></g>
+              <g class="fa-pop" style="transform-origin:294px 100px;animation-delay:.6s"><circle cx="294" cy="100" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="294" y="106" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+          <div class="stack-card fragment" data-fragment-index="1">
+            <div class="stack-lab">La Machine à Chantiers</div>
+            <div class="stack-val">100 % capté &amp; relancé</div>
+            <div class="stack-txt">Leads en &lt;5 min, devis relancés, alertes temps réel.</div>
+            <div class="stack-gold">24h/24, week-ends compris</div>
+            <div class="stack-anim"><svg viewBox="0 0 320 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="fa-flow" d="M14 78 L120 78" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="mc-lead"><rect x="22" y="70" width="28" height="18" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M23 72 l13 8 l13 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:.6s"><rect x="22" y="70" width="28" height="18" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M23 72 l13 8 l13 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:1.2s"><rect x="22" y="70" width="28" height="18" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M23 72 l13 8 l13 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <rect x="124" y="34" width="98" height="92" rx="14" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+              <rect x="142" y="42" width="62" height="20" rx="10" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <text class="fa-pulse" x="173" y="56" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">IA</text>
+              <g class="mc-cog" style="transform-origin:156px 90px"><circle cx="156" cy="90" r="20" fill="none" stroke="#F4D67A" stroke-width="6" stroke-dasharray="5 6"/></g>
+              <g class="mc-cog rev" style="transform-origin:194px 104px"><circle cx="194" cy="104" r="14" fill="none" stroke="#E9C75A" stroke-width="5" stroke-dasharray="4 5"/></g>
+              <path class="fa-flow" d="M222 78 L286 78" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="mc-coin" style="transform-origin:282px 78px"><circle cx="282" cy="78" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><text x="282" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="16" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.8s"><circle cx="282" cy="78" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><text x="282" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="16" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+          <div class="stack-card fragment" data-fragment-index="2">
+            <div class="stack-lab">Le ROI Pilot</div>
+            <div class="stack-val">Devis &amp; pilotage auto</div>
+            <div class="stack-txt">Devis sous 1 h, dashboard temps réel complet.</div>
+            <div class="stack-gold">Vos dimanches récupérés</div>
+            <div class="stack-anim"><svg viewBox="0 0 320 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="40" y="34" width="20" height="36" rx="10" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <path d="M32 56 a18 18 0 0 0 36 0" stroke="#F4D67A" stroke-width="2.6" fill="none"/>
+              <line x1="50" y1="74" x2="50" y2="84" stroke="#F4D67A" stroke-width="2.6"/>
+              <path class="fa-pulse" d="M20 44 a18 18 0 0 0 0 26" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="74" y1="60" x2="118" y2="60" stroke="#C9A84C" stroke-width="2.6"/>
+              <rect x="134" y="18" width="66" height="88" rx="11" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <rect x="144" y="30" width="46" height="56" rx="4" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.4"/>
+              <path class="fa-draw" d="M148 64 l10 -14 l10 8 l13 -22" stroke="#E9C75A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="150" y="70" width="8" height="14" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="162" y="70" width="8" height="14" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="174" y="70" width="8" height="14" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <text class="fa-pulse" x="167" y="124" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">30s/jour</text>
+              <line class="fa-flow" x1="216" y1="60" x2="252" y2="60" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="fa-bob"><circle cx="282" cy="56" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><circle cx="274" cy="52" r="2.6" fill="#F4D67A"/><circle cx="290" cy="52" r="2.6" fill="#F4D67A"/><path d="M272 62 a12 10 0 0 0 20 0" fill="none" stroke="#F4D67A" stroke-width="2.4"/></g>
+            </svg></div>
+          </div>
         </div>
       </section>
 
@@ -1044,32 +1291,75 @@
               <text x="150" y="176" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#C9A84C">Déploiement · 30 jours</text>
             </svg></div>
           </div>
-          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">3</div><div class="da-val">Ça rapporte</div><div class="da-txt">Du cash dès le 1<sup>er</sup> mois.</div>
-            <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <polyline points="40,140 90,120 130,128 175,90 220,96 266,48" fill="none" stroke="#C9A84C" stroke-opacity=".5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M266 48 l-11 1 l4 -10" fill="none" stroke="#C9A84C" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-              <rect x="92" y="92" width="116" height="74" rx="14" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
-              <rect x="116" y="100" width="68" height="16" rx="8" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
-              <text class="fa-pulse" x="150" y="112" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#F4D67A">CASH MACHINE</text>
-              <g class="mc-cog" style="transform-origin:130px 134px"><circle cx="130" cy="134" r="20" fill="none" stroke="#F4D67A" stroke-width="7" stroke-dasharray="5 6"/><circle cx="130" cy="134" r="8" fill="none" stroke="#E9C75A" stroke-width="2.6"/></g>
-              <g class="mc-cog rev" style="transform-origin:172px 144px"><circle cx="172" cy="144" r="14" fill="none" stroke="#E9C75A" stroke-width="6" stroke-dasharray="4 5"/><circle cx="172" cy="144" r="6" fill="none" stroke="#C9A84C" stroke-width="2.4"/></g>
-              <g class="mc-coin" style="transform-origin:212px 96px"><circle cx="214" cy="100" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="214" y="105" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
-              <g class="mc-coin" style="animation-delay:.7s"><circle cx="214" cy="100" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="214" y="105" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
-              <g class="mc-coin" style="animation-delay:1.4s"><circle cx="214" cy="100" r="13" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="214" y="105" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">3</div><div class="da-val">Ça rapporte</div><div class="da-txt">Votre atelier tourne 24/7 — du cash dès le 1<sup>er</sup> mois.</div>
+            <div class="flow-anim xl"><svg viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- ciel + sol -->
+              <rect x="0" y="0" width="300" height="150" fill="url(#skyG)"/>
+              <defs><linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16140e"/><stop offset="1" stop-color="#0c0b07"/></linearGradient></defs>
+              <line x1="0" y1="150" x2="300" y2="150" stroke="#C9A84C" stroke-opacity=".35" stroke-width="1.5"/>
+              <!-- soleil / lune (cycle 24h) -->
+              <g class="mc-sun" style="transform-origin:150px 150px"><circle cx="42" cy="78" r="10" fill="#F4D67A"/></g>
+              <!-- ATELIER (entrepôt menuiserie) -->
+              <polygon points="46,82 156,82 156,150 46,150" fill="#1a1812" stroke="#C9A84C" stroke-width="2.4"/>
+              <polygon points="44,82 158,82 102,52" fill="#16140e" stroke="#C9A84C" stroke-width="2.4"/>
+              <!-- portes / fenêtres lumière -->
+              <rect x="58" y="100" width="14" height="20" fill="#F4D67A" opacity=".7"/>
+              <rect x="80" y="100" width="14" height="20" fill="#F4D67A" opacity=".7"/>
+              <rect x="102" y="100" width="14" height="20" fill="#F4D67A" opacity=".7"/>
+              <rect x="124" y="100" width="14" height="20" fill="#F4D67A" opacity=".7"/>
+              <rect x="80" y="124" width="32" height="26" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <!-- planches de bois -->
+              <rect x="50" y="156" width="22" height="3" fill="#a5853d"/>
+              <rect x="50" y="162" width="22" height="3" fill="#a5853d"/>
+              <rect x="124" y="156" width="22" height="3" fill="#a5853d"/>
+              <rect x="124" y="162" width="22" height="3" fill="#a5853d"/>
+              <!-- enseigne -->
+              <text x="102" y="74" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#C9A84C">MENUISERIE</text>
+              <!-- cheminée fumée (production) -->
+              <rect x="124" y="58" width="8" height="18" fill="#1a1812" stroke="#C9A84C" stroke-width="1.4"/>
+              <g class="mc-zzz" style="transform-origin:128px 50px"><circle cx="128" cy="48" r="4" fill="#C9A84C" opacity=".5"/></g>
+              <g class="mc-zzz" style="animation-delay:1s"><circle cx="124" cy="42" r="5" fill="#C9A84C" opacity=".45"/></g>
+              <g class="mc-zzz" style="animation-delay:1.6s"><circle cx="132" cy="36" r="6" fill="#C9A84C" opacity=".4"/></g>
+              <!-- engrenages qui tournent dans l'atelier -->
+              <g class="mc-cog" style="transform-origin:172px 116px"><circle cx="172" cy="116" r="14" fill="none" stroke="#F4D67A" stroke-width="5" stroke-dasharray="4 5"/></g>
+              <g class="mc-cog rev" style="transform-origin:200px 132px"><circle cx="200" cy="132" r="9" fill="none" stroke="#E9C75A" stroke-width="4" stroke-dasharray="3 4"/></g>
+              <!-- badge 24/7 -->
+              <circle class="fa-pulse" cx="226" cy="80" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <text x="226" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">24/7</text>
+              <!-- tapis de € qui sortent en bas -->
+              <g class="mc-coin" style="transform-origin:170px 168px"><circle cx="172" cy="172" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="172" y="177" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.55s"><circle cx="172" cy="172" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="172" y="177" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:1.1s"><circle cx="172" cy="172" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="172" y="177" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:1.65s"><circle cx="172" cy="172" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="172" y="177" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+              <!-- courbe CA qui décolle au-dessus -->
+              <path class="fa-draw-lg" d="M192 110 l16 -10 l18 -6 l20 -16 l18 -20" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <g class="fa-pop" style="transform-origin:264px 58px;animation-delay:1s"><path d="M256 58 l14 0 l-5 -11" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <text class="fa-pulse" x="270" y="46" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">CA ↗</text>
             </svg></div>
           </div>
         </div>
         <p class="da-foot fragment" data-fragment-index="3">Vous donnez vos accès — on s’occupe de tout le reste.</p>
       </section>
 
-      <!-- 14 — BLOC 3 — 4 MOIS OFFERTS -->
+      <!-- 14 — BLOC 3a — BONUS HEADLINE (révélation 4 mois) -->
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">3 · Ce qui est inclus en bonus</p>
+        <div class="bonus-wrap">
+          <p class="bonus-line">Inclus dans la prestation : 4 mois de collaboration, <span class="dots">dont…</span></p>
+          <div class="bonus-deco fragment fade-in-then-out" data-fragment-index="0"></div>
+          <h2 class="bonus-huge fragment" data-fragment-index="0">4 mois<br>offerts</h2>
+          <div class="bonus-deco fragment" data-fragment-index="1"></div>
+          <p class="bonus-eq fragment" data-fragment-index="1">Soit <strong style="color:#F8EFC8;">12 000 €</strong> de prestation offerte<span class="sep">·</span><span style="color:#4BE6A0;">0 frais mensuel</span></p>
+        </div>
+      </section>
+
+      <!-- 14 — BLOC 3b — DÉTAIL DU BONUS (4 cartes) -->
       <section class="da-slide" data-transition="fade">
-        <p class="da-kicker">3 · Gestion offerte</p>
-        <h2 class="da-h2">4 mois de gestion offerts</h2>
-        <p class="da-sub">Soit <strong style="color:#F4D67A;">12 000 €</strong> de prestation incluse — zéro frais mensuel de votre côté.</p>
+        <p class="da-kicker">3 · Ce qui est inclus</p>
+        <h2 class="da-h2">Les 4 mois en détail</h2>
         <div class="ia2-grid">
 
-          <div class="ia2-card fragment" data-fragment-index="0">
+          <div class="ia2-card lg fragment" data-fragment-index="0">
             <div class="ia2-lab">Maintenance</div>
             <div class="ia2-txt">Maintenance technique <strong>24/7</strong> — bugs corrigés en &lt; 24 h.</div>
             <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1081,7 +1371,7 @@
             </svg></div>
           </div>
 
-          <div class="ia2-card fragment" data-fragment-index="1">
+          <div class="ia2-card lg fragment" data-fragment-index="1">
             <div class="ia2-lab">Optimisation</div>
             <div class="ia2-txt"><strong>Optimisation continue</strong> : A/B testing &amp; calibrage de l’IA.</div>
             <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1094,7 +1384,7 @@
             </svg></div>
           </div>
 
-          <div class="ia2-card fragment" data-fragment-index="2">
+          <div class="ia2-card lg fragment" data-fragment-index="2">
             <div class="ia2-lab">Pilotage</div>
             <div class="ia2-txt"><strong>1 réunion / mois</strong> de pilotage pour vos ajustements.</div>
             <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1108,7 +1398,7 @@
             </svg></div>
           </div>
 
-          <div class="ia2-card fragment" data-fragment-index="3">
+          <div class="ia2-card lg fragment" data-fragment-index="3">
             <div class="ia2-lab">Outils</div>
             <div class="ia2-txt"><strong>Tous les outils tiers offerts</strong> — aucun frais supplémentaire.</div>
             <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1130,16 +1420,16 @@
         <div class="prix-card fragment" data-fragment-index="0">
           <div class="prix-lab">Investissement total</div>
           <div class="prix-num">16 000 €</div>
-          <div class="prix-txt">Installation complète du système <strong style="color:#F4D67A;">+ les 4 mois de gestion</strong>.</div>
+          <div class="prix-txt">Installation complète du système <strong style="color:#F4D67A;">+ les 4 mois de gestion du technicien offert</strong>.</div>
         </div>
-        <p class="da-foot fragment" data-fragment-index="1">À l’issue des 4 mois : retainer 3 000 €/mois (optionnel).</p>
+        <p class="da-foot fragment" data-fragment-index="1">À l’issue des 4 mois, vous êtes libre de continuer la collaboration <em>ou non</em>.</p>
       </section>
 
       <!-- 18 — GARANTIE (dédiée) -->
       <section class="da-slide da-center" data-transition="fade">
         <p class="da-kicker">La garantie</p>
         <h2 class="da-h2">Inscrite dans votre contrat</h2>
-        <div class="gar-figs">
+        <div class="gar-figs airy">
           <div class="gar-fig fragment" data-fragment-index="0">
             <div class="gar-lab">CA additionnel garanti</div>
             <div class="gar-big">+50 000 €</div>
@@ -1147,16 +1437,16 @@
           </div>
           <div class="gar-fig fragment" data-fragment-index="1">
             <div class="gar-lab">ROI minimum</div>
-            <div class="gar-big">×&nbsp;2</div>
-            <div class="gar-sub">+50 000 € générés − 16 000 € investis = +34 000 € net</div>
+            <div class="gar-big">×&nbsp;3,1</div>
+            <div class="gar-sub">+50 000 € générés pour 16 000 € investis</div>
           </div>
         </div>
-        <div class="gar-points fragment" data-fragment-index="2">
+        <div class="gar-points airy fragment" data-fragment-index="2">
           <span class="gar-pt"><b>Inscrit</b> noir sur blanc dans le contrat</span>
           <span class="gar-pt"><b>+50 000 €</b> de CA minimum sur 4 mois</span>
           <span class="gar-pt"><b>Sinon</b>, remboursement intégral</span>
         </div>
-        <p class="gar-foot fragment" data-fragment-index="3">Et ce, de manière garantie.</p>
+        <p class="gar-foot lg fragment" data-fragment-index="3">Et ce, de manière garantie.</p>
       </section>
 
       <!-- 14 — FINALE -->

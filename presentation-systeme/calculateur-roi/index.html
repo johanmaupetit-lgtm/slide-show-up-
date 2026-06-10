@@ -991,14 +991,14 @@
           )}
 
           {!apiKey && (
-            <div className="mb-6 p-3 bg-rouge/10 border border-rouge/30 rounded text-sm text-rouge">
-              ⚠ Clé API Gemini non configurée. Configure-la d'abord en bas de la page (gratuit, 2 minutes).
+            <div className="mb-6 p-3 bg-or/10 border border-or/30 rounded text-sm text-or/90">
+              ℹ Pas de clé API Gemini — la session sera créée avec la charte Scalia par défaut. (Tu peux configurer une clé en bas de la page pour activer l'extraction automatique de charte.)
             </div>
           )}
 
           <div className="flex gap-3 justify-end">
             <button type="button" onClick={onCancel} className="px-5 py-2.5 text-gray-400 hover:text-white transition text-sm">Annuler</button>
-            <button type="submit" disabled={!apiKey || !url.trim() || !dirigeantName.trim()} className="bg-or text-noir px-7 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed">
+            <button type="submit" disabled={!url.trim() || !dirigeantName.trim()} className="bg-or text-noir px-7 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or-fonce transition disabled:opacity-30 disabled:cursor-not-allowed">
               ✦ Générer la session
             </button>
           </div>

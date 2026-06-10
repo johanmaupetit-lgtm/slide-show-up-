@@ -762,6 +762,7 @@
       const [meta, setMeta] = useState(null);
       const [aiTokens, setAiTokens] = useState(null);
       const [error, setError] = useState('');
+      const [aiWarning, setAiWarning] = useState('');
 
       const handleLogoUpload = async (e) => {
         const file = e.target.files?.[0];
@@ -776,24 +777,53 @@
 
       const runFullPipeline = async () => {
         if (!url.trim()) { alert('Entre une URL d\'abord.'); return; }
-        if (!apiKey) { alert('Configure d\'abord ta clé API Gemini en bas de cette page (gratuit, 2 minutes).'); return; }
         setError('');
+        setAiWarning('');
         setStep('fetching');
+
+        // 1) Capture du site (Microlink — indépendant de Gemini)
+        let result = null;
         try {
-          const result = await fetchUrlScreenshot(url);
+          result = await fetchUrlScreenshot(url);
           setScreenshot(result.screenshot);
           setMeta(result);
-          // Précharger la police si disponible avant l'analyse
-          setStep('analyzing');
+        } catch (e) {
+          // Capture impossible — on propose quand même la création (bouton dans l'écran d'erreur)
+          setError('Capture du site impossible : ' + (e.message || String(e)));
+          setStep('error');
+          return;
+        }
+
+        // 2) Analyse IA — OPTIONNELLE : si elle échoue (quota, surcharge, pas de clé),
+        //    on continue avec la charte Scalia par défaut au lieu de bloquer la création.
+        if (!apiKey) {
+          setAiTokens(null);
+          setAiWarning('Pas de clé Gemini configurée — la session utilisera la charte Scalia par défaut. (Clé configurable en bas de la page admin.)');
+          setStep('preview');
+          return;
+        }
+        setStep('analyzing');
+        try {
           const tokens = await analyzeCharteAI(apiKey, [result.screenshot]);
           if (tokens.policePrimaire) loadGoogleFont(tokens.policePrimaire);
           if (tokens.policeSecondaire) loadGoogleFont(tokens.policeSecondaire);
           setAiTokens(tokens);
           setStep('preview');
         } catch (e) {
-          setError(e.message || String(e));
-          setStep('error');
+          setAiTokens(null);
+          setAiWarning('IA indisponible (' + (e.message || String(e)).split('\n')[0].slice(0, 160) + ') — la session sera créée avec la charte Scalia par défaut. Tu pourras régénérer le style plus tard via le bouton « Régénérer le style » sur la page d\'audit.');
+          setStep('preview');
         }
+      };
+
+      // Création directe sans capture ni IA (réseau / quota KO)
+      const continueWithoutCapture = () => {
+        setError('');
+        setScreenshot('');
+        setMeta(null);
+        setAiTokens(null);
+        setAiWarning('Session sans capture ni IA — charte Scalia par défaut. Renseigne le nom de l\'entreprise dans « Avancé » si besoin.');
+        setStep('preview');
       };
 
       const confirmCreation = async () => {
@@ -829,6 +859,7 @@
       const resetAndRetry = () => {
         setStep('input');
         setError('');
+        setAiWarning('');
         setScreenshot('');
         setMeta(null);
         setAiTokens(null);
@@ -857,6 +888,7 @@
               screenshot={screenshot}
               meta={meta}
               aiTokens={aiTokens}
+              aiWarning={aiWarning}
               url={url}
               dirigeantName={dirigeantName} setDirigeantName={setDirigeantName}
               meetingDate={meetingDate} setMeetingDate={setMeetingDate}
@@ -870,10 +902,15 @@
           {step === 'error' && (
             <div className="text-center py-8">
               <p className="text-rouge text-lg mb-3">⚠ Erreur</p>
-              <p className="text-gray-300 mb-6 text-sm">{error}</p>
-              <button onClick={resetAndRetry} className="bg-or text-noir px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
-                Recommencer
-              </button>
+              <p className="text-gray-300 mb-6 text-sm whitespace-pre-line">{error}</p>
+              <div className="flex items-center justify-center gap-4">
+                <button onClick={resetAndRetry} className="bg-or text-noir px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or-fonce transition">
+                  Recommencer
+                </button>
+                <button onClick={continueWithoutCapture} className="border border-or/50 text-or px-5 py-2.5 rounded font-semibold uppercase text-xs tracking-wider hover:bg-or hover:text-noir transition">
+                  Créer quand même (sans capture)
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -997,7 +1034,7 @@
     };
 
     // ===== ÉTAPE 3 : APERÇU DES TOKENS DÉTECTÉS =====
-    const FormStepPreview = ({ screenshot, meta, aiTokens, url, dirigeantName, setDirigeantName, meetingDate, setMeetingDate, overrideCompany, setOverrideCompany, overrideLogo, handleLogoUpload, onConfirm, onRetry, onCancel }) => {
+    const FormStepPreview = ({ screenshot, meta, aiTokens, aiWarning, url, dirigeantName, setDirigeantName, meetingDate, setMeetingDate, overrideCompany, setOverrideCompany, overrideLogo, handleLogoUpload, onConfirm, onRetry, onCancel }) => {
       const t = aiTokens || {};
       const detectedLogo = overrideLogo || meta?.logo || '';
       const detectedName = overrideCompany || t.nomEntreprise || meta?.title || domainNameFromUrl(url);
@@ -1006,11 +1043,17 @@
         <div className="fade-in">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-1">✓ Charte extraite</h3>
+              <h3 className="font-serif uppercase tracking-[0.18em] text-or text-sm mb-1">{aiTokens ? '✓ Charte extraite' : '✓ Session prête (charte Scalia par défaut)'}</h3>
               <p className="text-gray-400 text-sm">Vérifie le résultat et lance la session — tu pourras saisir les chiffres ensuite.</p>
             </div>
             <button onClick={onRetry} className="text-xs text-gray-500 hover:text-or transition">↻ Recommencer</button>
           </div>
+
+          {aiWarning && (
+            <div className="mb-6 p-4 rounded border border-or/40 bg-or/5 text-sm text-or/90">
+              ⚠ {aiWarning}
+            </div>
+          )}
 
           {/* Aperçu visuel : screenshot + nom détecté */}
           <div className="grid grid-cols-2 gap-6 mb-6">
@@ -1599,8 +1642,21 @@ La carrière de quelqu'un en dépend.`;
             triggerSwitch();
           }
         };
+        // Bascule discrète : double-clic sur le nom / logo de l'entreprise (Pertes)
+        // ou sur le logo Scalia (Gains) — invisible pour le prospect.
+        const onDbl = (e) => {
+          if (e.target && e.target.closest &&
+              e.target.closest('.scalia-hero-name, .scalia-hero-logo, .scalia-hero-logo-fallback, .logo-scalia')) {
+            e.preventDefault();
+            triggerSwitch();
+          }
+        };
         window.addEventListener('keydown', onKey);
-        return () => window.removeEventListener('keydown', onKey);
+        window.addEventListener('dblclick', onDbl);
+        return () => {
+          window.removeEventListener('keydown', onKey);
+          window.removeEventListener('dblclick', onDbl);
+        };
       }, [triggerSwitch]);
 
       if (!session) {

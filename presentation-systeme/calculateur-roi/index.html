@@ -119,22 +119,27 @@
     .dot3 { animation: blink 1.4s infinite 0.4s; }
   </style>
 
-  <script type="importmap">
-  {
-    "imports": {
-      "react": "https://esm.sh/react@18.3.1",
-      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
-    }
-  }
-  </script>
-
-  <script type="module">
-    import React, { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext } from 'react';
-    import { createRoot } from 'react-dom/client';
-    window.React = React;
-    window.ReactHooks = { useState, useEffect, useRef, useCallback, useMemo, createContext, useContext };
-    window.createRoot = createRoot;
-    window.dispatchEvent(new Event('react-ready'));
+  <!-- React via UMD (une seule instance — robuste avec Babel standalone) -->
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script>
+    (function(){
+      if(!window.React || !window.ReactDOM){
+        document.addEventListener('DOMContentLoaded', function(){
+          var r=document.getElementById('root');
+          if(r) r.innerHTML='<div style="color:#C9A84C;font-family:Georgia,serif;text-align:center;padding:80px;">Échec du chargement de React (réseau). Rechargez la page.</div>';
+        });
+        return;
+      }
+      var R = window.React;
+      window.ReactHooks = {
+        useState: R.useState, useEffect: R.useEffect, useRef: R.useRef,
+        useCallback: R.useCallback, useMemo: R.useMemo,
+        createContext: R.createContext, useContext: R.useContext
+      };
+      window.createRoot = window.ReactDOM.createRoot;
+      window.dispatchEvent(new Event('react-ready'));
+    })();
   </script>
 
   <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>

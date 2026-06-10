@@ -546,6 +546,28 @@
     .bonus-eq .sep{ color:#5e4e22; padding:0 18px; }
     .bonus-eq .green{ color:#4BE6A0; }
 
+    /* slide 16 — bonus plein écran, impactant */
+    .reveal section.bonus16{ display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:1010px; padding:40px 84px; position:relative; }
+    .bonus16 .b16-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(58% 46% at 50% 44%, rgba(201,168,76,0.16), transparent 72%); }
+    .b16-stamp{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; }
+    .b16-over{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:.34em; text-transform:uppercase; font-size:18px; margin-bottom:18px; }
+    .b16-huge{ font-family:'Cinzel',serif; font-weight:700; text-transform:uppercase; letter-spacing:.05em; line-height:.96;
+      font-size:168px; text-align:center;
+      background: linear-gradient(100deg,#A88736 0%,#F8EFC8 26%,#E9CE7A 50%,#F8EFC8 72%,#A88736 100%);
+      background-size:240% auto; -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 8px 34px rgba(201,168,76,0.5));
+      animation: shimmer 6.5s linear infinite;
+    }
+    .b16-rule{ width:600px; max-width:80vw; height:2px; background:linear-gradient(90deg,transparent,#C9A84C 30%,#F4D67A 50%,#C9A84C 70%,transparent); margin:34px auto 40px; }
+    .b16-figs{ display:flex; align-items:flex-start; justify-content:center; gap:70px; }
+    .b16-fig{ text-align:center; }
+    .b16-num{ font-family:'Cinzel',serif; font-size:88px; line-height:1; color:#F4D67A; text-shadow:0 0 40px rgba(201,168,76,0.5); }
+    .b16-num.green{ color:#4BE6A0; text-shadow:0 0 40px rgba(52,211,153,0.45); }
+    .b16-cap{ font-family:'Inter',sans-serif; font-weight:300; color:#cfcfcf; font-size:23px; margin-top:12px; letter-spacing:.02em; }
+    .b16-vsep{ width:1px; align-self:stretch; background:linear-gradient(180deg,transparent,#5e4e22,transparent); }
+    .b16-foot{ position:relative; z-index:1; margin-top:74px; font-family:'Cinzel',serif; color:#9a9a9a; font-size:21px; letter-spacing:.18em; text-transform:uppercase; text-align:center; }
+    .b16-foot b{ color:#C9A84C; font-weight:600; }
+
     /* ia2-scene plus grand pour la slide 16 cartes */
     .ia2-card.lg .ia2-scene{ height:240px; }
     .ia2-card.lg .ia2-txt{ font-size:24px; }
@@ -1289,7 +1311,7 @@
         <p class="da-kicker">2 · Déploiement clé en main</p>
         <h2 class="da-h2">Opérationnel en 30 jours</h2>
         <div class="da-cards da-flow">
-          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">1</div><div class="da-val">Début de la collaboration</div><div class="da-txt">On démarre ensemble — vous donnez vos accès.</div>
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">1</div><div class="da-val">Début de la collaboration</div><div class="da-txt">On démarre ensemble et on calibre vos attentes.</div>
             <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="92" y="26" width="116" height="118" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
               <line x1="112" y1="52" x2="188" y2="52" stroke="#C9A84C" stroke-width="2.4"/>
@@ -1325,27 +1347,41 @@
             <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
               <line x1="0" y1="152" x2="300" y2="152" stroke="#C9A84C" stroke-opacity=".35" stroke-width="1.5"/>
               <!-- soleil / lune (cycle 24h) -->
-              <g class="mc-sun" style="transform-origin:150px 152px"><circle cx="150" cy="34" r="9" fill="#F4D67A"/></g>
+              <g class="mc-sun" style="transform-origin:150px 152px"><circle cx="150" cy="32" r="9" fill="#F4D67A"/></g>
               <!-- badge 24/7 -->
-              <circle class="fa-pulse" cx="150" cy="30" r="19" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
-              <text x="150" y="34" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">24/7</text>
+              <circle class="fa-pulse" cx="150" cy="28" r="18" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <text x="150" y="32" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">24/7</text>
               <!-- bâtiment menuiserie -->
-              <polygon points="110,152 110,88 190,88 190,152" fill="#1a1812" stroke="#C9A84C" stroke-width="2.6"/>
-              <polygon points="104,88 196,88 150,62" fill="#16140e" stroke="#C9A84C" stroke-width="2.6"/>
-              <text x="150" y="82" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#C9A84C">MENUISERIE</text>
-              <rect x="120" y="100" width="14" height="16" fill="#F4D67A" opacity=".7"/>
-              <rect x="143" y="100" width="14" height="16" fill="#F4D67A" opacity=".7"/>
-              <rect x="166" y="100" width="14" height="16" fill="#F4D67A" opacity=".7"/>
-              <rect x="138" y="124" width="24" height="28" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
-              <g class="mc-cog" style="transform-origin:150px 136px"><circle cx="150" cy="136" r="8" fill="none" stroke="#E9C75A" stroke-width="3" stroke-dasharray="3 4"/></g>
+              <polygon points="116,152 116,92 184,92 184,152" fill="#1a1812" stroke="#C9A84C" stroke-width="2.6"/>
+              <polygon points="110,92 190,92 150,68" fill="#16140e" stroke="#C9A84C" stroke-width="2.6"/>
+              <text x="150" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#C9A84C">MENUISERIE</text>
+              <rect x="124" y="102" width="13" height="14" fill="#F4D67A" opacity=".7"/>
+              <rect x="143" y="102" width="13" height="14" fill="#F4D67A" opacity=".7"/>
+              <rect x="162" y="102" width="13" height="14" fill="#F4D67A" opacity=".7"/>
+              <rect x="140" y="126" width="20" height="26" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <g class="mc-cog" style="transform-origin:150px 138px"><circle cx="150" cy="138" r="7" fill="none" stroke="#E9C75A" stroke-width="2.6" stroke-dasharray="3 4"/></g>
+              <!-- OUVRIER GAUCHE + machine -->
+              <g class="fa-bob">
+                <path d="M33 118 a10 10 0 0 1 20 0 z" fill="#F4D67A"/>
+                <rect x="31" y="117" width="24" height="3" rx="1.5" fill="#F4D67A"/>
+                <circle cx="43" cy="126" r="6" fill="none" stroke="#F4D67A" stroke-width="2"/>
+                <path d="M43 132 l0 14 M43 136 l-9 5 M43 136 l9 5 M43 146 l-6 6 M43 146 l6 6" stroke="#F4D67A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g class="mc-cog" style="transform-origin:74px 140px"><circle cx="74" cy="140" r="10" fill="none" stroke="#E9C75A" stroke-width="3.4" stroke-dasharray="3 4"/><circle cx="74" cy="140" r="3.5" fill="none" stroke="#C9A84C" stroke-width="1.6"/></g>
+              <!-- OUVRIER DROITE + machine -->
+              <g class="fa-bob" style="animation-delay:.5s">
+                <path d="M247 118 a10 10 0 0 1 20 0 z" fill="#F4D67A"/>
+                <rect x="245" y="117" width="24" height="3" rx="1.5" fill="#F4D67A"/>
+                <circle cx="257" cy="126" r="6" fill="none" stroke="#F4D67A" stroke-width="2"/>
+                <path d="M257 132 l0 14 M257 136 l-9 5 M257 136 l9 5 M257 146 l-6 6 M257 146 l6 6" stroke="#F4D67A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g class="mc-cog rev" style="transform-origin:226px 140px"><circle cx="226" cy="140" r="10" fill="none" stroke="#E9C75A" stroke-width="3.4" stroke-dasharray="3 4"/><circle cx="226" cy="140" r="3.5" fill="none" stroke="#C9A84C" stroke-width="1.6"/></g>
               <!-- $ qui sortent à droite -->
-              <g class="mc-coin" style="transform-origin:196px 112px"><circle cx="198" cy="116" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="198" y="121" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
-              <g class="mc-coin" style="animation-delay:.7s"><circle cx="198" cy="116" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="198" y="121" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
-              <g class="mc-coin" style="animation-delay:1.4s"><circle cx="198" cy="116" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="198" y="121" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
+              <g class="mc-coin" style="transform-origin:190px 104px"><circle cx="192" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="192" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
+              <g class="mc-coin" style="animation-delay:1s"><circle cx="192" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="192" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
               <!-- $ qui sortent à gauche -->
-              <g class="mc-coin-l" style="transform-origin:102px 112px"><circle cx="102" cy="116" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="102" y="121" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
-              <g class="mc-coin-l" style="animation-delay:.7s"><circle cx="102" cy="116" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="102" y="121" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
-              <g class="mc-coin-l" style="animation-delay:1.4s"><circle cx="102" cy="116" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="102" y="121" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
+              <g class="mc-coin-l" style="transform-origin:108px 104px"><circle cx="108" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="108" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
+              <g class="mc-coin-l" style="animation-delay:1s"><circle cx="108" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="108" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
             </svg></div>
           </div>
         </div>
@@ -1353,14 +1389,19 @@
       </section>
 
       <!-- 14 — BLOC 3a — BONUS HEADLINE (révélation 4 mois) -->
-      <section class="da-slide da-center" data-transition="fade">
-        <p class="da-kicker">3 · Ce qui est inclus en bonus</p>
-        <div class="bonus-wrap">
-          <p class="bonus-intro">Inclus dans la prestation — <strong>4 mois de collaboration</strong>, <span class="dots">dont</span></p>
-          <div class="bonus-deco fragment" data-fragment-index="0"></div>
-          <h2 class="bonus-huge fragment" data-fragment-index="0">4 mois offerts</h2>
-          <p class="bonus-eq fragment" data-fragment-index="1">Soit <span class="green">12 000 €</span> de prestation offerte <span class="sep">·</span> <span class="green">0 frais mensuel</span></p>
+      <section class="da-slide bonus16" data-transition="fade">
+        <div class="b16-glow"></div>
+        <div class="b16-stamp">
+          <p class="b16-over">Ce qui est inclus en bonus</p>
+          <h2 class="b16-huge fragment" data-fragment-index="0">4 mois offerts</h2>
+          <div class="b16-rule fragment" data-fragment-index="1"></div>
+          <div class="b16-figs fragment" data-fragment-index="1">
+            <div class="b16-fig"><div class="b16-num">12 000 €</div><div class="b16-cap">de prestation offerte</div></div>
+            <div class="b16-vsep"></div>
+            <div class="b16-fig"><div class="b16-num green">0 €</div><div class="b16-cap">de frais mensuel</div></div>
+          </div>
         </div>
+        <p class="b16-foot fragment" data-fragment-index="2">Inclus dans la prestation — <b>4 mois de collaboration complète</b></p>
       </section>
 
       <!-- 14 — BLOC 3b — DÉTAIL DU BONUS (4 cartes) -->

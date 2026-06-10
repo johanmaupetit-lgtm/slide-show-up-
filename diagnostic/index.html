@@ -534,10 +534,10 @@
               <button onClick={() => navigate(`/session/${slug}`)} className="px-4 py-2 text-xs text-noir bg-or rounded font-semibold uppercase tracking-wider hover:bg-or-fonce transition">
                 Ouvrir diag
               </button>
-              <a href={`../vente/calculateur-roi/#/session/${slug}`} className="px-3 py-2 text-xs text-or border border-or/40 rounded font-semibold uppercase tracking-wider hover:border-or transition no-underline">
+              <a href={`../presentation-systeme/calculateur-roi/#/session/${slug}`} className="px-3 py-2 text-xs text-or border border-or/40 rounded font-semibold uppercase tracking-wider hover:border-or transition no-underline">
                 Audit
               </a>
-              <a href={`../vente/?session=${slug}`} className="px-3 py-2 text-xs text-gray-300 border border-anthracite rounded font-semibold uppercase tracking-wider hover:border-or/40 transition no-underline">
+              <a href={`../presentation-systeme/?session=${slug}`} className="px-3 py-2 text-xs text-gray-300 border border-anthracite rounded font-semibold uppercase tracking-wider hover:border-or/40 transition no-underline">
                 Pitch
               </a>
               <button onClick={onDelete} className="px-3 py-2 text-xs text-rouge border border-rouge/40 rounded hover:bg-rouge hover:text-white transition">
@@ -644,10 +644,10 @@
                     <div className={`px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider ${goNoGo === 'GO' ? 'score-go' : (goNoGo === 'NO-GO' ? 'score-nogo' : 'score-partial')}`}>
                       {goNoGo === 'GO' ? '✓ GO' : goNoGo === 'NO-GO' ? '✗ NO-GO' : `${cochesOblig}/${obligs.length} obligatoires`}
                     </div>
-                    <a href={`../vente/calculateur-roi/#/session/${slug}`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-xs bg-or text-noir rounded font-bold uppercase tracking-wider hover:bg-or-fonce transition no-underline">
+                    <a href={`../presentation-systeme/calculateur-roi/#/session/${slug}`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-xs bg-or text-noir rounded font-bold uppercase tracking-wider hover:bg-or-fonce transition no-underline">
                       → Audit ROI
                     </a>
-                    <a href={`../vente/?session=${slug}`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-xs border border-or text-or rounded font-bold uppercase tracking-wider hover:bg-or hover:text-noir transition no-underline">
+                    <a href={`../presentation-systeme/?session=${slug}`} target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-xs border border-or text-or rounded font-bold uppercase tracking-wider hover:bg-or hover:text-noir transition no-underline">
                       → Pitch
                     </a>
                   </div>
@@ -909,10 +909,10 @@
                 <p className="font-serif uppercase tracking-[0.18em] text-vert-go text-sm mb-3">✓ Prêt à enchaîner</p>
                 <p className="text-gray-200 italic mb-6">« OK, on a fait le tour. Je vais maintenant vous montrer en direct, basé sur vos chiffres et les benchmarks réels du marché menuiserie, combien vous perdez chaque mois. »</p>
                 <div className="flex gap-3 justify-center">
-                  <a href={`../vente/calculateur-roi/#/session/${slug}`} target="_blank" rel="noopener noreferrer" className="bg-or text-noir px-6 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or-fonce transition no-underline">
+                  <a href={`../presentation-systeme/calculateur-roi/#/session/${slug}`} target="_blank" rel="noopener noreferrer" className="bg-or text-noir px-6 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or-fonce transition no-underline">
                     → Lancer l'audit (Mode Pertes)
                   </a>
-                  <a href={`../vente/?session=${slug}`} target="_blank" rel="noopener noreferrer" className="border border-or text-or px-6 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or hover:text-noir transition no-underline">
+                  <a href={`../presentation-systeme/?session=${slug}`} target="_blank" rel="noopener noreferrer" className="border border-or text-or px-6 py-3 rounded font-bold uppercase text-sm tracking-wider hover:bg-or hover:text-noir transition no-underline">
                     → Lancer le pitch
                   </a>
                 </div>

@@ -7,6 +7,10 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>SCALIA BTP — Système ROI PILOT</title>
+  <link rel="preload" as="image" href="hero-roipilot.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="mine-dor.jpg">
+  <link rel="preload" as="image" href="fear.jpg">
+  <link rel="preload" as="image" href="roipilot.jpg">
 
   <!-- Version publique (sans mot de passe) — duplicata exact du pitch -->
   <style id="public-view">
@@ -23,7 +27,7 @@
        >>> CA MENSUEL A MODIFIER (grand chiffre dore de la slide 1)
        Change le nombre ci-dessous  OU  ajoute ?ca=52000 a l'URL.
        =========================================================== */
-    window.ROI_CA = 38400;   /* ex : 30000, 52000, 75000 ... */
+    window.ROI_CA = 98700;   /* version publique : chiffre fixe, non modifiable */
   </script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
@@ -627,7 +631,7 @@
           <div class="hero-benefits">
             <div class="bcard fragment" data-fragment-index="1">
               <div class="bcard-label">CA récupéré chaque mois</div>
-              <div class="bcard-value gold">Jusqu’à <span id="roi-ca" contenteditable="true" spellcheck="false" title="Cliquez pour modifier le chiffre"></span> €<span class="bcard-per"> / mois</span></div>
+              <div class="bcard-value gold">Jusqu’à <span id="roi-ca"></span> €<span class="bcard-per"> / mois</span></div>
             </div>
             <div class="bcard fragment" data-fragment-index="2">
               <div class="bcard-label">Votre liberté</div>
@@ -649,7 +653,7 @@
                    onerror="this.remove();">
               <source src="hero-roipilot.mp4" type="video/mp4">
             </video>
-            <img class="hero-photo" src="ChatGPT%20Image%209%20juin%202026,%2020_18_32.png" alt="" onerror="this.style.opacity=0;">
+            <img class="hero-photo" loading="eager" decoding="async" src="hero-roipilot.jpg" alt="" onerror="this.style.opacity=0;">
             <div class="hero-stage-scrim"></div>
           </div>
         </div>
@@ -780,7 +784,7 @@
             <p class="pillar-line fragment" data-fragment-index="0">Récupérer le cash qui <strong>dort dans votre entreprise</strong> depuis 10 ans — <strong>sans lever le petit doigt</strong>, sans recruter, sans acheter un lead.</p>
           </div>
           <div class="hero-stage fragment" data-fragment-index="0">
-            <img class="hero-photo" src="mine-dor.png" alt="" onerror="this.style.opacity=0;">
+            <img class="hero-photo" loading="eager" decoding="async" src="mine-dor.jpg" alt="" onerror="this.style.opacity=0;">
             <div class="hero-stage-scrim"></div>
           </div>
         </div>
@@ -790,7 +794,7 @@
       <section class="da-slide" data-transition="fade">
         <div class="da-hero">
           <div class="hero-stage danger fragment" data-fragment-index="0">
-            <img class="hero-photo" src="fear.png" alt="" onerror="this.style.opacity=0;">
+            <img class="hero-photo" loading="eager" decoding="async" src="fear.jpg" alt="" onerror="this.style.opacity=0;">
             <div class="hero-stage-scrim"></div>
           </div>
           <div class="da-hero-txt">
@@ -1109,7 +1113,7 @@
             <div class="da-chip fragment" data-fragment-index="1">Vos dimanches récupérés</div>
           </div>
           <div class="hero-stage fragment" data-fragment-index="0">
-            <img class="hero-photo" src="roipilot.png.png" alt="" onerror="this.style.opacity=0;">
+            <img class="hero-photo" loading="eager" decoding="async" src="roipilot.jpg" alt="" onerror="this.style.opacity=0;">
             <div class="hero-stage-scrim"></div>
           </div>
         </div>
@@ -1797,22 +1801,9 @@
       var el = document.getElementById('roi-ca'); if (!el) return;
       var nf = new Intl.NumberFormat('fr-FR');
       function parse(t){ var n = parseInt(String(t).replace(/[^0-9]/g,''),10); return isNaN(n)?0:n; }
-      var val;
-      try { var q=new URLSearchParams(location.search).get('ca'); if(q!=null && q!=='') val=parse(q); } catch(e){}
-      if (val==null) { try { var ls=localStorage.getItem('scalia-roi-ca'); if(ls) val=parse(ls); } catch(e){} }
-      if (val==null) val = (window.ROI_CA!=null ? window.ROI_CA : 38400);
+      // Version publique : chiffre TOUJOURS fixe à 98 700 € — non modifiable, ignore URL/localStorage.
+      var val = 98700;
       el.textContent = nf.format(val);
-
-      el.addEventListener('focus', function(){ el.textContent = String(parse(el.textContent) || ''); });
-      el.addEventListener('keydown', function(ev){ ev.stopPropagation(); if(ev.key==='Enter'){ ev.preventDefault(); el.blur(); } });
-      el.addEventListener('blur', function(){ val = parse(el.textContent); el.textContent = nf.format(val); try{ localStorage.setItem('scalia-roi-ca', String(val)); }catch(e){} });
-
-      function countUp(){
-        if (document.activeElement===el) return;
-        if(!window.gsap){ el.textContent=nf.format(val); return; }
-        var o={v:0};
-        try{ gsap.fromTo(o,{v:0},{v:val,duration:1.6,ease:'power2.out',onUpdate:function(){ if(document.activeElement!==el) el.textContent=nf.format(Math.round(o.v)); }}); }catch(e){ el.textContent=nf.format(val);} }
-      if (window.Reveal && Reveal.on) Reveal.on('fragmentshown', function(ev){ if(ev.fragment && ev.fragment.querySelector && ev.fragment.querySelector('#roi-ca')) countUp(); });
     })();
   </script>
 </body>

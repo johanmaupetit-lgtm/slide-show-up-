@@ -619,7 +619,7 @@
       <!-- 1 — CONTEXTE : ROI PILOT (HERO v9) -->
       <section class="hero-roi" data-transition="fade">
         <div class="hero-top">
-          <p class="hero-kicker hero-anim">Le système que je vais vous présenter</p>
+          <p class="hero-kicker hero-anim">Présentation du système</p>
           <h1 class="hero-title fragment" data-fragment-index="0">ROI PILOT</h1>
           <div class="hero-tl fragment" data-fragment-index="0"></div>
         </div>
@@ -627,7 +627,7 @@
           <div class="hero-benefits">
             <div class="bcard fragment" data-fragment-index="1">
               <div class="bcard-label">CA récupéré chaque mois</div>
-              <div class="bcard-value gold"><span id="roi-ca" contenteditable="true" spellcheck="false" title="Cliquez pour modifier le chiffre"></span> €<span class="bcard-per"> / mois</span></div>
+              <div class="bcard-value gold">Jusqu’à <span id="roi-ca" contenteditable="true" spellcheck="false" title="Cliquez pour modifier le chiffre"></span> €<span class="bcard-per"> / mois</span></div>
             </div>
             <div class="bcard fragment" data-fragment-index="2">
               <div class="bcard-label">Votre liberté</div>
@@ -1666,19 +1666,19 @@
     // 2) REVEAL INIT
     // ============================================================
     Reveal.initialize({
-      view: 'scroll',
-      scrollProgress: true,
       hash: true,
       slideNumber: 'c/t',
       transition: 'fade',
-      controls: false,
+      controls: true,
       progress: true,
       center: true,
+      fragments: false,
       width: 1920,
       height: 1080,
       margin: 0.04
     });
-    // Vue publique : on démarre directement (pas d'écran "Démarrer", pas de plein écran auto)
+    // Vue publique : on démarre directement (pas d'écran "Démarrer", pas de plein écran auto).
+    // fragments:false → une flèche = slide suivante entière, tous les blocs déjà visibles.
     document.body.classList.add('da-started');
 
     // ============================================================

@@ -3,134 +3,1808 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SCALIA BTP — Slides</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>SCALIA BTP — Système ROI PILOT</title>
+  <link rel="preload" as="image" href="hero-roipilot.jpg" fetchpriority="high">
+  <link rel="preload" as="image" href="mine-dor.jpg">
+  <link rel="preload" as="image" href="fear.jpg">
+  <link rel="preload" as="image" href="roipilot.jpg">
+
+  <!-- Version publique (sans mot de passe) — duplicata exact du pitch -->
+  <style id="public-view">
+    /* Vue publique : on saute l'écran de démarrage, et TOUS les blocs/fragments
+       sont déjà visibles (pas de reveal progressif) — on voit tout le pitch en scrollant. */
+    #da-intro { display: none !important; }
+    .reveal .fragment { opacity: 1 !important; transform: none !important; filter: none !important; visibility: visible !important; }
+    .hero-anim, .chart-area, .node-pop, .hud, .media-overlays, #ambient-canvas { opacity: 1 !important; }
+    .reveal .hero-roi .hero-title.fragment { filter: none !important; transform: none !important; }
+  </style>
+
+  <script>
+    /* ===========================================================
+       >>> CA MENSUEL A MODIFIER (grand chiffre dore de la slide 1)
+       Change le nombre ci-dessous  OU  ajoute ?ca=52000 a l'URL.
+       =========================================================== */
+    window.ROI_CA = 98700;   /* version publique : chiffre fixe, non modifiable */
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
   <link rel="stylesheet" href="theme.css">
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: var(--noir);
-      color: var(--blanc);
-      font-family: var(--font-sans);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 24px;
-      box-sizing: border-box;
+
+  <!-- ============================================================ -->
+  <!-- DA PITCH — direction artistique "waouh" (prototype slide 1)  -->
+  <!-- ============================================================ -->
+  <style id="da-pitch">
+    :root {
+      --vert: #34D399;          /* accent gains / résultats */
+      --vert-fonce: #0F5132;
+      --or-glow: rgba(201,168,76,0.55);
     }
-    .logo-scalia { font-size: 72px; margin-bottom: 52px; }
-    .page-title {
-      font-family: var(--font-serif);
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--or);
-      font-size: 13px;
-      margin: 0 0 6px 0;
+
+    /* ===================== ÉCRAN DE DÉMARRAGE ===================== */
+    .da-intro {
+      position: fixed; inset: 0; z-index: 100000;
+      background:
+        radial-gradient(circle at 50% 38%, rgba(201,168,76,0.10) 0%, rgba(13,13,13,0) 45%),
+        radial-gradient(circle at 50% 40%, #1a1a1a 0%, #0D0D0D 55%, #000 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+      overflow: hidden;
     }
-    .page-rule {
-      width: 100%;
-      max-width: 720px;
-      height: 1px;
-      background: var(--or);
-      opacity: 0.3;
-      margin-bottom: 40px;
+    .da-intro::before {
+      /* grille futuriste discrète */
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%);
     }
-    .section-label {
-      font-family: var(--font-serif);
-      font-weight: 400;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      color: var(--or);
-      font-size: 10px;
-      margin: 32px 0 12px 0;
-      width: 100%;
-      max-width: 720px;
+    .da-intro.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .da-intro .da-mark {
+      font-family:'Cinzel',serif; color: var(--or); letter-spacing:0.55em;
+      font-size: 13px; text-transform:uppercase; margin-bottom: 14px; opacity:0.85;
+      position: relative;
     }
-    .list {
-      width: 100%;
-      max-width: 720px;
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .da-intro .da-sys {
+      font-family:'Cinzel',serif; color:#fff; letter-spacing:0.32em;
+      font-size: 26px; text-transform:uppercase; margin-bottom: 64px; position:relative;
     }
-    .list a {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 24px;
-      background: var(--noir-card);
-      border: 0.5px solid var(--anthracite);
-      border-radius: 4px;
-      color: var(--blanc);
-      text-decoration: none;
-      margin-bottom: 10px;
-      transition: border-color 0.2s;
+    .da-start-btn {
+      position: relative;
+      font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.26em;
+      font-size: 17px; font-weight:600;
+      color:#0D0D0D; background: linear-gradient(135deg,#F4E3A8 0%,#C9A84C 55%,#A88736 100%);
+      border:none; border-radius: 999px; padding: 24px 54px; cursor:pointer;
+      box-shadow: 0 0 40px rgba(201,168,76,0.35);
+      animation: pulseBtn 2.4s infinite ease-out;
+      transition: transform 0.2s;
     }
-    .list a:hover { border-color: var(--or); }
-    .list .title { font-weight: 600; font-size: 15px; }
-    .list .arrow { color: var(--or); font-family: var(--font-serif); font-size: 16px; }
-    .footer {
-      margin-top: 52px;
-      font-size: 10px;
-      color: var(--gris-leg);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-family: var(--font-serif);
+    .da-start-btn:hover { transform: scale(1.05); }
+    @keyframes pulseBtn {
+      0%   { box-shadow: 0 0 30px rgba(201,168,76,0.35), 0 0 0 0 rgba(201,168,76,0.45); }
+      70%  { box-shadow: 0 0 30px rgba(201,168,76,0.35), 0 0 0 30px rgba(201,168,76,0); }
+      100% { box-shadow: 0 0 30px rgba(201,168,76,0.35), 0 0 0 0 rgba(201,168,76,0); }
+    }
+    .da-intro .da-hint { margin-top: 30px; color:#555; font-size:12px; letter-spacing:0.12em; position:relative; }
+
+    /* ===================== SLIDE 1 — HERO ===================== */
+    .reveal section.hero-roi {
+      text-align:left; padding:0 84px;
+      background:
+        radial-gradient(44% 54% at 80% 32%, rgba(201,168,76,0.18), transparent 70%),
+        radial-gradient(80% 90% at 50% 50%, rgba(20,17,11,0.85), transparent 82%);
+    }
+    .hero-wrap { display:flex; align-items:center; gap:72px; width:100%; }
+    .hero-left  { flex: 1 1 55%; min-width:0; }
+    .hero-right { flex: 1 1 45%; display:flex; align-items:center; justify-content:center; position:relative; }
+
+    .hero-kicker {
+      font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.3em;
+      color: #B89B57; font-size: 20px; margin: 0 0 30px 0;
+    }
+    .hero-title {
+      font-family:'Cinzel',serif; font-weight:600; text-transform:uppercase;
+      letter-spacing: 0.04em; line-height: 0.92; white-space: nowrap;
+      font-size: 132px; margin: 0 0 34px 0;
+      background: linear-gradient(135deg, #F8EFC8 0%, #E9CE7A 30%, #C9A84C 60%, #A88736 100%);
+      background-size: 220% auto;
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 8px 46px rgba(201,168,76,0.7));
+    }
+    .hero-rule { height:4px; width:0; background: linear-gradient(90deg, var(--or), rgba(201,168,76,0)); margin-bottom: 40px; border-radius:2px; }
+    .hero-obj {
+      font-family:'Inter',sans-serif; color:#C4C4C4; font-size: 35px; line-height:1.58;
+      max-width: 900px; font-weight: 300; margin: 0;
+    }
+    .hero-obj .euro {
+      color: var(--or); font-weight: 800; font-size: 1.32em; white-space: nowrap;
+      text-shadow: 0 0 26px var(--or-glow);
+    }
+    .hero-obj .obj-strong { color:#FFFFFF; font-weight:700; }
+    .hero-obj .obj-gold { color: var(--or); font-weight:600; }
+    .hero-chips { display:flex; gap:16px; margin-top:46px; flex-wrap:wrap; }
+    .hero-chip {
+      font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.14em;
+      font-size:14px; color:var(--or); border:1px solid rgba(201,168,76,0.45);
+      border-radius:999px; padding:9px 18px; background: rgba(201,168,76,0.05);
+    }
+    body.da-started .reveal section.hero-roi.present .hero-chips { animation: daUp .7s ease forwards 1.7s; }
+    .hero-visual { width:100%; max-width:540px; position:relative; }
+    .hero-photo { width:100%; border-radius:18px; display:block; box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+
+    /* ===================== ANIMATIONS D'ENTRÉE ===================== */
+    .hero-anim { opacity: 0; }
+    body.da-started .reveal section.hero-roi.present .hero-kicker { animation: daUp .7s ease forwards .15s; }
+    body.da-started .reveal section.hero-roi.present .hero-title  { animation: daPop 1.0s cubic-bezier(.2,.85,.2,1) forwards .45s, shimmer 7s ease-in-out 1.7s infinite; }
+    @keyframes shimmer { 0%,100% { background-position: 0% center; } 50% { background-position: 220% center; } }
+    body.da-started .reveal section.hero-roi.present .hero-rule   { animation: daRule .85s ease forwards 1.15s; }
+    body.da-started .reveal section.hero-roi.present .hero-obj    { animation: daUp .7s ease forwards 1.3s; }
+    body.da-started .reveal section.hero-roi.present .hero-sans   { animation: daUp .7s ease forwards 1.65s; }
+    body.da-started .reveal section.hero-roi.present .hero-right  { animation: daFloat 1.0s ease forwards .7s; }
+
+    @keyframes daUp   { from {opacity:0; transform: translateY(26px);} to {opacity:1; transform:translateY(0);} }
+    @keyframes daFloat{ from {opacity:0; transform: translateY(40px) scale(.96);} to {opacity:1; transform:translateY(0) scale(1);} }
+    @keyframes daPop  {
+      0%   { opacity:0; transform: scale(.72); filter: blur(10px) drop-shadow(0 6px 34px var(--or-glow)); }
+      60%  { opacity:1; filter: blur(0) drop-shadow(0 6px 44px var(--or-glow)); }
+      100% { opacity:1; transform: scale(1); }
+    }
+    @keyframes daRule { to { width: 240px; } }
+
+    /* SVG dashboard animé */
+    .chart-line { stroke-dasharray: 620; stroke-dashoffset: 620; }
+    body.da-started .reveal section.hero-roi.present .chart-line { animation: drawLine 1.7s ease forwards 1.2s; }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+    .chart-area { opacity: 0; }
+    body.da-started .reveal section.hero-roi.present .chart-area { animation: fadeArea 1.2s ease forwards 1.9s; }
+    @keyframes fadeArea { to { opacity: 1; } }
+    .orbit { transform-origin: 260px 300px; animation: spin 26s linear infinite; }
+    #mf-bar1, #mf-bar2, #mf-bar3 { transform-box: fill-box; }
+    .orbit.rev { animation: spin 34s linear infinite reverse; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .glow-pulse { animation: glowPulse 3.2s ease-in-out infinite; transform-origin:center; }
+    @keyframes glowPulse { 0%,100%{opacity:.35;} 50%{opacity:.9;} }
+    .node-pop { opacity:0; }
+    body.da-started .reveal section.hero-roi.present .node-pop { animation: nodePop .5s ease forwards; }
+    body.da-started .reveal section.hero-roi.present .node-pop.n1 { animation-delay: 2.0s; }
+    body.da-started .reveal section.hero-roi.present .node-pop.n2 { animation-delay: 2.2s; }
+    body.da-started .reveal section.hero-roi.present .node-pop.n3 { animation-delay: 2.4s; }
+    @keyframes nodePop { from{opacity:0; transform:scale(.4);} to{opacity:1; transform:scale(1);} }
+
+    /* plein écran dramatique : header/footer masqués sur le hero */
+    body:has(.reveal section.present.hero-roi) .persistent-header,
+    body:has(.reveal section.present.hero-roi) .persistent-footer,
+    body:has(.reveal section.present.hero-roi) .reveal .slide-number { opacity: 0; }
+
+    /* ===================== CADRE MÉDIA CINÉMATIQUE ===================== */
+    /* Accueille un mini-film (video) > image IA > illustration SVG       */
+    .media-frame {
+      position: relative; width: 100%; max-width: 560px; margin: 0 auto;
+      border-radius: 20px; padding: 14px;
+      background: linear-gradient(160deg, rgba(201,168,76,0.12), rgba(201,168,76,0.02));
+      box-shadow: 0 0 0 1px rgba(201,168,76,0.35), 0 30px 90px rgba(0,0,0,0.65), inset 0 0 70px rgba(201,168,76,0.05);
+    }
+    .media-inner { position: relative; border-radius: 13px; overflow: hidden; background: radial-gradient(72% 60% at 50% 28%, #181410 0%, #090909 72%); }
+    .media-inner .reveal-clip { display:block; }
+    .media-inner .hero-media,
+    .media-inner .hero-photo,
+    .media-inner .hero-illu { display:block; width:100%; }
+    /* Mouvement cinématique (Ken Burns) sur image/vidéo IA */
+    .media-inner.has-media .hero-media,
+    .media-inner.has-media .hero-photo { animation: kenburns 22s ease-in-out infinite alternate; }
+    @keyframes kenburns { from { transform: scale(1.05); } to { transform: scale(1.16) translate(-2%, -2%); } }
+    .media-inner.has-media::after {
+      content:''; position:absolute; inset:0; pointer-events:none; z-index:2;
+      background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0) 42%, rgba(13,11,8,0.55) 100%);
+    }
+    /* Overlays dorés de données (superposés sur la scène) */
+    .media-overlays { position:absolute; inset:0; z-index:4; pointer-events:none; opacity:0; transition:opacity .6s ease; }
+    .media-inner.has-media .media-overlays { opacity:1; }
+    .ov-ca {
+      position:absolute; top:18px; left:18px; display:flex; flex-direction:column; gap:3px;
+      background: rgba(13,12,9,0.62); backdrop-filter: blur(8px);
+      border:1px solid rgba(201,168,76,0.5); border-radius:14px; padding:12px 16px;
+      box-shadow:0 10px 32px rgba(0,0,0,0.45);
+    }
+    .ov-ca-label { font-family:'Inter',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:#bcbcbc; }
+    .ov-ca-num { font-family:'Inter',sans-serif; font-size:30px; font-weight:800; color:#F4D67A; text-shadow:0 0 22px rgba(201,168,76,0.7); line-height:1; }
+    .ov-ca-delta { font-family:'Inter',sans-serif; font-size:12px; font-weight:700; color:#4BE6A0; }
+    .ov-toast {
+      position:absolute; right:18px; bottom:58px; display:flex; align-items:center; gap:8px;
+      background: rgba(15,42,29,0.80); backdrop-filter: blur(8px);
+      border:1px solid #4BE6A0; border-radius:999px; padding:9px 16px;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:700; color:#CFF6E6;
+      box-shadow:0 8px 26px rgba(0,0,0,0.45);
+    }
+    .ov-pill {
+      position:absolute; left:18px; bottom:18px; display:flex; align-items:center; gap:8px;
+      background: rgba(13,12,9,0.62); backdrop-filter: blur(8px);
+      border:1px solid rgba(201,168,76,0.45); border-radius:999px; padding:8px 14px;
+      font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:#E9C75A;
+    }
+    .ov-dot { width:8px; height:8px; border-radius:50%; background:#4BE6A0; box-shadow:0 0 10px #4BE6A0; }
+    .ov-dot.gold { background:#E9C75A; box-shadow:0 0 10px #E9C75A; }
+    .hud { position:absolute; width:28px; height:28px; border:2px solid var(--or); opacity:0; z-index:3; }
+    .hud.tl { top:6px; left:6px; border-right:none; border-bottom:none; border-radius:8px 0 0 0; }
+    .hud.tr { top:6px; right:6px; border-left:none; border-bottom:none; border-radius:0 8px 0 0; }
+    .hud.bl { bottom:6px; left:6px; border-right:none; border-top:none; border-radius:0 0 0 8px; }
+    .hud.br { bottom:6px; right:6px; border-left:none; border-top:none; border-radius:0 0 8px 0; }
+    body.da-started .reveal section.hero-roi.present .hud { animation: hudIn .6s ease forwards; }
+    body.da-started .reveal section.hero-roi.present .hud.tl { animation-delay:.9s; }
+    body.da-started .reveal section.hero-roi.present .hud.tr { animation-delay:1.0s; }
+    body.da-started .reveal section.hero-roi.present .hud.bl { animation-delay:1.1s; }
+    body.da-started .reveal section.hero-roi.present .hud.br { animation-delay:1.2s; }
+    @keyframes hudIn { from{opacity:0; transform:scale(.6);} to{opacity:.85; transform:scale(1);} }
+    .scanline {
+      position:absolute; left:0; right:0; top:0; height:40%;
+      background: linear-gradient(180deg, rgba(201,168,76,0.18), rgba(201,168,76,0));
+      mix-blend-mode: screen; pointer-events:none; z-index:2;
+      animation: scan 4.8s linear infinite;
+    }
+    @keyframes scan { 0%{transform:translateY(-45%);} 100%{transform:translateY(260%);} }
+    .reveal-clip { clip-path: inset(0 100% 0 0); }
+    body.da-started .reveal section.hero-roi.present .reveal-clip { animation: clipIn 1.15s cubic-bezier(.6,0,.2,1) forwards .7s; }
+    @keyframes clipIn { to { clip-path: inset(0 0% 0 0); } }
+
+    /* ===================== POUSSIÈRE D'OR AMBIANTE ===================== */
+    #ambient-canvas { position: fixed; inset:0; z-index:0; pointer-events:none; opacity:0; transition:opacity 1.4s ease; }
+    body.da-started #ambient-canvas { opacity:1; }
+    .reveal { position: relative; z-index: 1; }
+    .persistent-header, .persistent-footer { z-index: 2; }
+
+    /* ===================== HERO v9 — cartes encadrées (charte) + clack ===================== */
+    .media-overlays { display:none !important; }
+    .reveal { background: radial-gradient(115% 80% at 50% 36%, #120d07 0%, #070504 70%) !important; }
+    .reveal section.hero-roi {
+      background: transparent !important; text-align:center;
+      padding: 20px 80px; min-height: 1010px;
+      display:flex; flex-direction:column; justify-content:center; gap: 36px;
+    }
+    .hero-top { width:100%; }
+    .hero-kicker { font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.34em; color:#C9A84C; font-size:19px; margin:0 0 14px 0; }
+    .hero-title {
+      font-family:'Cinzel',serif; font-weight:600; text-transform:uppercase; white-space:nowrap;
+      font-size:200px; line-height:0.90; letter-spacing:0.09em; margin:0;
+      background: linear-gradient(135deg,#F8EFC8 0%,#E9CE7A 30%,#C9A84C 60%,#A88736 100%);
+      background-size:220% auto; -webkit-background-clip:text; background-clip:text;
+      color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 8px 56px rgba(201,168,76,0.85));
+      animation: shimmer 7s ease-in-out infinite;
+    }
+    .hero-tl { height:3px; width:0; margin:20px auto 0; background:linear-gradient(90deg,transparent,#C9A84C,transparent); border-radius:2px; }
+    body.da-started .reveal section.hero-roi.present .hero-kicker { animation: daUp .7s ease forwards .15s; }
+    body.da-started .reveal section.hero-roi.present .hero-tl     { animation: heroTl 1s ease forwards 1.0s; }
+    @keyframes heroTl { to { width: 340px; } }
+
+    .hero-body { display:flex; align-items:center; gap:72px; width:100%; }
+    .hero-benefits { flex:1 1 49%; display:flex; flex-direction:column; gap:24px; text-align:left; }
+    .bcard {
+      background: linear-gradient(90deg, rgba(26,24,18,0.92), rgba(26,24,18,0.42));
+      border:0.5px solid rgba(201,168,76,0.4); border-left:4px solid #C9A84C;
+      border-radius:8px; padding:28px 38px; box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    }
+    .bcard-label { font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.2em; text-transform:uppercase; font-size:16px; margin-bottom:12px; }
+    .bcard-value { font-family:'Cinzel',serif; color:#FFFFFF; font-size:46px; line-height:1.06; }
+    .bcard-value .g { color:#E9C75A; }
+    .bcard-value.gold { color:#F4D67A; font-size:84px; text-shadow:0 0 36px rgba(201,168,76,0.65); letter-spacing:0.02em; }
+    .bcard-value .bcard-per { font-size:30px; color:#E9C75A; }
+    .hero-chips { display:flex; gap:12px; margin-top:4px; flex-wrap:wrap; }
+    .hero-chip { font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.14em; font-size:14px; color:var(--or); border:1px solid rgba(201,168,76,0.5); border-radius:999px; padding:11px 22px; background:rgba(201,168,76,0.06); }
+    .hero-stage { flex:1 1 52%; position:relative; aspect-ratio:16/9; border-radius:16px; overflow:hidden; box-shadow:0 34px 100px rgba(0,0,0,0.72),0 0 0 1px rgba(201,168,76,0.3),0 0 80px rgba(201,168,76,0.12); }
+    .hero-stage .hero-media, .hero-stage .hero-photo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; animation: kenburns 18s ease-in-out infinite alternate; }
+    .hero-stage-scrim { position:absolute; inset:0; pointer-events:none; background: radial-gradient(120% 120% at 50% 45%, transparent 58%, rgba(6,5,4,0.5) 100%); }
+    .hero-stage::before { content:''; position:absolute; inset:0; z-index:2; pointer-events:none; background: linear-gradient(115deg, transparent 34%, rgba(255,228,150,0.13) 50%, transparent 64%); transform: translateX(-45%); animation: sheen 7.5s ease-in-out infinite; }
+    @keyframes sheen { 0%{transform:translateX(-45%);} 50%{transform:translateX(45%);} 100%{transform:translateX(-45%);} }
+    @keyframes kenburns { 0%{transform: scale(1.05) translate(2%, 1%);} 100%{transform: scale(1.20) translate(-3%, -2%);} }
+
+    /* CLACK : fragments (cartes, chips, image) surgissent */
+    .reveal .hero-roi .fragment { opacity:0; transform: translateX(-72px); transition: opacity .7s ease, transform .9s cubic-bezier(.22,.68,.24,1); }
+    .reveal .hero-roi .fragment.visible { opacity:1 !important; transform: none !important; }
+    .reveal .hero-roi .hero-stage.fragment { transform: translateX(60px) scale(0.97); }
+    .reveal .hero-roi .hero-title.fragment { opacity:0; transform: scale(1.55); filter: blur(22px) brightness(2); transition: opacity .45s ease, transform .9s cubic-bezier(.2,.95,.25,1), filter .6s ease; }
+    .reveal .hero-roi .hero-title.fragment.visible { transform: none !important; filter: blur(0) brightness(1) !important; }
+
+        #roi-ca { outline:none; cursor:text; border-bottom:2px dashed transparent; transition:border-color .2s; padding-bottom:2px; }
+    #roi-ca:hover, #roi-ca:focus { border-bottom-color: rgba(201,168,76,0.55); }
+
+    /* ===================== LANGAGE DA — slides de contenu ===================== */
+    .reveal section.da-slide { text-align:left; padding: 40px 84px; }
+    .da-kicker { font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.3em; color:#C9A84C; font-size:17px; margin:0 0 14px 0; }
+    .da-h2 {
+      font-family:'Cinzel',serif; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; line-height:1.04;
+      font-size:62px; margin:0;
+      background: linear-gradient(135deg,#F8EFC8 0%,#E9CE7A 35%,#C9A84C 70%,#A88736 100%);
+      background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 6px 36px rgba(201,168,76,0.55));
+    }
+    .da-sub { font-family:'Inter',sans-serif; font-weight:300; color:#B9B9B9; font-size:24px; line-height:1.5; margin:22px 0 0; max-width:1200px; }
+    .da-cards { display:flex; gap:26px; margin-top:50px; }
+    .da-card {
+      flex:1; min-width:0; background: linear-gradient(180deg, rgba(26,24,18,0.92), rgba(26,24,18,0.40));
+      border-top:3px solid #C9A84C; border-radius:12px; padding:34px 28px;
+      box-shadow:0 14px 40px rgba(0,0,0,0.45);
+    }
+    .da-card .ico { width:60px; height:60px; margin-bottom:20px; display:block; }
+    .da-lab { font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.18em; text-transform:uppercase; font-size:13px; margin-bottom:8px; }
+    .da-val { font-family:'Cinzel',serif; color:#FFFFFF; font-size:27px; line-height:1.1; margin-bottom:14px; }
+    .da-txt { font-family:'Inter',sans-serif; color:#9a9a9a; font-size:16px; line-height:1.55; }
+    .ico-pulse { animation: icoPulse 2.4s ease-in-out infinite; transform-origin:center; }
+    @keyframes icoPulse { 0%,100%{opacity:.55; transform:scale(.95);} 50%{opacity:1; transform:scale(1.05);} }
+    .ico-spin { animation: icoSpin 9s linear infinite; transform-origin:center; }
+    @keyframes icoSpin { to { transform: rotate(360deg); } }
+    /* fragments des slides de contenu : glissement qui claque */
+    .reveal .da-slide .fragment { opacity:0; transform: translateY(46px) scale(0.92); filter: blur(8px); transition: opacity .55s ease, transform .7s cubic-bezier(.16,1.5,.3,1), filter .55s ease; }
+    .reveal .da-slide .fragment.visible { opacity:1 !important; transform: translateY(0) scale(1) !important; filter: blur(0) !important; }
+
+    /* --- composants DA additionnels --- */
+    .reveal section.da-slide.da-center { display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height:900px; }
+    .da-center .da-h2, .da-center .da-kicker { text-align:center; }
+    .da-big { font-size:120px !important; }
+    .da-cols { display:flex; gap:28px; width:100%; margin-top:54px; }
+    .da-col { flex:1; text-align:center; padding:44px 26px; border-top:3px solid #C9A84C; background:linear-gradient(180deg,rgba(26,24,18,0.92),rgba(26,24,18,0.4)); border-radius:14px; box-shadow:0 14px 40px rgba(0,0,0,0.45); }
+    .da-col-num { font-family:'Cinzel',serif; color:#F4D67A; font-size:58px; line-height:1; text-shadow:0 0 28px rgba(201,168,76,0.5); }
+    .da-col-name { font-family:'Cinzel',serif; color:#fff; font-size:30px; margin:16px 0 10px; }
+    .da-col-tag { font-family:'Inter',sans-serif; color:#9a9a9a; font-size:17px; }
+    .da-hero { display:flex; align-items:center; gap:64px; min-height:740px; }
+    .da-hero-txt { flex:1 1 50%; min-width:0; }
+    .da-hero .hero-stage { flex:1 1 50%; }
+    .da-hero .da-h2 { font-size:90px; }
+    .da-chip { display:inline-block; font-family:'Cinzel',serif; text-transform:uppercase; letter-spacing:0.16em; font-size:14px; color:var(--or); border:1px solid rgba(201,168,76,0.5); border-radius:999px; padding:11px 22px; margin-top:26px; background:rgba(201,168,76,0.06); }
+    .da-list { margin-top:32px; display:flex; flex-direction:column; gap:16px; }
+    .da-li { font-family:'Inter',sans-serif; font-size:25px; color:#dcdcdc; padding:18px 24px; border-left:3px solid #C9A84C; background:rgba(255,255,255,0.025); border-radius:0 8px 8px 0; }
+    .da-li strong { color:#F4D67A; }
+    .da-li.neg { border-left-color:#D9685E; }
+    .da-li.neg strong { color:#E8857B; }
+    .da-step { font-family:'Cinzel',serif; color:#F4D67A; font-size:42px; line-height:1; margin-bottom:14px; text-shadow:0 0 24px rgba(201,168,76,0.45); }
+    .da-flow .da-card { border-top:none; border-left:4px solid #C9A84C; }
+    .da-card.res .da-ico { width:46px; height:46px; margin-bottom:16px; display:block; }
+    .da-mini { display:inline-block; margin-top:8px; color:#C9A84C; font-size:14px; font-style:italic; }
+    .da-gold { margin-top:14px; font-family:'Cinzel',serif; color:#F4D67A; letter-spacing:0.06em; font-size:18px; }
+    .da-val.gold-xl { color:#F4D67A; font-size:74px; text-shadow:0 0 34px rgba(201,168,76,0.6); }
+    .da-foot { margin-top:34px; font-family:'Inter',sans-serif; color:#C9A84C; font-size:21px; }
+
+    /* teaser curiosité (slide 3) */
+    .da-teaser { margin:20px auto 16px; width:100%; height:96px; border-radius:12px; background:linear-gradient(135deg, rgba(201,168,76,0.14), rgba(201,168,76,0.02)); border:1px solid rgba(201,168,76,0.22); display:flex; align-items:center; justify-content:center; font-family:'Cinzel',serif; font-size:52px; color:#C9A84C; filter: blur(2px); opacity:0.75; animation: teaserPulse 2.8s ease-in-out infinite; }
+    @keyframes teaserPulse { 0%,100%{opacity:.55; filter:blur(2.5px);} 50%{opacity:.9; filter:blur(1.5px);} }
+    /* flèche de flux entre les étapes */
+    .da-flow { position:relative; }
+    .da-flow .da-card { position:relative; }
+    .da-flow .da-card:not(:last-child)::after { content:'→'; position:absolute; right:-30px; top:50%; transform:translateY(-50%); color:#C9A84C; font-size:30px; opacity:0.7; }
+    /* coche des résultats : halo qui respire */
+    .da-card.res .da-ico { animation: icoGlow 2.6s ease-in-out infinite; transform-origin:center; }
+    @keyframes icoGlow { 0%,100%{filter:drop-shadow(0 0 4px rgba(201,168,76,0.3));} 50%{filter:drop-shadow(0 0 14px rgba(201,168,76,0.8));} }
+    .da-step { animation: icoGlow 3s ease-in-out infinite; }
+
+    /* ===== slide 2 — système IA : liste bénéfices + robot motion ===== */
+    .ia-hero { display:flex; align-items:center; gap:70px; min-height:720px; }
+    .ia-txt  { flex:1 1 46%; min-width:0; }
+    .ia-stage{ flex:1 1 54%; position:relative; aspect-ratio:4/3; border-radius:18px; overflow:hidden;
+               background:radial-gradient(120% 120% at 50% 42%, #1d1a12 0%, #100e0a 60%, #0b0a07 100%);
+               box-shadow:0 34px 100px rgba(0,0,0,0.7),0 0 0 1px rgba(201,168,76,0.28),0 0 90px rgba(201,168,76,0.12); }
+    .ia-stage svg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+    .ia-li{ font-family:'Inter',sans-serif; font-size:27px; line-height:1.25; color:#ececec; font-weight:300;
+            padding:20px 26px; margin-bottom:16px; border-left:3px solid #C9A84C;
+            background:linear-gradient(90deg, rgba(201,168,76,0.10), rgba(201,168,76,0.0));
+            border-radius:0 10px 10px 0; }
+    .ia-li strong{ color:#F4D67A; font-weight:600; }
+    .ia-li small{ display:block; font-size:18px; color:#9a9a9a; margin-top:6px; }
+    /* robot animations */
+    .ia-orbit{ transform-origin:320px 248px; animation:icoSpin 26s linear infinite; }
+    .ia-orbit-rev{ transform-origin:320px 248px; animation:icoSpin 34s linear infinite reverse; }
+    .ia-eye{ transform-origin:center; animation:iaBlink 4.2s ease-in-out infinite; }
+    @keyframes iaBlink{ 0%,92%,100%{transform:scaleY(1);} 96%{transform:scaleY(0.12);} }
+    .ia-antenna{ animation:glowPulse 1.8s ease-in-out infinite; transform-origin:center; }
+    .ia-bar{ transform-origin:center bottom; animation:iaBar 1.1s ease-in-out infinite; }
+    .ia-bar:nth-child(2){ animation-delay:.18s; } .ia-bar:nth-child(3){ animation-delay:.36s; } .ia-bar:nth-child(4){ animation-delay:.54s; }
+    @keyframes iaBar{ 0%,100%{transform:scaleY(.4);} 50%{transform:scaleY(1);} }
+    .ia-wire{ stroke-dasharray:7 9; animation:iaFlow 1.6s linear infinite; }
+    @keyframes iaFlow{ to{ stroke-dashoffset:-32; } }
+    .ia-badge{ animation:iaFloat 5s ease-in-out infinite; }
+    .ia-badge:nth-of-type(2){ animation-delay:.6s; } .ia-badge:nth-of-type(3){ animation-delay:1.2s; } .ia-badge:nth-of-type(4){ animation-delay:1.8s; }
+    @keyframes iaFloat{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-9px);} }
+    .ia-glow{ animation:glowPulse 3.4s ease-in-out infinite; transform-origin:center; }
+
+    /* ===== slide 8 — Machine à Chantiers : machine qui tourne pendant que vous vous reposez ===== */
+    .mc-cog{ transform-box:fill-box; transform-origin:center; animation:icoSpin 11s linear infinite; }
+    .mc-cog.rev{ animation:icoSpin 8s linear infinite reverse; }
+    .mc-core{ transform-box:fill-box; transform-origin:center; animation:glowPulse 2s ease-in-out infinite; }
+    .mc-lead{ transform-box:fill-box; animation:mcLead 2.6s ease-in infinite; }
+    @keyframes mcLead{ 0%{transform:translateX(0);opacity:0} 12%{opacity:1} 80%{opacity:1} 100%{transform:translateX(148px);opacity:0} }
+    .mc-coin{ transform-box:fill-box; animation:mcCoin 2.4s ease-out infinite; }
+    @keyframes mcCoin{ 0%{transform:translate(0,0) scale(.6);opacity:0} 18%{opacity:1} 100%{transform:translate(72px,-104px) scale(1);opacity:0} }
+    .mc-coin-l{ transform-box:fill-box; animation:mcCoinL 2.4s ease-out infinite; }
+    @keyframes mcCoinL{ 0%{transform:translate(0,0) scale(.6);opacity:0} 18%{opacity:1} 100%{transform:translate(-72px,-104px) scale(1);opacity:0} }
+    .mc-zzz{ transform-box:fill-box; animation:mcZzz 3s ease-in-out infinite; }
+    @keyframes mcZzz{ 0%{transform:translateY(0);opacity:0} 30%{opacity:1} 100%{transform:translateY(-24px);opacity:0} }
+    .mc-wire{ stroke-dasharray:6 9; animation:iaFlow 1.4s linear infinite; }
+    .mc-sun{ transform-box:fill-box; transform-origin:center; animation:icoSpin 30s linear infinite; }
+
+    /* ===== mini-animations sous les étapes "Concrètement" (piliers) ===== */
+    .da-flow .da-card{ display:flex; flex-direction:column; }
+    .flow-anim{ margin-top:22px; height:168px; }
+    .flow-anim svg{ width:100%; height:100%; display:block; overflow:visible; }
+    .fa-bell{ transform-box:fill-box; transform-origin:50% 18%; animation:faBell 1.5s ease-in-out infinite; }
+    @keyframes faBell{ 0%,100%{transform:rotate(-13deg)} 50%{transform:rotate(13deg)} }
+    .fa-dot{ transform-box:fill-box; animation:faDot 2.2s ease-in infinite; }
+    @keyframes faDot{ 0%{transform:translateX(0);opacity:0} 14%{opacity:1} 80%{opacity:1} 100%{transform:translateX(54px);opacity:0} }
+    .fa-wave{ transform-box:fill-box; transform-origin:center; animation:faWave 1.8s ease-out infinite; }
+    @keyframes faWave{ 0%{transform:scale(.3);opacity:.9} 100%{transform:scale(1.5);opacity:0} }
+    .fa-rise{ transform-box:fill-box; animation:faRise 2s ease-out infinite; }
+    @keyframes faRise{ 0%{transform:translateY(0);opacity:0} 18%{opacity:1} 100%{transform:translateY(-28px);opacity:0} }
+    .fa-radar{ transform-box:fill-box; transform-origin:center; animation:icoSpin 3.2s linear infinite; }
+    .fa-loop{ transform-box:fill-box; transform-origin:center; animation:icoSpin 4s linear infinite; }
+    .fa-bar{ transform-box:fill-box; transform-origin:center bottom; animation:iaBar 1.1s ease-in-out infinite; }
+    .fa-pulse{ transform-box:fill-box; transform-origin:center; animation:glowPulse 1.6s ease-in-out infinite; }
+    /* toolkit scènes complètes */
+    .fa-flow{ stroke-dasharray:6 8; animation:iaFlow 1.4s linear infinite; }
+    .fa-stream{ transform-box:fill-box; animation:faStream 1.9s linear infinite; }
+    @keyframes faStream{ 0%{transform:translateX(0);opacity:0} 14%{opacity:1} 78%{opacity:1} 100%{transform:translateX(48px);opacity:0} }
+    .fa-pop{ transform-box:fill-box; transform-origin:center; animation:faPop 2.8s ease-in-out infinite; }
+    @keyframes faPop{ 0%,12%{transform:scale(0);opacity:0} 26%{transform:scale(1.18);opacity:1} 36%,100%{transform:scale(1);opacity:1} }
+    .fa-draw{ stroke-dasharray:52; stroke-dashoffset:52; animation:faDraw 2.8s ease-in-out infinite; }
+    @keyframes faDraw{ 0%,12%{stroke-dashoffset:52} 50%,100%{stroke-dashoffset:0} }
+    .fa-grow{ transform-box:fill-box; transform-origin:left center; animation:faGrow 2.8s ease-in-out infinite; }
+    @keyframes faGrow{ 0%,12%{transform:scaleX(0)} 58%,100%{transform:scaleX(1)} }
+    .fa-fill{ transform-box:fill-box; transform-origin:center bottom; animation:faFill 2.8s ease-in-out infinite; }
+    @keyframes faFill{ 0%,12%{transform:scaleY(0)} 58%,100%{transform:scaleY(1)} }
+    .fa-bob{ transform-box:fill-box; animation:faBob 2.4s ease-in-out infinite; }
+    @keyframes faBob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+    .fa-tap{ transform-box:fill-box; animation:faTap 1.9s ease-in-out infinite; }
+    @keyframes faTap{ 0%,38%,100%{transform:translateY(0)} 50%,58%{transform:translateY(5px)} }
+    .fa-turn{ transform-box:fill-box; transform-origin:center; animation:faTurn 2.8s ease-in-out infinite; }
+    @keyframes faTurn{ 0%,100%{transform:rotate(-16deg)} 50%{transform:rotate(16deg)} }
+    .fa-toggle{ transform-box:fill-box; animation:faToggle 2.6s ease-in-out infinite; }
+    @keyframes faToggle{ 0%,42%{transform:translateX(0)} 56%,100%{transform:translateX(15px)} }
+
+    /* slide 2 — grille 4 animations (une par bénéfice) */
+    .ia2-grid{ display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:30px; }
+    .ia2-card{ position:relative; background:linear-gradient(180deg, rgba(26,24,18,0.92), rgba(26,24,18,0.40)); border-top:3px solid #C9A84C; border-radius:14px; padding:22px 30px 24px; box-shadow:0 14px 40px rgba(0,0,0,0.45); display:flex; flex-direction:column; }
+    .ia2-lab{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.18em; text-transform:uppercase; font-size:13px; margin-bottom:7px; }
+    .ia2-txt{ font-family:'Inter',sans-serif; color:#ececec; font-size:23px; line-height:1.3; font-weight:300; }
+    .ia2-txt strong{ color:#F4D67A; font-weight:600; }
+    .ia2-scene{ height:176px; margin-top:16px; }
+    .ia2-scene svg{ width:100%; height:100%; display:block; overflow:visible; }
+    .fa-draw-lg{ stroke-dasharray:240; stroke-dashoffset:240; animation:faDrawLg 2.8s ease-in-out infinite; }
+    @keyframes faDrawLg{ 0%,12%{stroke-dashoffset:240} 55%,100%{stroke-dashoffset:0} }
+    .flow-anim.xl{ height:228px; }
+
+    /* slide prix */
+    .prix-card{ max-width:780px; margin:30px auto 0; text-align:center; background:linear-gradient(180deg, rgba(26,24,18,0.92), rgba(26,24,18,0.40)); border-top:3px solid #C9A84C; border-radius:18px; padding:42px 50px; box-shadow:0 18px 54px rgba(0,0,0,0.5); }
+    .prix-lab{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:0.22em; text-transform:uppercase; font-size:15px; }
+    .prix-num{ font-family:'Cinzel',serif; color:#F4D67A; font-size:120px; line-height:1; text-shadow:0 0 44px rgba(201,168,76,0.55); margin:10px 0 16px; }
+    .prix-txt{ font-family:'Inter',sans-serif; color:#cfcfcf; font-size:23px; font-weight:300; }
+
+    /* slide garantie */
+    .gar-figs{ display:flex; align-items:stretch; justify-content:center; gap:34px; margin:26px 0 6px; width:100%; }
+    .gar-fig{ flex:1; max-width:440px; text-align:center; background:linear-gradient(180deg, rgba(20,30,26,0.9), rgba(18,22,20,0.4)); border-top:3px solid #34D399; border-radius:18px; padding:30px 30px 34px; box-shadow:0 18px 50px rgba(0,0,0,0.5); }
+    .gar-lab{ font-family:'Cinzel',serif; letter-spacing:.2em; text-transform:uppercase; font-size:14px; color:#7fccab; margin-bottom:12px; }
+    .gar-big{ font-family:'Cinzel',serif; font-weight:600; font-size:100px; line-height:1; color:#4BE6A0; text-shadow:0 0 44px rgba(52,211,153,0.5); }
+    .gar-sub{ font-family:'Inter',sans-serif; color:#B9B9B9; font-size:17px; margin-top:14px; font-weight:300; }
+    .gar-points{ display:flex; gap:16px; justify-content:center; margin-top:24px; flex-wrap:wrap; }
+    .gar-pt{ font-family:'Inter',sans-serif; font-size:18px; color:#e4e4e4; padding:13px 22px; border:1px solid rgba(52,211,153,0.4); border-radius:999px; background:rgba(52,211,153,0.06); }
+    .gar-pt b{ color:#4BE6A0; }
+    .gar-foot{ margin-top:28px; font-family:'Cinzel',serif; color:#4BE6A0; font-size:25px; letter-spacing:.03em; }
+
+    /* cadre or animé autour des hero-stages des piliers (4, 8, 11) */
+    .da-hero .hero-stage{ position:relative; }
+    .da-hero .hero-stage::after{
+      content:''; position:absolute; inset:-7px; border-radius:22px; pointer-events:none;
+      padding:2px;
+      background: conic-gradient(from 0deg, rgba(201,168,76,0) 0deg, #F4D67A 70deg, rgba(201,168,76,0.2) 150deg, #C9A84C 230deg, rgba(201,168,76,0) 320deg);
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      animation: goldRing 9s linear infinite;
+    }
+    @keyframes goldRing { to { transform: rotate(360deg); } }
+    /* slide 5 : lueur rouge anxiogène au lieu de l'or */
+    .da-hero .hero-stage.danger::after{
+      background: conic-gradient(from 0deg, rgba(139,26,26,0) 0deg, #E0564A 70deg, rgba(139,26,26,0.25) 150deg, #8B1A1A 230deg, rgba(139,26,26,0) 320deg);
+    }
+    .da-hero .hero-stage.danger{ box-shadow:0 34px 100px rgba(0,0,0,0.72),0 0 0 1px rgba(139,26,26,0.5),0 0 70px rgba(176,42,42,0.35); animation: dangerPulse 3.4s ease-in-out infinite; }
+    @keyframes dangerPulse { 0%,100%{ box-shadow:0 34px 100px rgba(0,0,0,0.72),0 0 0 1px rgba(139,26,26,0.5),0 0 60px rgba(176,42,42,0.28);} 50%{ box-shadow:0 34px 100px rgba(0,0,0,0.72),0 0 0 1px rgba(176,42,42,0.7),0 0 110px rgba(200,52,52,0.5);} }
+
+    /* pilier hero : texte plus aéré / majestueux */
+    .da-hero-txt .da-kicker{ font-size:19px; letter-spacing:0.36em; margin-bottom:22px; }
+    .pillar-obj{ margin-top:30px; font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:.32em; text-transform:uppercase; font-size:13px; }
+    .pillar-rule{ width:120px; height:1px; background:linear-gradient(90deg,#C9A84C, transparent); margin:14px 0 22px; }
+    .pillar-line{ font-family:'Cormorant Garamond','Times New Roman',serif; font-style:italic; font-weight:300; font-size:31px; line-height:1.55; color:#ECECEC; letter-spacing:.012em; }
+    .pillar-line strong{ font-style:normal; font-weight:600; color:#F4D67A; letter-spacing:.02em; }
+
+    /* slide 5 — texte plus aéré */
+    .da-list.airy{ gap:24px; margin-top:38px; }
+    .da-list.airy .da-li{ font-size:27px; padding:22px 28px; line-height:1.4; }
+
+    /* mini animation sous chaque carte résultat */
+    .da-card.res .res-anim{ margin-top:18px; height:96px; }
+    .da-card.res .res-anim svg{ width:100%; height:100%; display:block; overflow:visible; }
+
+    /* slide 14 — value stack plus impactant */
+    .stack-cards{ display:flex; gap:30px; margin-top:46px; }
+    .stack-card{ flex:1; min-width:0; background:linear-gradient(180deg, rgba(26,24,18,0.95), rgba(26,24,18,0.40)); border-top:4px solid #C9A84C; border-radius:14px; padding:34px 30px; box-shadow:0 18px 50px rgba(0,0,0,0.5); display:flex; flex-direction:column; }
+    .stack-lab{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:.2em; text-transform:uppercase; font-size:14px; margin-bottom:10px; }
+    .stack-val{ font-family:'Cinzel',serif; color:#fff; font-size:34px; line-height:1.12; margin-bottom:12px; }
+    .stack-txt{ font-family:'Inter',sans-serif; color:#cfcfcf; font-size:19px; line-height:1.45; }
+    .stack-gold{ margin-top:18px; font-family:'Cinzel',serif; color:#F4D67A; letter-spacing:.05em; font-size:21px; }
+    .stack-anim{ margin-top:auto; padding-top:22px; height:170px; }
+    .stack-anim svg{ width:100%; height:100%; display:block; overflow:visible; }
+
+    /* slide bonus headline — épurée */
+    .bonus-wrap{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:780px; gap:0; }
+    .bonus-intro{ font-family:'Inter',sans-serif; font-weight:300; color:#B9B9B9; font-size:26px; letter-spacing:.02em; text-align:center; }
+    .bonus-intro strong{ color:#ECECEC; font-weight:500; }
+    .bonus-intro .dots{ color:#C9A84C; letter-spacing:.45em; padding-left:6px; }
+    .bonus-deco{ width:300px; height:1px; background:linear-gradient(90deg,transparent,#C9A84C,transparent); margin:30px auto; }
+    .bonus-huge{ font-family:'Cinzel',serif; font-weight:700; text-transform:uppercase; letter-spacing:.05em; line-height:1.0;
+      font-size:120px; text-align:center; margin:6px 0;
+      background: linear-gradient(135deg,#F8EFC8 0%,#E9CE7A 38%,#C9A84C 72%,#A88736 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 4px 18px rgba(201,168,76,0.4));
+    }
+    .bonus-eq{ font-family:'Cinzel',serif; color:#F4D67A; letter-spacing:.05em; font-size:30px; text-align:center; }
+    .bonus-eq .sep{ color:#5e4e22; padding:0 18px; }
+    .bonus-eq .green{ color:#4BE6A0; }
+
+    /* slide 16 — bonus plein écran, impactant */
+    .reveal section.bonus16{ display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:1010px; padding:40px 84px; position:relative; }
+    .bonus16 .b16-glow{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(58% 46% at 50% 44%, rgba(201,168,76,0.16), transparent 72%); }
+    .b16-stamp{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; }
+    .b16-over{ font-family:'Cinzel',serif; color:#C9A84C; letter-spacing:.34em; text-transform:uppercase; font-size:18px; margin-bottom:26px; }
+    .b16-intro{ font-family:'Inter',sans-serif; font-weight:300; color:#ECECEC; font-size:34px; letter-spacing:.01em; text-align:center; margin:0 0 30px; max-width:1100px; line-height:1.45; }
+    .b16-intro strong{ color:#F4D67A; font-weight:600; }
+    .b16-huge{ font-family:'Cinzel',serif; font-weight:700; text-transform:uppercase; letter-spacing:.05em; line-height:.96;
+      font-size:168px; text-align:center;
+      background: linear-gradient(100deg,#A88736 0%,#F8EFC8 26%,#E9CE7A 50%,#F8EFC8 72%,#A88736 100%);
+      background-size:240% auto; -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+      filter: drop-shadow(0 8px 34px rgba(201,168,76,0.5));
+      animation: shimmer 6.5s linear infinite;
+    }
+    .b16-rule{ width:600px; max-width:80vw; height:2px; background:linear-gradient(90deg,transparent,#C9A84C 30%,#F4D67A 50%,#C9A84C 70%,transparent); margin:34px auto 40px; }
+    .b16-figs{ display:flex; align-items:flex-start; justify-content:center; gap:70px; }
+    .b16-fig{ text-align:center; }
+    .b16-num{ font-family:'Cinzel',serif; font-size:88px; line-height:1; color:#F4D67A; text-shadow:0 0 40px rgba(201,168,76,0.5); }
+    .b16-num.green{ color:#4BE6A0; text-shadow:0 0 40px rgba(52,211,153,0.45); }
+    .b16-cap{ font-family:'Inter',sans-serif; font-weight:300; color:#cfcfcf; font-size:23px; margin-top:12px; letter-spacing:.02em; }
+    .b16-vsep{ width:1px; align-self:stretch; background:linear-gradient(180deg,transparent,#5e4e22,transparent); }
+    .b16-foot{ position:relative; z-index:1; margin-top:74px; font-family:'Cinzel',serif; color:#9a9a9a; font-size:21px; letter-spacing:.18em; text-transform:uppercase; text-align:center; }
+    .b16-foot b{ color:#C9A84C; font-weight:600; }
+
+    /* ia2-scene plus grand pour la slide 16 cartes */
+    .ia2-card.lg .ia2-scene{ height:240px; }
+    .ia2-card.lg .ia2-txt{ font-size:24px; }
+
+    /* garantie plus aérée */
+    .gar-figs.airy{ gap:46px; margin-top:46px; }
+    .gar-figs.airy .gar-fig{ padding:38px 36px 42px; }
+    .gar-figs.airy .gar-big{ font-size:116px; }
+    .gar-figs.airy .gar-sub{ margin-top:18px; font-size:18px; }
+    .gar-points.airy{ gap:22px; margin-top:42px; }
+    .gar-points.airy .gar-pt{ font-size:19px; padding:15px 26px; }
+    .gar-foot.lg{ margin-top:40px; font-size:30px; letter-spacing:.06em; }
+
+@media (prefers-reduced-motion: reduce) {
+      .hero-anim, .chart-area, .node-pop, .reveal-clip { opacity: 1 !important; clip-path: none !important; animation: none !important; }
+      .chart-line { stroke-dashoffset: 0 !important; }
+      .scanline, .media-frame { animation: none !important; }
+      #ambient-canvas { display: none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="logo-scalia">
-    <span class="scalia">SCALIA</span>
-    <span class="rule"></span>
-    <span class="btp">BTP</span>
+  <!-- ===================== ÉCRAN DE DÉMARRAGE ===================== -->
+  <div class="da-intro" id="da-intro">
+    <div class="da-mark">Scalia BTP</div>
+    <div class="da-sys">Système ROI Pilot</div>
+    <button class="da-start-btn" id="da-start">▶ Démarrer la présentation</button>
+    <div class="da-hint">Plein écran automatique · → ou Espace pour avancer</div>
   </div>
 
-  <p class="page-title">Présentations</p>
-  <div class="page-rule"></div>
+  <!-- Poussière d'or ambiante (mouvement continu) -->
+  <canvas id="ambient-canvas"></canvas>
 
-  <p class="section-label">Show Up</p>
-  <ul class="list">
-    <li>
-      <a href="show-up/">
-        <span class="title">Préparer votre Audit ROI</span>
-        <span class="arrow">→</span>
-      </a>
-    </li>
-  </ul>
+  <div class="persistent-header">
+    <div class="logo-scalia">
+      <span class="scalia">SCALIA</span>
+      <span class="rule"></span>
+      <span class="btp">BTP</span>
+    </div>
+  </div>
+  <div class="persistent-footer">Système ROI Pilot.</div>
 
-  <p class="section-label">Diagnostic · Cockpit RDV</p>
-  <ul class="list">
-    <li>
-      <a href="diagnostic/">
-        <span class="title">Phase A — Faisabilité · Chiffres · Douleurs</span>
-        <span class="arrow">→</span>
-      </a>
-    </li>
-  </ul>
+  <div class="reveal">
+    <div class="slides">
 
-  <p class="section-label">Vente · Slides</p>
-  <ul class="list">
-    <li>
-      <a href="presentation-systeme/">
-        <span class="title">Pitch de vente — Système ROI Pilot</span>
-        <span class="arrow">→</span>
-      </a>
-    </li>
-  </ul>
+      <!-- 1 — CONTEXTE : ROI PILOT (HERO v9) -->
+      <section class="hero-roi" data-transition="fade">
+        <div class="hero-top">
+          <p class="hero-kicker hero-anim">Présentation du système</p>
+          <h1 class="hero-title fragment" data-fragment-index="0">ROI PILOT</h1>
+          <div class="hero-tl fragment" data-fragment-index="0"></div>
+        </div>
+        <div class="hero-body">
+          <div class="hero-benefits">
+            <div class="bcard fragment" data-fragment-index="1">
+              <div class="bcard-label">CA récupéré chaque mois</div>
+              <div class="bcard-value gold">Jusqu’à <span id="roi-ca"></span> €<span class="bcard-per"> / mois</span></div>
+            </div>
+            <div class="bcard fragment" data-fragment-index="2">
+              <div class="bcard-label">Votre liberté</div>
+              <div class="bcard-value">Une machine qui tourne <span class="g">sans vous</span></div>
+            </div>
+            <div class="bcard fragment" data-fragment-index="3">
+              <div class="bcard-label">Le contrôle</div>
+              <div class="bcard-value">Piloté depuis votre <span class="g">téléphone</span></div>
+            </div>
+            <div class="hero-chips fragment" data-fragment-index="4">
+              <span class="hero-chip">Sans lead</span>
+              <span class="hero-chip">Sans pub</span>
+              <span class="hero-chip">Sans recruter</span>
+            </div>
+          </div>
+          <div class="hero-stage fragment" data-fragment-index="1">
+            <video class="hero-media" autoplay muted loop playsinline preload="auto" style="display:none;"
+                   onloadeddata="this.style.display='block'; var st=this.closest('.hero-stage'); st.querySelectorAll('.hero-photo').forEach(function(e){e.style.display='none';});"
+                   onerror="this.remove();">
+              <source src="hero-roipilot.mp4" type="video/mp4">
+            </video>
+            <img class="hero-photo" loading="eager" decoding="async" src="hero-roipilot.jpg" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
+          </div>
+        </div>
+      </section>
 
-  <p class="section-label">Vente · Outils</p>
-  <ul class="list">
-    <li>
-      <a href="presentation-systeme/calculateur-roi/">
-        <span class="title">Calculateur ROI — Pertes / Gains</span>
-        <span class="arrow">→</span>
-      </a>
-    </li>
-  </ul>
+      <!-- 2 — SYSTÈME IA (da-slide) -->
+      <section class="da-slide" data-transition="fade">
+        <h2 class="da-h2">Un système boosté à l’IA</h2>
+        <div class="ia2-grid">
 
-  <p class="footer">Scaliabtp.fr</p>
+          <!-- 1 : Intelligence artificielle -->
+          <div class="ia2-card fragment" data-fragment-index="0">
+            <div class="ia2-lab">Intelligence</div>
+            <div class="ia2-txt"><strong>Boosté à l’intelligence artificielle.</strong></div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle class="fa-pulse" cx="150" cy="80" r="60" fill="none" stroke="#C9A84C" stroke-opacity="0.32" stroke-width="7"/>
+              <circle class="fa-stream" cx="14" cy="80" r="4" fill="#F4D67A"/>
+              <circle class="fa-stream" cx="14" cy="80" r="4" fill="#E9C75A" style="animation-delay:.6s"/>
+              <circle class="fa-stream" cx="14" cy="62" r="3.4" fill="#C9A84C" style="animation-delay:1.1s"/>
+              <g stroke="#C9A84C" stroke-width="2">
+                <line class="fa-flow" x1="150" y1="80" x2="150" y2="26"/>
+                <line class="fa-flow" x1="150" y1="80" x2="212" y2="50"/>
+                <line class="fa-flow" x1="150" y1="80" x2="214" y2="108"/>
+                <line class="fa-flow" x1="150" y1="80" x2="150" y2="134"/>
+                <line class="fa-flow" x1="150" y1="80" x2="86" y2="108"/>
+                <line class="fa-flow" x1="150" y1="80" x2="88" y2="50"/>
+              </g>
+              <circle class="fa-pop" cx="150" cy="26" r="7" fill="#F4D67A"/>
+              <circle class="fa-pop" cx="212" cy="50" r="7" fill="#E9C75A" style="animation-delay:.3s"/>
+              <circle class="fa-pop" cx="214" cy="108" r="7" fill="#F4D67A" style="animation-delay:.6s"/>
+              <circle class="fa-pop" cx="150" cy="134" r="7" fill="#E9C75A" style="animation-delay:.9s"/>
+              <circle class="fa-pop" cx="86" cy="108" r="7" fill="#F4D67A" style="animation-delay:1.2s"/>
+              <circle class="fa-pop" cx="88" cy="50" r="7" fill="#E9C75A" style="animation-delay:1.5s"/>
+              <circle cx="150" cy="80" r="26" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <path class="fa-pulse" d="M153 66 l-9 16 l7 0 l-3 12 l11 -17 l-7 0 z" fill="#F4D67A"/>
+              <circle class="fa-pop" cx="270" cy="34" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4" style="animation-delay:1.8s"/>
+              <path class="fa-pop" d="M264 34 l4 4 l8 -9" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" style="animation-delay:1.8s"/>
+            </svg></div>
+          </div>
+
+          <!-- 2 : Clé en main -->
+          <div class="ia2-card fragment" data-fragment-index="1">
+            <div class="ia2-lab">Clé en main</div>
+            <div class="ia2-txt">Installé chez vous, <strong>100 % clé en main</strong>.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="fa-turn" style="transform-origin:54px 60px">
+                <circle cx="54" cy="60" r="20" fill="none" stroke="#F4D67A" stroke-width="4"/>
+                <circle cx="54" cy="60" r="7" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+                <rect x="50" y="78" width="8" height="42" rx="2" fill="#F4D67A"/>
+                <rect x="58" y="100" width="12" height="6" rx="2" fill="#F4D67A"/>
+                <rect x="58" y="110" width="9" height="6" rx="2" fill="#F4D67A"/>
+              </g>
+              <g font-family="Cinzel,serif" font-size="11" fill="#C9A84C">
+                <rect x="104" y="22" width="150" height="28" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="40">CRM</text>
+                <path class="fa-draw" d="M226 36 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="104" y="58" width="150" height="28" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="76">Intégré à vos outils</text>
+                <path class="fa-draw" style="animation-delay:.5s" d="M226 72 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="104" y="94" width="150" height="28" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><text x="116" y="106" font-size="9">Aucune gestion / config</text>
+                <path class="fa-draw" style="animation-delay:1s" d="M226 108 l5 6 l12 -14" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <rect x="104" y="128" width="150" height="10" rx="5" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/>
+              <rect class="fa-grow" x="104" y="128" width="150" height="10" rx="5" fill="#F4D67A"/>
+              <text x="276" y="138" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">100%</text>
+            </svg></div>
+          </div>
+
+          <!-- 3 : Mobile -->
+          <div class="ia2-card fragment" data-fragment-index="2">
+            <div class="ia2-lab">Mobile</div>
+            <div class="ia2-txt">Que vous <strong>pilotez depuis votre téléphone</strong>.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="fa-pulse" d="M64 58 a26 26 0 0 0 0 44" stroke="#C9A84C" stroke-width="2" fill="none"/>
+              <path class="fa-pulse" style="animation-delay:.4s" d="M48 48 a40 40 0 0 0 0 64" stroke="#8a6f2e" stroke-width="2" fill="none"/>
+              <rect x="110" y="14" width="84" height="132" rx="14" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <rect x="120" y="30" width="64" height="84" rx="6" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.4"/>
+              <path class="fa-draw" d="M126 90 l12 -14 l12 8 l16 -22" stroke="#E9C75A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="128" y="94" width="9" height="14" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="142" y="94" width="9" height="14" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="156" y="94" width="9" height="14" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <rect x="124" y="122" width="34" height="14" rx="7" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/>
+              <circle class="fa-toggle" cx="132" cy="129" r="6" fill="#F4D67A"/>
+              <circle class="fa-wave" cx="174" cy="129" r="12" fill="none" stroke="#F4D67A" stroke-width="2" style="transform-origin:174px 129px"/>
+              <g class="fa-tap"><circle cx="174" cy="129" r="5" fill="#C9A84C"/></g>
+            </svg></div>
+          </div>
+
+          <!-- 4 : Automatique -->
+          <div class="ia2-card fragment" data-fragment-index="3">
+            <div class="ia2-lab">Automatique</div>
+            <div class="ia2-txt"><strong>Produit en automatique</strong> — même week-ends, congés, équipe occupée.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="mc-sun" style="transform-origin:42px 40px"><circle cx="42" cy="40" r="13" fill="none" stroke="#F4D67A" stroke-width="2.4"/><g stroke="#F4D67A" stroke-width="2.2" stroke-linecap="round"><line x1="42" y1="20" x2="42" y2="26"/><line x1="42" y1="54" x2="42" y2="60"/><line x1="22" y1="40" x2="28" y2="40"/><line x1="56" y1="40" x2="62" y2="40"/><line x1="28" y1="26" x2="32" y2="30"/><line x1="52" y1="50" x2="56" y2="54"/><line x1="28" y1="54" x2="32" y2="50"/><line x1="52" y1="30" x2="56" y2="26"/></g></g>
+              <path d="M268 30 a16 16 0 1 0 0 28 a12 12 0 1 1 0 -28 z" fill="#F4D67A"/>
+              <text class="mc-zzz" x="236" y="38" font-family="Cinzel,serif" font-size="15" fill="#C9A84C">z</text>
+              <text class="mc-zzz" x="248" y="26" font-family="Cinzel,serif" font-size="19" fill="#C9A84C" style="animation-delay:1s">Z</text>
+              <rect x="96" y="64" width="108" height="76" rx="14" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+              <rect x="120" y="72" width="60" height="16" rx="8" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <text class="fa-pulse" x="150" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">IA · 24/7</text>
+              <g class="mc-cog" style="transform-origin:130px 110px"><circle cx="130" cy="110" r="20" fill="none" stroke="#F4D67A" stroke-width="7" stroke-dasharray="5 6"/><circle cx="130" cy="110" r="8" fill="none" stroke="#E9C75A" stroke-width="2.6"/></g>
+              <g class="mc-cog rev" style="transform-origin:172px 122px"><circle cx="172" cy="122" r="14" fill="none" stroke="#E9C75A" stroke-width="6" stroke-dasharray="4 5"/><circle cx="172" cy="122" r="6" fill="none" stroke="#C9A84C" stroke-width="2.4"/></g>
+              <g class="mc-coin" style="transform-origin:210px 96px"><circle cx="210" cy="96" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="210" y="101" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.9s"><circle cx="210" cy="96" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="210" y="101" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+
+        </div>
+      </section>
+
+            <!-- 3 — TRANSITION 3 PILIERS -->
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">Le système se décompose en</p>
+        <h2 class="da-h2 da-big">3 piliers</h2>
+        <div class="da-cols">
+          <div class="da-col fragment" data-fragment-index="0"><div class="da-col-num">01</div><div class="da-col-name">La Mine d’Or</div><div class="da-teaser">?</div><div class="da-col-tag">Réveiller le cash dormant</div></div>
+          <div class="da-col fragment" data-fragment-index="1"><div class="da-col-num">02</div><div class="da-col-name">La Machine à Chantiers</div><div class="da-teaser">?</div><div class="da-col-tag">Capter 100 % des leads &amp; devis</div></div>
+          <div class="da-col fragment" data-fragment-index="2"><div class="da-col-num">03</div><div class="da-col-name">Le ROI Pilot</div><div class="da-teaser">?</div><div class="da-col-tag">Piloter depuis votre téléphone</div></div>
+        </div>
+      </section>
+
+      <!-- 4 — TITRE PILIER 1 -->
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="da-hero-txt">
+            <p class="da-kicker">Pilier 01</p>
+            <h2 class="da-h2">La Mine d’Or</h2>
+            <p class="pillar-obj fragment" data-fragment-index="0">Objectif</p>
+            <div class="pillar-rule fragment" data-fragment-index="0"></div>
+            <p class="pillar-line fragment" data-fragment-index="0">Récupérer le cash qui <strong>dort dans votre entreprise</strong> depuis 10 ans — <strong>sans lever le petit doigt</strong>, sans recruter, sans acheter un lead.</p>
+          </div>
+          <div class="hero-stage fragment" data-fragment-index="0">
+            <img class="hero-photo" loading="eager" decoding="async" src="mine-dor.jpg" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 — PARCE QU’AUJOURD’HUI -->
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="hero-stage danger fragment" data-fragment-index="0">
+            <img class="hero-photo" loading="eager" decoding="async" src="fear.jpg" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
+          </div>
+          <div class="da-hero-txt">
+            <p class="da-kicker" style="color:#D9685E;">Parce qu’aujourd’hui…</p>
+            <h2 class="da-h2" style="font-size:62px;">L’argent meurt sur la table</h2>
+            <div class="da-list airy">
+              <div class="da-li neg fragment" data-fragment-index="0">Des <strong>devis non-signés</strong> dorment dans votre base</div>
+              <div class="da-li neg fragment" data-fragment-index="1">Vous avez <strong>payé</strong> pour ces leads — pub, salons, recommandations</div>
+              <div class="da-li neg fragment" data-fragment-index="2">Ce sont des <strong>prospects chauds</strong> qui valent encore quelque chose</div>
+              <div class="da-li neg fragment" data-fragment-index="3">C’est de l’argent qui <strong>refroidit et meurt</strong> sur la table</div>
+            </div>
+            <p class="da-foot fragment" data-fragment-index="4" style="color:#8a8a8a;">Ce n’est pas de votre faute : vos équipes sont saturées, et trier 5 ans de base à la main est mécaniquement impossible.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 — CONCRÈTEMENT P1 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Concrètement, le système</p>
+        <h2 class="da-h2">Il réveille votre base, tout seul</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Extrait &amp; trie avec l’IA</div><div class="da-txt">Toute votre base nettoyée et segmentée : chauds / tièdes / froids.</div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#F4D67A" stroke-width="2.4" fill="#16140e"><ellipse cx="40" cy="34" rx="20" ry="7"/><path d="M20 34 L20 74 a20 7 0 0 0 40 0 L60 34"/><path d="M20 54 a20 7 0 0 0 40 0" fill="none"/></g>
+              <line class="fa-flow" x1="68" y1="55" x2="120" y2="55" stroke="#C9A84C" stroke-width="2.2"/><path d="M118 50 l8 5 l-8 5" fill="none" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle class="fa-stream" cx="74" cy="55" r="3.4" fill="#F4D67A"/>
+              <circle class="fa-pulse" cx="170" cy="55" r="30" fill="none" stroke="#C9A84C" stroke-opacity=".35" stroke-width="6"/>
+              <circle cx="170" cy="55" r="21" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <path class="fa-pulse" d="M173 42 l-8 15 l6 0 l-3 11 l10 -16 l-6 0 z" fill="#F4D67A"/>
+              <text x="170" y="100" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C9A84C">IA</text>
+              <line class="fa-flow" x1="200" y1="55" x2="252" y2="55" stroke="#C9A84C" stroke-width="2.2"/><path d="M250 50 l8 5 l-8 5" fill="none" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle class="fa-stream" cx="206" cy="55" r="3.4" fill="#F4D67A" style="animation-delay:.5s"/>
+              <rect x="276" y="26" width="54" height="13" rx="3" fill="#F4D67A"/>
+              <rect x="276" y="48" width="54" height="13" rx="3" fill="#C9A84C" opacity=".7"/>
+              <rect x="276" y="70" width="54" height="13" rx="3" fill="#8a6f2e" opacity=".55"/>
+              <path class="fa-pulse" d="M267 33 c-4 -6 2 -8 0 -13 c6 3 9 9 4 13 z" fill="#F4D67A"/>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Séquence multicanale auto</div><div class="da-txt">Réactive 100 % de vos archives sans que vous touchiez à rien.</div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="42" cy="44" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path d="M26 80 a16 18 0 0 1 32 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <text class="mc-zzz" x="58" y="34" font-family="Cinzel,serif" font-size="13" fill="#C9A84C">z</text>
+              <line class="fa-flow" x1="72" y1="55" x2="118" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pulse"><rect x="132" y="18" width="30" height="20" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M133 20 l14 8 l14 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="fa-pulse" style="animation-delay:.35s"><rect x="132" y="44" width="30" height="20" rx="5" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><circle cx="140" cy="54" r="1.7" fill="#F4D67A"/><circle cx="147" cy="54" r="1.7" fill="#F4D67A"/><circle cx="154" cy="54" r="1.7" fill="#F4D67A"/></g>
+              <g class="fa-pulse" style="animation-delay:.7s"><path d="M134 72 a22 22 0 0 0 16 16 l3 -5 a3 3 0 0 0 -3 -4 l-4 1 a16 16 0 0 1 -7 -7 l1 -4 a3 3 0 0 0 -4 -3 z" fill="#16140e" stroke="#F4D67A" stroke-width="2"/></g>
+              <circle class="fa-stream" cx="166" cy="28" r="2.6" fill="#F4D67A"/>
+              <circle class="fa-stream" cx="166" cy="54" r="2.6" fill="#F4D67A" style="animation-delay:.4s"/>
+              <line class="fa-flow" x1="214" y1="55" x2="262" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="296" cy="44" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <circle cx="290" cy="42" r="2.4" fill="#F4D67A"/><circle cx="302" cy="42" r="2.4" fill="#F4D67A"/>
+              <path d="M289 52 a8 8 0 0 0 14 0" fill="none" stroke="#F4D67A" stroke-width="2"/>
+              <path d="M280 82 a16 18 0 0 1 32 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <g class="fa-pop" style="transform-origin:320px 26px"><circle cx="320" cy="26" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><line x1="320" y1="20" x2="320" y2="28" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/><circle cx="320" cy="32" r="1.6" fill="#F4D67A"/></g>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte prospect chaud</div><div class="da-txt">Vos équipes sont prévenues avec le contexte, au bon moment.</div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="34" y="20" width="14" height="50" rx="7" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <circle cx="41" cy="78" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <rect class="fa-fill" x="37" y="30" width="6" height="44" rx="3" fill="#F4D67A" style="transform-origin:40px 74px"/>
+              <circle cx="41" cy="78" r="6" fill="#F4D67A"/>
+              <line class="fa-flow" x1="62" y1="55" x2="116" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bell" style="transform-origin:170px 24px"><path d="M170 26 C156 26 153 40 153 50 L187 50 C187 40 184 26 170 26 Z" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><line x1="148" y1="55" x2="192" y2="55" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/><circle cx="170" cy="63" r="5" fill="#F4D67A"/><line x1="170" y1="18" x2="170" y2="26" stroke="#F4D67A" stroke-width="2.6"/></g>
+              <circle class="fa-wave" cx="170" cy="44" r="30" fill="none" stroke="#C9A84C" stroke-width="2" style="transform-origin:170px 44px"/>
+              <line class="fa-flow" x1="206" y1="55" x2="258" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="280" y="18" width="40" height="74" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <path class="fa-pop" d="M290 54 l7 8 l16 -18" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transform-origin:300px 50px"/>
+            </svg></div>
+          </div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="3">Plusieurs dizaines de milliers d’euros récupérés dès le 1<sup>er</sup> mois.</p>
+      </section>
+
+      <!-- 7 — RÉSULTATS PILIER 1 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Résultats</p>
+        <h2 class="da-h2">Ce que la Mine d’Or vous rapporte</h2>
+        <div class="da-cards">
+          <div class="da-card res fragment" data-fragment-index="0">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Le cash dormant récupéré</div><div class="da-txt">Dès les premières semaines, sans rien faire.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#F4D67A" stroke-width="2.4" fill="#16140e"><ellipse cx="44" cy="22" rx="22" ry="7"/><path d="M22 22 L22 66 a22 7 0 0 0 44 0 L66 22"/><path d="M22 44 a22 7 0 0 0 44 0" fill="none"/></g>
+              <text class="mc-zzz" x="68" y="20" font-family="Cinzel,serif" font-size="14" fill="#C9A84C">z</text>
+              <line class="fa-flow" x1="80" y1="46" x2="138" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:170px 46px"><circle cx="170" cy="46" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><text x="170" y="51" text-anchor="middle" font-family="Cinzel,serif" font-size="18" fill="#F4D67A">€</text></g>
+              <line class="fa-flow" x1="194" y1="46" x2="246" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bob"><rect x="258" y="22" width="38" height="48" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <line x1="266" y1="34" x2="288" y2="34" stroke="#C9A84C" stroke-width="2"/><line x1="266" y1="44" x2="288" y2="44" stroke="#C9A84C" stroke-width="2"/>
+              <text x="277" y="62" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="1">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">100 % de votre base réactivée</div><div class="da-txt">Contre 0 aujourd’hui.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g opacity=".55"><circle cx="36" cy="30" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="36" cy="60" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="66" cy="30" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="66" cy="60" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="96" cy="30" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/><circle cx="96" cy="60" r="8" fill="none" stroke="#8a6f2e" stroke-width="2"/></g>
+              <g><circle class="fa-pop" cx="36" cy="30" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.15s" cx="36" cy="60" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.3s" cx="66" cy="30" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.45s" cx="66" cy="60" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.6s" cx="96" cy="30" r="8" fill="#F4D67A"/><circle class="fa-pop" style="animation-delay:.75s" cx="96" cy="60" r="8" fill="#F4D67A"/></g>
+              <rect x="142" y="34" width="120" height="20" rx="10" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/>
+              <rect class="fa-grow" x="142" y="34" width="120" height="20" rx="10" fill="#F4D67A"/>
+              <text x="202" y="78" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">100 %</text>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="2">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Prospects chauds en automatique</div><div class="da-txt">Remontés à vos équipes, prêts à closer.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="18" y="20" width="48" height="52" rx="6" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <circle cx="42" cy="38" r="9" fill="none" stroke="#F4D67A" stroke-width="2"/>
+              <path d="M30 64 a12 12 0 0 1 24 0" fill="none" stroke="#F4D67A" stroke-width="2"/>
+              <path class="fa-pulse" d="M62 18 c-6 6 3 9 0 15 c-8 -2 -9 -10 -3 -13 c0 3 2 4 3 2 c0 -2 0 -3 0 -4 z" fill="#E0564A"/>
+              <line class="fa-flow" x1="74" y1="46" x2="120" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="158" cy="40" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path d="M142 40 a16 16 0 0 1 32 0" fill="none" stroke="#F4D67A" stroke-width="2.6"/>
+              <rect x="139" y="40" width="6" height="13" rx="3" fill="#F4D67A"/><rect x="171" y="40" width="6" height="13" rx="3" fill="#F4D67A"/>
+              <path d="M174 51 a7 9 0 0 1 -11 7" fill="none" stroke="#F4D67A" stroke-width="2"/>
+              <circle class="fa-pulse" cx="158" cy="40" r="3.2" fill="#F4D67A"/>
+              <line class="fa-flow" x1="186" y1="46" x2="236" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:268px 40px"><circle cx="268" cy="40" r="18" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><path d="M259 40 l6 6 l13 -15" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+            </svg></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 — TITRE PILIER 2 -->
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="ia-stage fragment" data-fragment-index="0">
+            <svg viewBox="0 0 640 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="mcG" cx="50%" cy="44%" r="52%">
+                  <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.28"/>
+                  <stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <circle class="mc-core" cx="320" cy="210" r="185" fill="url(#mcG)"/>
+
+              <!-- ENTRÉE : les leads affluent, aucun ne s'échappe -->
+              <text x="74" y="150" font-family="Cinzel,serif" font-size="15" letter-spacing="2" fill="#C9A84C">LEADS · 24/7</text>
+              <path class="mc-wire" d="M70 210 L250 210" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="mc-lead"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:.65s"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:1.3s"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:1.95s"><rect x="78" y="200" width="24" height="17" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M79 202 l11 7 l11 -7" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+
+              <!-- LA MACHINE -->
+              <rect x="250" y="138" width="158" height="150" rx="22" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+              <rect x="288" y="150" width="82" height="28" rx="14" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.6"/>
+              <text class="mc-core" x="329" y="170" text-anchor="middle" font-family="Cinzel,serif" font-size="16" fill="#F4D67A">IA</text>
+              <!-- cogs -->
+              <g class="mc-cog"><circle cx="300" cy="228" r="30" fill="none" stroke="#F4D67A" stroke-width="9" stroke-dasharray="5 6"/><circle cx="300" cy="228" r="10" fill="none" stroke="#E9C75A" stroke-width="3"/></g>
+              <g class="mc-cog rev"><circle cx="360" cy="262" r="20" fill="none" stroke="#E9C75A" stroke-width="8" stroke-dasharray="4 5"/><circle cx="360" cy="262" r="7" fill="none" stroke="#C9A84C" stroke-width="2.6"/></g>
+
+              <!-- SORTIE : le cash sort tout seul -->
+              <path class="mc-wire" d="M408 200 L470 150" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="mc-coin"><circle cx="412" cy="206" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="412" y="212" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.8s"><circle cx="412" cy="206" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="412" y="212" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:1.6s"><circle cx="412" cy="206" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="412" y="212" text-anchor="middle" font-family="Cinzel,serif" font-size="15" fill="#F4D67A">€</text></g>
+              <text class="mc-core" x="512" y="118" text-anchor="middle" font-family="Cinzel,serif" font-size="30" fill="#F4D67A">€€€</text>
+
+              <!-- RIBBON REPOS : pendant que vous vous reposez -->
+              <rect x="46" y="372" width="548" height="92" rx="20" fill="rgba(201,168,76,0.07)" stroke="#C9A84C" stroke-opacity="0.32" stroke-width="1.5"/>
+              <!-- soleil -->
+              <g class="mc-sun"><circle cx="100" cy="418" r="13" fill="none" stroke="#F4D67A" stroke-width="2.6"/><g stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"><line x1="100" y1="396" x2="100" y2="402"/><line x1="100" y1="434" x2="100" y2="440"/><line x1="78" y1="418" x2="84" y2="418"/><line x1="116" y1="418" x2="122" y2="418"/><line x1="85" y1="403" x2="89" y2="407"/><line x1="111" y1="429" x2="115" y2="433"/><line x1="85" y1="433" x2="89" y2="429"/><line x1="111" y1="407" x2="115" y2="403"/></g></g>
+              <text class="mc-zzz" x="128" y="398" font-family="Cinzel,serif" font-size="18" fill="#C9A84C">z</text>
+              <!-- lune -->
+              <path d="M548 404 a18 18 0 1 0 0 30 a14 14 0 1 1 0 -30 z" fill="#F4D67A"/>
+              <text x="320" y="412" text-anchor="middle" font-family="Inter,sans-serif" font-size="20" fill="#ECECEC" font-weight="300">Pendant que vous vous reposez,</text>
+              <text x="320" y="440" text-anchor="middle" font-family="Cinzel,serif" font-size="20" fill="#F4D67A">la machine tourne.</text>
+            </svg>
+          </div>
+          <div class="da-hero-txt">
+            <p class="da-kicker">Pilier 02</p>
+            <h2 class="da-h2">La Machine à Chantiers</h2>
+            <p class="pillar-obj fragment" data-fragment-index="0">Objectif</p>
+            <div class="pillar-rule fragment" data-fragment-index="0"></div>
+            <p class="pillar-line fragment" data-fragment-index="0">Plus <strong>aucun lead</strong> qui s’échappe, plus <strong>aucun devis</strong> qui dort — même le week-end, même en vacances. Pour reprendre l’argent que <strong>vos concurrents vous volent</strong>.</p>
+            <div class="da-chip fragment" data-fragment-index="1">24h/24 · week-ends compris</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9 — CONCRÈTEMENT P2 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Concrètement, le système</p>
+        <h2 class="da-h2">Plus rien ne s’échappe, jamais</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Traite TOUS vos leads &lt; 5 min</div><div class="da-txt">24/7 — qualifie et planifie le RDV, via un voice bot entrant et sortant.<br><span class="da-mini">Conversion ×4 vs un rappel sous 24 h</span></div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M30 32 a30 30 0 0 0 22 22 l5 -7 a4 4 0 0 0 -4 -5 l-6 1 a20 20 0 0 1 -10 -10 l1 -6 a4 4 0 0 0 -5 -4 z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-pulse" d="M58 24 a14 14 0 0 1 6 10" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="72" y1="55" x2="116" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="150" y="30" width="40" height="38" rx="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <circle class="ia-eye" cx="162" cy="47" r="4.6" fill="#F4D67A"/><circle class="ia-eye" cx="178" cy="47" r="4.6" fill="#F4D67A"/>
+              <line x1="170" y1="22" x2="170" y2="30" stroke="#F4D67A" stroke-width="2.4"/><circle class="ia-antenna" cx="170" cy="18" r="4" fill="#F4D67A"/>
+              <path class="fa-pulse" d="M142 38 a10 10 0 0 0 0 22" fill="none" stroke="#E9C75A" stroke-width="2"/>
+              <path class="fa-pulse" style="animation-delay:.3s" d="M198 38 a10 10 0 0 1 0 22" fill="none" stroke="#E9C75A" stroke-width="2"/>
+              <text x="170" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#C9A84C">&lt; 5 min</text>
+              <line class="fa-flow" x1="210" y1="55" x2="258" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="280" y="24" width="44" height="44" rx="5" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <line x1="280" y1="34" x2="324" y2="34" stroke="#C9A84C" stroke-width="2"/>
+              <line x1="290" y1="20" x2="290" y2="28" stroke="#F4D67A" stroke-width="2.4"/><line x1="314" y1="20" x2="314" y2="28" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-pop" d="M290 48 l6 6 l13 -15" stroke="#F4D67A" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transform-origin:300px 46px"/>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Relance vos devis et réduit les annulations</div><div class="da-txt">Automatiquement et intelligemment, jusqu’à signature.<br><span class="da-mini">Séquence anti no-show automatique pour augmenter le taux de présence.</span></div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="26" y="20" width="40" height="52" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <line x1="34" y1="32" x2="58" y2="32" stroke="#C9A84C" stroke-width="2"/><line x1="34" y1="42" x2="58" y2="42" stroke="#C9A84C" stroke-width="2"/><line x1="34" y1="52" x2="50" y2="52" stroke="#C9A84C" stroke-width="2"/>
+              <text x="46" y="68" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">€</text>
+              <line class="fa-flow" x1="74" y1="46" x2="120" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pulse"><rect x="146" y="22" width="48" height="48" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="156" y1="14" x2="156" y2="26" stroke="#F4D67A" stroke-width="2.6"/><line x1="184" y1="14" x2="184" y2="26" stroke="#F4D67A" stroke-width="2.6"/><line x1="146" y1="34" x2="194" y2="34" stroke="#C9A84C" stroke-width="2"/><path d="M156 52 l6 6 l16 -18" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <text x="170" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C9A84C">anti no-show</text>
+              <line class="fa-flow" x1="200" y1="46" x2="250" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="288" cy="30" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <path d="M274 64 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:316px 30px"><circle cx="316" cy="30" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><path d="M310 30 l4 4 l8 -9" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alerte dès qu’un prospect est chaud</div><div class="da-txt">Vos équipes appellent au moment opportun.</div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="48" cy="50" r="26" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <circle cx="48" cy="50" r="16" fill="none" stroke="#C9A84C" stroke-width="1.3" opacity=".5"/>
+              <g class="fa-radar" style="transform-origin:48px 50px"><path d="M48 50 L48 24 A26 26 0 0 1 71 38 Z" fill="#F4D67A" opacity=".32"/><line x1="48" y1="50" x2="48" y2="24" stroke="#F4D67A" stroke-width="2"/></g>
+              <line class="fa-flow" x1="78" y1="50" x2="122" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <path class="fa-pulse" d="M170 22 c-11 13 7 17 0 30 c-15 -4 -17 -19 -6 -25 c0 6 4 8 6 4 c0 -5 0 -7 0 -9 z" fill="#F4D67A"/>
+              <text x="170" y="88" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#C9A84C">chaud</text>
+              <line class="fa-flow" x1="206" y1="50" x2="252" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bell" style="transform-origin:286px 22px"><path d="M286 24 C274 24 272 36 272 45 L300 45 C300 36 298 24 286 24 Z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="268" y1="49" x2="304" y2="49" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/><circle cx="286" cy="56" r="4" fill="#F4D67A"/><line x1="286" y1="17" x2="286" y2="24" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <path class="fa-pulse" d="M312 60 a24 24 0 0 0 16 16 l4 -6 a3 3 0 0 0 -4 -4 l-4 1 a16 16 0 0 1 -8 -8 l1 -4 a3 3 0 0 0 -5 -3 z" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+            </svg></div>
+          </div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="3">Vos équipes ne traitent plus que des leads qualifiés. Coûts d’acquisition divisés, marge augmentée.</p>
+      </section>
+
+      <!-- 10 — RÉSULTATS PILIER 2 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Résultats</p>
+        <h2 class="da-h2">Ce que la Machine vous rapporte</h2>
+        <div class="da-cards">
+          <div class="da-card res fragment" data-fragment-index="0">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Vos concurrents vous envient</div><div class="da-txt">Vous traitez vos leads avant tout le monde.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- dirigeant fier au centre, sur un piédestal -->
+              <g class="fa-bob">
+                <circle cx="150" cy="34" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+                <path d="M132 70 a18 16 0 0 1 36 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+                <circle cx="144" cy="32" r="2.4" fill="#F4D67A"/><circle cx="156" cy="32" r="2.4" fill="#F4D67A"/>
+                <path d="M143 40 a9 7 0 0 0 14 0" fill="none" stroke="#F4D67A" stroke-width="2.2"/>
+                <path d="M138 18 l4 6 l8 -9 l8 9 l4 -6 l-2 8 l-20 0 z" fill="#F4D67A"/>
+              </g>
+              <rect x="126" y="74" width="48" height="8" rx="2" fill="#C9A84C"/>
+              <!-- concurrents jaloux, plus petits et grisés -->
+              <g opacity=".5"><circle cx="54" cy="50" r="12" fill="#16140e" stroke="#8a6f2e" stroke-width="2"/><path d="M40 76 a14 13 0 0 1 28 0" fill="#16140e" stroke="#8a6f2e" stroke-width="2"/><path d="M48 50 a6 5 0 0 0 12 0" fill="none" stroke="#8a6f2e" stroke-width="1.8"/>
+              <path class="mc-zzz" d="M64 38 l8 0 l-8 8 l8 0" fill="none" stroke="#8a6f2e" stroke-width="1.6"/></g>
+              <g opacity=".5"><circle cx="246" cy="50" r="12" fill="#16140e" stroke="#8a6f2e" stroke-width="2"/><path d="M232 76 a14 13 0 0 1 28 0" fill="#16140e" stroke="#8a6f2e" stroke-width="2"/><path d="M240 50 a6 5 0 0 0 12 0" fill="none" stroke="#8a6f2e" stroke-width="1.8"/></g>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="1">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Ça produit même pendant vos congés</div><div class="da-txt">Le week-end, en vacances, pendant vos RDV.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- soleil + mer + transat (vous vous reposez) -->
+              <g class="mc-sun" style="transform-origin:40px 24px"><circle cx="40" cy="24" r="9" fill="#F4D67A"/><g stroke="#F4D67A" stroke-width="1.8" stroke-linecap="round"><line x1="40" y1="8" x2="40" y2="12"/><line x1="40" y1="36" x2="40" y2="40"/><line x1="24" y1="24" x2="28" y2="24"/><line x1="52" y1="24" x2="56" y2="24"/><line x1="29" y1="13" x2="32" y2="16"/><line x1="48" y1="32" x2="51" y2="35"/><line x1="29" y1="35" x2="32" y2="32"/><line x1="48" y1="16" x2="51" y2="13"/></g></g>
+              <path d="M10 70 q14 -8 28 0 t28 0 t28 0" fill="none" stroke="#C9A84C" stroke-opacity=".5" stroke-width="2"/>
+              <!-- transat + bonhomme -->
+              <circle cx="58" cy="50" r="6" fill="#F4D67A"/>
+              <path d="M48 60 l30 -6" stroke="#F4D67A" stroke-width="3" stroke-linecap="round"/>
+              <path d="M48 60 l-4 10 M48 60 l8 0 l-2 10" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M78 54 l4 14" stroke="#F4D67A" stroke-width="2.6" stroke-linecap="round"/>
+              <!-- machine qui tourne + dollars qui sortent, à côté -->
+              <rect x="150" y="34" width="70" height="48" rx="10" fill="#16140e" stroke="#C9A84C" stroke-width="2.6"/>
+              <rect x="166" y="40" width="38" height="12" rx="6" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.2"/>
+              <text class="fa-pulse" x="185" y="49" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#F4D67A">24/7</text>
+              <g class="mc-cog" style="transform-origin:172px 66px"><circle cx="172" cy="66" r="10" fill="none" stroke="#F4D67A" stroke-width="4" stroke-dasharray="3 4"/></g>
+              <g class="mc-cog rev" style="transform-origin:196px 70px"><circle cx="196" cy="70" r="7" fill="none" stroke="#E9C75A" stroke-width="3" stroke-dasharray="2 3"/></g>
+              <g class="mc-coin" style="transform-origin:236px 56px"><circle cx="238" cy="60" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="238" y="65" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
+              <g class="mc-coin" style="animation-delay:.7s"><circle cx="238" cy="60" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="238" y="65" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
+              <g class="mc-coin" style="animation-delay:1.4s"><circle cx="238" cy="60" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/><text x="238" y="65" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">$</text></g>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="2">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Marge augmentée</div><div class="da-txt">Coût d’acquisition divisé.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- gauche : coût d'acquisition qui chute -->
+              <line x1="20" y1="80" x2="140" y2="80" stroke="#C9A84C" stroke-opacity=".35" stroke-width="1.6"/>
+              <path class="fa-draw-lg" d="M26 24 l24 16 l24 14 l30 18" stroke="#D9685E" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <g class="fa-pop" style="transform-origin:104px 72px;animation-delay:1.1s"><path d="M112 72 l-14 0 l5 -11" stroke="#D9685E" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <text x="60" y="16" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#D9685E">Coût d’acquisition</text>
+              <!-- séparateur -->
+              <line x1="150" y1="14" x2="150" y2="82" stroke="#3a3a3a" stroke-width="1.4" stroke-dasharray="3 4"/>
+              <!-- droite : marge qui grimpe -->
+              <line x1="160" y1="80" x2="280" y2="80" stroke="#C9A84C" stroke-opacity=".35" stroke-width="1.6"/>
+              <path class="fa-draw-lg" d="M166 74 l24 -14 l24 -10 l30 -28" stroke="#F4D67A" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <g class="fa-pop" style="transform-origin:244px 22px;animation-delay:1.1s"><path d="M236 22 l14 0 l-5 -11" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <text x="210" y="16" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#F4D67A">Marge</text>
+            </svg></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 — TITRE PILIER 3 -->
+      <section class="da-slide" data-transition="fade">
+        <div class="da-hero">
+          <div class="da-hero-txt">
+            <p class="da-kicker">Pilier 03</p>
+            <h2 class="da-h2">Le ROI Pilot</h2>
+            <p class="pillar-obj fragment" data-fragment-index="0">Objectif</p>
+            <div class="pillar-rule fragment" data-fragment-index="0"></div>
+            <p class="pillar-line fragment" data-fragment-index="0">Récupérer <strong>du temps pour vous</strong>, libérer vos équipes, et piloter <strong>tout votre business</strong> depuis votre téléphone — en 30 secondes par jour.</p>
+            <div class="da-chip fragment" data-fragment-index="1">Vos dimanches récupérés</div>
+          </div>
+          <div class="hero-stage fragment" data-fragment-index="0">
+            <img class="hero-photo" loading="eager" decoding="async" src="roipilot.jpg" alt="" onerror="this.style.opacity=0;">
+            <div class="hero-stage-scrim"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12 — CONCRÈTEMENT P3 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Concrètement, le système</p>
+        <h2 class="da-h2">Vous reprenez le contrôle</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">01</div><div class="da-val">Devis en dictée vocale</div><div class="da-txt">Générés et envoyés sous 1 h — avant le concurrent.</div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="34" y="20" width="16" height="28" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path d="M28 40 a14 14 0 0 0 28 0" stroke="#F4D67A" stroke-width="2.4" fill="none"/>
+              <line x1="42" y1="54" x2="42" y2="62" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-pulse" d="M18 30 a16 16 0 0 0 0 22" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <path class="fa-pulse" style="animation-delay:.3s" d="M62 30 a16 16 0 0 1 0 22" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="74" y1="46" x2="118" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="146" y="16" width="48" height="60" rx="5" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <path class="fa-draw" d="M154 30 l32 0" stroke="#C9A84C" stroke-width="2.4" fill="none"/>
+              <path class="fa-draw" style="animation-delay:.3s" d="M154 40 l32 0" stroke="#C9A84C" stroke-width="2.4" fill="none"/>
+              <path class="fa-draw" style="animation-delay:.6s" d="M154 50 l22 0" stroke="#C9A84C" stroke-width="2.4" fill="none"/>
+              <text class="fa-pop" x="178" y="70" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A" style="transform-origin:178px 66px">€</text>
+              <line class="fa-flow" x1="202" y1="46" x2="250" y2="46" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bob">
+                <circle cx="292" cy="38" r="18" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+                <circle cx="285" cy="34" r="2.6" fill="#F4D67A"/><circle cx="299" cy="34" r="2.6" fill="#F4D67A"/>
+                <path d="M283 44 a10 8 0 0 0 18 0" fill="none" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round"/>
+              </g>
+              <g class="fa-pop" style="transform-origin:318px 22px"><circle cx="318" cy="22" r="10" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M313 22 l3 4 l7 -8" stroke="#F4D67A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">02</div><div class="da-val">Dashboard temps réel</div><div class="da-txt">Leads, devis, signatures, CA — sur votre téléphone, 30 s/jour.</div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g font-family="Cinzel,serif" font-size="9" fill="#C9A84C">
+                <rect x="14" y="20" width="46" height="16" rx="4" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/><text x="22" y="31">Leads</text>
+                <rect x="14" y="44" width="46" height="16" rx="4" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/><text x="22" y="55">Devis</text>
+                <rect x="14" y="68" width="46" height="16" rx="4" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/><text x="24" y="79">CA</text>
+              </g>
+              <circle class="fa-stream" cx="64" cy="28" r="3" fill="#F4D67A"/>
+              <circle class="fa-stream" cx="64" cy="52" r="3" fill="#F4D67A" style="animation-delay:.4s"/>
+              <circle class="fa-stream" cx="64" cy="76" r="3" fill="#F4D67A" style="animation-delay:.8s"/>
+              <rect x="142" y="10" width="56" height="90" rx="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <rect x="150" y="22" width="40" height="58" rx="4" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.3"/>
+              <path class="fa-draw" d="M154 60 l9 -12 l9 7 l12 -18" stroke="#E9C75A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="155" y="64" width="7" height="12" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="167" y="64" width="7" height="12" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="179" y="64" width="7" height="12" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <line class="fa-flow" x1="206" y1="55" x2="252" y2="55" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="290" cy="44" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <circle cx="284" cy="42" r="2.4" fill="#F4D67A"/><circle cx="296" cy="42" r="2.4" fill="#F4D67A"/>
+              <path d="M284 50 a8 7 0 0 0 12 0" fill="none" stroke="#F4D67A" stroke-width="2"/>
+              <path d="M276 76 a15 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:320px 28px"><circle cx="320" cy="28" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="320" y="32" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#F4D67A">30s</text></g>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">03</div><div class="da-val">Alertes intelligentes</div><div class="da-txt">Surveillent vos KPIs et vous préviennent au bon moment.</div>
+            <div class="flow-anim"><svg viewBox="0 0 340 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 64 a30 30 0 0 1 56 0" fill="none" stroke="#C9A84C" stroke-width="3"/>
+              <g class="fa-turn" style="transform-origin:50px 64px"><line x1="50" y1="64" x2="68" y2="44" stroke="#F4D67A" stroke-width="3" stroke-linecap="round"/></g>
+              <circle cx="50" cy="64" r="4" fill="#F4D67A"/>
+              <line class="fa-flow" x1="86" y1="50" x2="122" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <circle cx="170" cy="50" r="26" fill="#16140e" stroke="#F4D67A" stroke-width="2.2"/>
+              <g class="fa-radar" style="transform-origin:170px 50px"><path d="M170 50 L170 24 A26 26 0 0 1 193 38 Z" fill="#F4D67A" opacity=".3"/><line x1="170" y1="50" x2="170" y2="24" stroke="#F4D67A" stroke-width="2"/></g>
+              <circle class="fa-pop" cx="184" cy="40" r="4" fill="#F4D67A" style="transform-origin:184px 40px"/>
+              <line class="fa-flow" x1="200" y1="50" x2="250" y2="50" stroke="#C9A84C" stroke-width="2.2"/>
+              <rect x="278" y="14" width="44" height="80" rx="10" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <g class="fa-pop" style="transform-origin:300px 40px"><rect x="286" y="30" width="28" height="20" rx="4" fill="#0c0b07" stroke="#F4D67A" stroke-width="1.8"/><circle cx="293" cy="40" r="2" fill="#F4D67A"/><line x1="299" y1="37" x2="309" y2="37" stroke="#F4D67A" stroke-width="1.6"/><line x1="299" y1="43" x2="306" y2="43" stroke="#C9A84C" stroke-width="1.6"/></g>
+              <circle class="fa-pulse" cx="314" cy="24" r="4" fill="#F4D67A"/>
+            </svg></div>
+          </div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="3">Se branche directement sur vos outils existants.</p>
+      </section>
+
+      <!-- 13 — RÉSULTATS PILIER 3 -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">Résultats</p>
+        <h2 class="da-h2">Ce que le ROI Pilot vous rapporte</h2>
+        <div class="da-cards">
+          <div class="da-card res fragment" data-fragment-index="0">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Devis partis avant le concurrent</div><div class="da-txt">En moins d’une heure.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- VOUS : poignée de main avec le client -->
+              <text x="74" y="14" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#F4D67A">Vous</text>
+              <g class="fa-bob"><circle cx="46" cy="34" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M34 60 a12 13 0 0 1 24 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <g class="fa-bob" style="animation-delay:.3s"><circle cx="102" cy="34" r="12" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M90 60 a12 13 0 0 1 24 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <path class="fa-pulse" d="M58 50 l32 0" stroke="#F4D67A" stroke-width="3.4" stroke-linecap="round"/>
+              <g class="fa-pop" style="transform-origin:74px 50px"><circle cx="74" cy="50" r="8" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M70 50 l3 3 l5 -6" stroke="#F4D67A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <!-- séparateur -->
+              <line x1="150" y1="12" x2="150" y2="84" stroke="#3a3a3a" stroke-width="1.4" stroke-dasharray="3 4"/>
+              <!-- CONCURRENT : croule sous la paperasse -->
+              <text x="226" y="14" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#8a6f2e">Concurrent</text>
+              <g opacity=".75"><circle cx="226" cy="38" r="12" fill="#16140e" stroke="#8a6f2e" stroke-width="2"/><path d="M214 64 a12 13 0 0 1 24 0" fill="#16140e" stroke="#8a6f2e" stroke-width="2"/>
+              <line x1="220" y1="36" x2="225" y2="40" stroke="#8a6f2e" stroke-width="1.6"/><line x1="232" y1="36" x2="227" y2="40" stroke="#8a6f2e" stroke-width="1.6"/><path d="M221 48 a6 4 0 0 1 10 0" fill="none" stroke="#8a6f2e" stroke-width="1.8"/></g>
+              <g class="fa-bob"><rect x="200" y="60" width="16" height="12" rx="1.5" fill="#16140e" stroke="#8a6f2e" stroke-width="1.6"/><rect x="236" y="58" width="16" height="14" rx="1.5" fill="#16140e" stroke="#8a6f2e" stroke-width="1.6"/><rect x="218" y="66" width="16" height="10" rx="1.5" fill="#16140e" stroke="#8a6f2e" stroke-width="1.6"/></g>
+              <text class="mc-zzz" x="244" y="30" font-family="Cinzel,serif" font-size="13" fill="#8a6f2e">!</text>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="1">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Toute votre boîte pilotée</div><div class="da-txt">En 30 secondes par jour, depuis votre téléphone.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="124" y="6" width="52" height="80" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <rect x="132" y="16" width="36" height="56" rx="4" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.4"/>
+              <path class="fa-draw" d="M136 50 l8 -10 l8 6 l11 -14" stroke="#E9C75A" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="138" y="56" width="6" height="12" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="148" y="56" width="6" height="12" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="158" y="56" width="6" height="12" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <circle cx="58" cy="24" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="58" y="29" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">Leads</text>
+              <circle cx="58" cy="58" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="58" y="63" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">Devis</text>
+              <circle cx="244" cy="24" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="244" y="29" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">Sign.</text>
+              <circle cx="244" cy="58" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><text x="244" y="63" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">CA</text>
+              <line class="fa-flow" x1="72" y1="24" x2="124" y2="24" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="72" y1="58" x2="124" y2="58" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="176" y1="24" x2="230" y2="24" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="176" y1="58" x2="230" y2="58" stroke="#C9A84C" stroke-width="2"/>
+            </svg></div>
+          </div>
+          <div class="da-card res fragment" data-fragment-index="2">
+            <svg class="da-ico" viewBox="0 0 48 48" fill="none" stroke="#E9C75A"><circle cx="24" cy="24" r="20" stroke-width="2.5"/><path d="M15 25 l6 6 l12 -14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="da-val">Vous reprenez du temps</div><div class="da-txt">Vos équipes vous disent merci.</div>
+            <div class="res-anim"><svg viewBox="0 0 300 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="60" cy="45" r="22" fill="none" stroke="#F4D67A" stroke-width="2.6"/>
+              <g class="fa-turn" style="transform-origin:60px 45px"><line x1="60" y1="45" x2="60" y2="28" stroke="#F4D67A" stroke-width="2.8" stroke-linecap="round"/><line x1="60" y1="45" x2="72" y2="45" stroke="#F4D67A" stroke-width="2.8" stroke-linecap="round"/></g>
+              <line class="fa-flow" x1="92" y1="45" x2="128" y2="45" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-bob"><circle cx="160" cy="32" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M146 70 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M153 30 a8 6 0 0 0 14 0" fill="none" stroke="#F4D67A" stroke-width="2"/></g>
+              <g class="fa-pop" style="transform-origin:200px 26px"><path d="M186 26 c-2 -10 14 -10 14 0 c0 -10 16 -10 14 0 c0 8 -14 16 -14 16 c0 0 -14 -8 -14 -16 z" fill="#F4D67A"/></g>
+              <g class="fa-bob" style="animation-delay:.5s"><circle cx="246" cy="32" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M232 70 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M239 30 a8 6 0 0 0 14 0" fill="none" stroke="#F4D67A" stroke-width="2"/></g>
+            </svg></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14 — BLOC 1 — LE SYSTÈME COMPLET -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">1 · Le système IA complet</p>
+        <h2 class="da-h2">Les 3 piliers, livrés clé en main</h2>
+        <div class="stack-cards">
+          <div class="stack-card fragment" data-fragment-index="0">
+            <div class="stack-lab">La Mine d’Or</div>
+            <div class="stack-val">Cash récupéré dès le 1<sup>er</sup> mois</div>
+            <div class="stack-txt">Base dormante réveillée — prospects chauds remontés automatiquement.</div>
+            <div class="stack-anim"><svg viewBox="0 0 320 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke="#F4D67A" stroke-width="3" fill="#16140e"><ellipse cx="60" cy="38" rx="30" ry="10"/><path d="M30 38 L30 100 a30 10 0 0 0 60 0 L90 38"/><path d="M30 70 a30 10 0 0 0 60 0" fill="none"/></g>
+              <text class="mc-zzz" x="92" y="34" font-family="Cinzel,serif" font-size="18" fill="#C9A84C">z</text>
+              <line class="fa-flow" x1="98" y1="74" x2="156" y2="74" stroke="#C9A84C" stroke-width="2.6"/>
+              <circle class="fa-pulse" cx="190" cy="74" r="34" fill="none" stroke="#C9A84C" stroke-opacity=".4" stroke-width="6"/>
+              <circle cx="190" cy="74" r="24" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <path d="M193 60 l-10 18 l7 0 l-3 14 l12 -20 l-7 0 z" fill="#F4D67A"/>
+              <line class="fa-flow" x1="222" y1="74" x2="266" y2="74" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="fa-pop" style="transform-origin:294px 60px"><circle cx="294" cy="60" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="3"/><text x="294" y="68" text-anchor="middle" font-family="Cinzel,serif" font-size="20" fill="#F4D67A">€</text></g>
+              <g class="fa-pop" style="transform-origin:294px 100px;animation-delay:.6s"><circle cx="294" cy="100" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="294" y="106" text-anchor="middle" font-family="Cinzel,serif" font-size="14" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+          <div class="stack-card fragment" data-fragment-index="1">
+            <div class="stack-lab">La Machine à Chantiers</div>
+            <div class="stack-val">24h/24, week-ends compris</div>
+            <div class="stack-txt">100 % capté &amp; relancé — leads en &lt;5 min, devis relancés, alertes temps réel.</div>
+            <div class="stack-anim"><svg viewBox="0 0 320 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path class="fa-flow" d="M14 78 L120 78" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="mc-lead"><rect x="22" y="70" width="28" height="18" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M23 72 l13 8 l13 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:.6s"><rect x="22" y="70" width="28" height="18" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M23 72 l13 8 l13 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <g class="mc-lead" style="animation-delay:1.2s"><rect x="22" y="70" width="28" height="18" rx="3" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M23 72 l13 8 l13 -8" stroke="#F4D67A" stroke-width="1.6" fill="none"/></g>
+              <rect x="124" y="34" width="98" height="92" rx="14" fill="#16140e" stroke="#C9A84C" stroke-width="3"/>
+              <rect x="142" y="42" width="62" height="20" rx="10" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <text class="fa-pulse" x="173" y="56" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">IA</text>
+              <g class="mc-cog" style="transform-origin:156px 90px"><circle cx="156" cy="90" r="20" fill="none" stroke="#F4D67A" stroke-width="6" stroke-dasharray="5 6"/></g>
+              <g class="mc-cog rev" style="transform-origin:194px 104px"><circle cx="194" cy="104" r="14" fill="none" stroke="#E9C75A" stroke-width="5" stroke-dasharray="4 5"/></g>
+              <path class="fa-flow" d="M222 78 L286 78" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="mc-coin" style="transform-origin:282px 78px"><circle cx="282" cy="78" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><text x="282" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="16" fill="#F4D67A">€</text></g>
+              <g class="mc-coin" style="animation-delay:.8s"><circle cx="282" cy="78" r="16" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><text x="282" y="84" text-anchor="middle" font-family="Cinzel,serif" font-size="16" fill="#F4D67A">€</text></g>
+            </svg></div>
+          </div>
+          <div class="stack-card fragment" data-fragment-index="2">
+            <div class="stack-lab">Le ROI Pilot</div>
+            <div class="stack-val">Vos dimanches récupérés &amp; vos équipes libérées</div>
+            <div class="stack-txt">Devis &amp; pilotage auto — devis sous 1 h, dashboard temps réel complet.</div>
+            <div class="stack-anim"><svg viewBox="0 0 320 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="40" y="34" width="20" height="36" rx="10" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <path d="M32 56 a18 18 0 0 0 36 0" stroke="#F4D67A" stroke-width="2.6" fill="none"/>
+              <line x1="50" y1="74" x2="50" y2="84" stroke="#F4D67A" stroke-width="2.6"/>
+              <path class="fa-pulse" d="M20 44 a18 18 0 0 0 0 26" fill="none" stroke="#C9A84C" stroke-width="2"/>
+              <line class="fa-flow" x1="74" y1="60" x2="118" y2="60" stroke="#C9A84C" stroke-width="2.6"/>
+              <rect x="134" y="18" width="66" height="88" rx="11" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <rect x="144" y="30" width="46" height="56" rx="4" fill="#0c0b07" stroke="#C9A84C" stroke-opacity=".5" stroke-width="1.4"/>
+              <path class="fa-draw" d="M148 64 l10 -14 l10 8 l13 -22" stroke="#E9C75A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect class="fa-bar" x="150" y="70" width="8" height="14" rx="2" fill="#F4D67A"/>
+              <rect class="fa-bar" x="162" y="70" width="8" height="14" rx="2" fill="#E9C75A" style="animation-delay:.2s"/>
+              <rect class="fa-bar" x="174" y="70" width="8" height="14" rx="2" fill="#F4D67A" style="animation-delay:.4s"/>
+              <text class="fa-pulse" x="167" y="124" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#F4D67A">30s/jour</text>
+              <line class="fa-flow" x1="216" y1="60" x2="252" y2="60" stroke="#C9A84C" stroke-width="2.6"/>
+              <g class="fa-bob"><circle cx="282" cy="56" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><circle cx="274" cy="52" r="2.6" fill="#F4D67A"/><circle cx="290" cy="52" r="2.6" fill="#F4D67A"/><path d="M272 62 a12 10 0 0 0 20 0" fill="none" stroke="#F4D67A" stroke-width="2.4"/></g>
+            </svg></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14 — BLOC 2 — DÉPLOIEMENT -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">2 · Déploiement clé en main</p>
+        <h2 class="da-h2">Opérationnel en 30 jours</h2>
+        <div class="da-cards da-flow">
+          <div class="da-card fragment" data-fragment-index="0"><div class="da-step">1</div><div class="da-val">Début de la collaboration</div><div class="da-txt">On démarre ensemble et on calibre vos attentes.</div>
+            <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="92" y="26" width="116" height="118" rx="8" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <line x1="112" y1="52" x2="188" y2="52" stroke="#C9A84C" stroke-width="2.4"/>
+              <line x1="112" y1="70" x2="188" y2="70" stroke="#C9A84C" stroke-width="2.4"/>
+              <line x1="112" y1="88" x2="166" y2="88" stroke="#C9A84C" stroke-width="2.4"/>
+              <path class="fa-draw-lg" d="M112 120 c10 -16 16 14 26 2 c8 -8 14 8 24 -2 c6 -6 12 4 18 -2" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <g class="fa-tap"><path d="M178 104 l18 -18 l9 9 l-18 18 l-11 2 z" fill="#16140e" stroke="#F4D67A" stroke-width="2.4" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:212px 150px"><circle cx="212" cy="150" r="18" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/><path d="M203 150 l6 6 l13 -15" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <text x="120" y="168" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#C9A84C">Signé</text>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="1"><div class="da-step">2</div><div class="da-val">On déploie</div><div class="da-txt">30 jours, avec votre validation à chaque étape.</div>
+            <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="122" y="50" width="56" height="74" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <rect x="131" y="60" width="11" height="11" fill="#C9A84C" opacity=".55"/><rect x="148" y="60" width="11" height="11" fill="#C9A84C" opacity=".55"/>
+              <rect x="131" y="78" width="11" height="11" fill="#C9A84C" opacity=".55"/><rect x="148" y="78" width="11" height="11" fill="#C9A84C" opacity=".55"/>
+              <rect x="142" y="100" width="14" height="24" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <circle class="fa-pulse" cx="44" cy="44" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="44" y="48" text-anchor="middle" font-family="Cinzel,serif" font-size="9" fill="#F4D67A">Mine</text>
+              <circle class="fa-pulse" style="animation-delay:.3s" cx="256" cy="44" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="256" y="47" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#F4D67A">Machine</text>
+              <circle class="fa-pulse" style="animation-delay:.6s" cx="256" cy="112" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="256" y="115" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#F4D67A">Pilot</text>
+              <line class="fa-flow" x1="62" y1="52" x2="122" y2="74" stroke="#C9A84C" stroke-width="2.2"/>
+              <line class="fa-flow" x1="238" y1="50" x2="178" y2="72" stroke="#C9A84C" stroke-width="2.2"/>
+              <line class="fa-flow" x1="238" y1="110" x2="178" y2="92" stroke="#C9A84C" stroke-width="2.2"/>
+              <g class="fa-pop" style="transform-origin:104px 66px"><circle cx="104" cy="66" r="9" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M99 66 l3 3 l7 -8" stroke="#F4D67A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:196px 64px;animation-delay:.4s"><circle cx="196" cy="64" r="9" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M191 64 l3 3 l7 -8" stroke="#F4D67A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:196px 100px;animation-delay:.8s"><circle cx="196" cy="100" r="9" fill="#16140e" stroke="#F4D67A" stroke-width="2"/><path d="M191 100 l3 3 l7 -8" stroke="#F4D67A" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <rect x="60" y="150" width="180" height="12" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.4"/>
+              <rect class="fa-grow" x="60" y="150" width="180" height="12" rx="6" fill="#F4D67A"/>
+              <text x="150" y="176" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#C9A84C">Déploiement · 30 jours</text>
+            </svg></div>
+          </div>
+          <div class="da-card fragment" data-fragment-index="2"><div class="da-step">3</div><div class="da-val">Ça rapporte</div><div class="da-txt">Votre atelier tourne 24/7 — du cash dès le 1<sup>er</sup> mois.</div>
+            <div class="flow-anim xl"><svg viewBox="0 0 300 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="0" y1="152" x2="300" y2="152" stroke="#C9A84C" stroke-opacity=".35" stroke-width="1.5"/>
+              <!-- soleil / lune (cycle 24h) -->
+              <g class="mc-sun" style="transform-origin:150px 152px"><circle cx="150" cy="32" r="9" fill="#F4D67A"/></g>
+              <!-- badge 24/7 -->
+              <circle class="fa-pulse" cx="150" cy="28" r="18" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <text x="150" y="32" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">24/7</text>
+              <!-- bâtiment menuiserie -->
+              <polygon points="116,152 116,92 184,92 184,152" fill="#1a1812" stroke="#C9A84C" stroke-width="2.6"/>
+              <polygon points="110,92 190,92 150,68" fill="#16140e" stroke="#C9A84C" stroke-width="2.6"/>
+              <text x="150" y="86" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#C9A84C">MENUISERIE</text>
+              <rect x="124" y="102" width="13" height="14" fill="#F4D67A" opacity=".7"/>
+              <rect x="143" y="102" width="13" height="14" fill="#F4D67A" opacity=".7"/>
+              <rect x="162" y="102" width="13" height="14" fill="#F4D67A" opacity=".7"/>
+              <rect x="140" y="126" width="20" height="26" fill="#0c0b07" stroke="#C9A84C" stroke-width="1.4"/>
+              <g class="mc-cog" style="transform-origin:150px 138px"><circle cx="150" cy="138" r="7" fill="none" stroke="#E9C75A" stroke-width="2.6" stroke-dasharray="3 4"/></g>
+              <!-- OUVRIER GAUCHE + machine -->
+              <g class="fa-bob">
+                <path d="M33 118 a10 10 0 0 1 20 0 z" fill="#F4D67A"/>
+                <rect x="31" y="117" width="24" height="3" rx="1.5" fill="#F4D67A"/>
+                <circle cx="43" cy="126" r="6" fill="none" stroke="#F4D67A" stroke-width="2"/>
+                <path d="M43 132 l0 14 M43 136 l-9 5 M43 136 l9 5 M43 146 l-6 6 M43 146 l6 6" stroke="#F4D67A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g class="mc-cog" style="transform-origin:74px 140px"><circle cx="74" cy="140" r="10" fill="none" stroke="#E9C75A" stroke-width="3.4" stroke-dasharray="3 4"/><circle cx="74" cy="140" r="3.5" fill="none" stroke="#C9A84C" stroke-width="1.6"/></g>
+              <!-- OUVRIER DROITE + machine -->
+              <g class="fa-bob" style="animation-delay:.5s">
+                <path d="M247 118 a10 10 0 0 1 20 0 z" fill="#F4D67A"/>
+                <rect x="245" y="117" width="24" height="3" rx="1.5" fill="#F4D67A"/>
+                <circle cx="257" cy="126" r="6" fill="none" stroke="#F4D67A" stroke-width="2"/>
+                <path d="M257 132 l0 14 M257 136 l-9 5 M257 136 l9 5 M257 146 l-6 6 M257 146 l6 6" stroke="#F4D67A" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              </g>
+              <g class="mc-cog rev" style="transform-origin:226px 140px"><circle cx="226" cy="140" r="10" fill="none" stroke="#E9C75A" stroke-width="3.4" stroke-dasharray="3 4"/><circle cx="226" cy="140" r="3.5" fill="none" stroke="#C9A84C" stroke-width="1.6"/></g>
+              <!-- $ qui sortent à droite -->
+              <g class="mc-coin" style="transform-origin:190px 104px"><circle cx="192" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="192" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
+              <g class="mc-coin" style="animation-delay:1s"><circle cx="192" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="192" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
+              <!-- $ qui sortent à gauche -->
+              <g class="mc-coin-l" style="transform-origin:108px 104px"><circle cx="108" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="108" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
+              <g class="mc-coin-l" style="animation-delay:1s"><circle cx="108" cy="108" r="11" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><text x="108" y="113" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#F4D67A">$</text></g>
+            </svg></div>
+          </div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="3">Vous donnez vos accès — on s’occupe de tout le reste.</p>
+      </section>
+
+      <!-- 14 — BLOC 3a — BONUS HEADLINE (révélation 4 mois) -->
+      <section class="da-slide bonus16" data-transition="fade">
+        <div class="b16-glow"></div>
+        <div class="b16-stamp">
+          <p class="b16-over">3 · Ce que le système comprend</p>
+          <p class="b16-intro">La première phase de la collaboration dure <strong>4 mois</strong> — et ces 4 mois de gestion sont…</p>
+          <h2 class="b16-huge fragment" data-fragment-index="0">Offerts</h2>
+          <div class="b16-rule fragment" data-fragment-index="1"></div>
+          <div class="b16-figs fragment" data-fragment-index="1">
+            <div class="b16-fig"><div class="b16-num">12 000 €</div><div class="b16-cap">de prestation offerte</div></div>
+            <div class="b16-vsep"></div>
+            <div class="b16-fig"><div class="b16-num green">0 €</div><div class="b16-cap">de frais mensuel de votre côté</div></div>
+          </div>
+        </div>
+        <p class="b16-foot fragment" data-fragment-index="2"><b>4 mois de collaboration complète</b> — maintenance · optimisation · pilotage · outils</p>
+      </section>
+
+      <!-- 14 — BLOC 3b — DÉTAIL DU BONUS (4 cartes) -->
+      <section class="da-slide" data-transition="fade">
+        <p class="da-kicker">3 · Ce qui est inclus</p>
+        <h2 class="da-h2">Les 4 mois en détail</h2>
+        <div class="ia2-grid">
+
+          <div class="ia2-card lg fragment" data-fragment-index="0">
+            <div class="ia2-lab">Maintenance</div>
+            <div class="ia2-txt">Maintenance technique <strong>24/7</strong> — bugs corrigés en &lt; 24 h.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M150 18 l64 22 v40 c0 40 -34 60 -64 70 c-30 -10 -64 -30 -64 -70 v-40 z" fill="#16140e" stroke="#F4D67A" stroke-width="3"/>
+              <g class="fa-turn" style="transform-origin:146px 74px"><path d="M134 56 a16 16 0 1 0 16 26 l22 22 l9 -9 l-22 -22 a16 16 0 0 0 -25 -17 z" fill="none" stroke="#F4D67A" stroke-width="3" stroke-linejoin="round"/></g>
+              <circle class="fa-pulse" cx="228" cy="40" r="20" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/>
+              <text x="228" y="44" text-anchor="middle" font-family="Cinzel,serif" font-size="11" fill="#F4D67A">24/7</text>
+              <g class="fa-pop" style="transform-origin:150px 120px"><path d="M134 118 l11 11 l22 -27" stroke="#F4D67A" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+            </svg></div>
+          </div>
+
+          <div class="ia2-card lg fragment" data-fragment-index="1">
+            <div class="ia2-lab">Optimisation</div>
+            <div class="ia2-txt"><strong>Optimisation continue</strong> : A/B testing &amp; calibrage de l’IA.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="40" y1="120" x2="262" y2="120" stroke="#C9A84C" stroke-opacity=".4" stroke-width="2"/>
+              <path class="fa-draw-lg" d="M44 112 l40 -10 l36 6 l40 -34 l44 -30" stroke="#F4D67A" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <g class="fa-pop" style="transform-origin:248px 48px;animation-delay:1.2s"><path d="M238 48 l18 0 l-6 -13" stroke="#F4D67A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <line x1="70" y1="142" x2="230" y2="142" stroke="#C9A84C" stroke-width="3"/>
+              <circle class="fa-toggle" cx="118" cy="142" r="8" fill="#F4D67A"/>
+              <text x="74" y="42" font-family="Cinzel,serif" font-size="14" fill="#C9A84C" class="fa-pulse">A / B</text>
+            </svg></div>
+          </div>
+
+          <div class="ia2-card lg fragment" data-fragment-index="2">
+            <div class="ia2-lab">Pilotage</div>
+            <div class="ia2-txt"><strong>1 réunion / mois</strong> de pilotage pour vos ajustements.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="40" y="42" width="80" height="74" rx="6" fill="#16140e" stroke="#F4D67A" stroke-width="2.6"/>
+              <line x1="40" y1="60" x2="120" y2="60" stroke="#C9A84C" stroke-width="2"/>
+              <line x1="56" y1="34" x2="56" y2="48" stroke="#F4D67A" stroke-width="2.6"/><line x1="104" y1="34" x2="104" y2="48" stroke="#F4D67A" stroke-width="2.6"/>
+              <g class="fa-pop" style="transform-origin:80px 88px"><circle cx="80" cy="88" r="14" fill="none" stroke="#F4D67A" stroke-width="2.4"/><path d="M73 88 l5 5 l10 -12" stroke="#F4D67A" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-bob"><circle cx="180" cy="62" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M166 94 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <g class="fa-bob" style="animation-delay:.5s"><circle cx="230" cy="62" r="14" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M216 94 a14 16 0 0 1 28 0" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <g class="fa-pulse"><rect x="190" y="28" width="36" height="20" rx="6" fill="#16140e" stroke="#C9A84C" stroke-width="1.6"/><circle cx="200" cy="38" r="1.7" fill="#F4D67A"/><circle cx="208" cy="38" r="1.7" fill="#F4D67A"/><circle cx="216" cy="38" r="1.7" fill="#F4D67A"/></g>
+            </svg></div>
+          </div>
+
+          <div class="ia2-card lg fragment" data-fragment-index="3">
+            <div class="ia2-lab">Outils</div>
+            <div class="ia2-txt"><strong>Tous les outils tiers offerts</strong> — aucun frais supplémentaire.</div>
+            <div class="ia2-scene"><svg viewBox="0 0 300 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="fa-pop" style="transform-origin:70px 60px"><rect x="48" y="38" width="44" height="44" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><circle cx="70" cy="60" r="11" fill="none" stroke="#F4D67A" stroke-width="2.4" stroke-dasharray="4 4"/></g>
+              <g class="fa-pop" style="transform-origin:130px 60px;animation-delay:.3s"><rect x="108" y="38" width="44" height="44" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><path d="M120 70 l8 -16 l8 16" fill="none" stroke="#F4D67A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g class="fa-pop" style="transform-origin:190px 60px;animation-delay:.6s"><rect x="168" y="38" width="44" height="44" rx="9" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><rect x="180" y="50" width="20" height="20" rx="4" fill="none" stroke="#F4D67A" stroke-width="2.4"/></g>
+              <g class="fa-bob"><rect x="226" y="44" width="40" height="34" rx="4" fill="#16140e" stroke="#F4D67A" stroke-width="2.4"/><line x1="246" y1="44" x2="246" y2="78" stroke="#F4D67A" stroke-width="2.4"/><path d="M246 44 c-8 -12 -20 -4 -8 4 m8 -4 c8 -12 20 -4 8 4" fill="none" stroke="#F4D67A" stroke-width="2.2"/></g>
+              <g class="fa-pulse"><rect x="104" y="104" width="92" height="34" rx="17" fill="rgba(52,211,153,0.08)" stroke="#34D399" stroke-width="2"/><text x="150" y="127" text-anchor="middle" font-family="Cinzel,serif" font-size="17" fill="#4BE6A0">0 €/mois</text></g>
+            </svg></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 17 — PRIX -->
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">Investissement</p>
+        <h2 class="da-h2">Un risque nul, un ROI garanti</h2>
+        <div class="prix-card fragment" data-fragment-index="0">
+          <div class="prix-lab">Investissement total</div>
+          <div class="prix-num">16 000 €</div>
+          <div class="prix-txt">Installation complète du système <strong style="color:#F4D67A;">+ les 4 mois de gestion offerts</strong>.</div>
+        </div>
+        <p class="da-foot fragment" data-fragment-index="1">À l’issue des 4 mois, vous êtes libre de continuer la collaboration <em>ou non</em>.</p>
+      </section>
+
+      <!-- 18 — GARANTIE (dédiée) -->
+      <section class="da-slide da-center" data-transition="fade">
+        <p class="da-kicker">La garantie</p>
+        <h2 class="da-h2">Inscrite dans votre contrat</h2>
+        <div class="gar-figs airy">
+          <div class="gar-fig fragment" data-fragment-index="0">
+            <div class="gar-lab">CA additionnel garanti</div>
+            <div class="gar-big">+50 000 €</div>
+            <div class="gar-sub">minimum, attribuable sur 4 mois</div>
+          </div>
+          <div class="gar-fig fragment" data-fragment-index="1">
+            <div class="gar-lab">ROI minimum</div>
+            <div class="gar-big">×&nbsp;3,1</div>
+            <div class="gar-sub">+50 000 € générés pour 16 000 € investis</div>
+          </div>
+        </div>
+        <div class="gar-points airy fragment" data-fragment-index="2">
+          <span class="gar-pt"><b>Inscrit</b> noir sur blanc dans le contrat</span>
+          <span class="gar-pt"><b>+50 000 €</b> de CA minimum sur 4 mois</span>
+          <span class="gar-pt"><b>Sinon</b>, remboursement intégral</span>
+        </div>
+        <p class="gar-foot lg fragment" data-fragment-index="3">Et ce, de manière garantie.</p>
+      </section>
+
+      <!-- 14 — FINALE -->
+      <section class="da-slide da-center" data-transition="fade">
+        <div class="logo-scalia" style="font-size:54px; margin-bottom:40px;">
+          <span class="scalia">SCALIA</span><span class="rule"></span><span class="btp">BTP</span>
+        </div>
+        <h2 class="da-h2 da-big" style="font-size:96px;">Prêt à récupérer<br>ce qui vous échappe ?</h2>
+        <p class="da-sub" style="text-align:center; margin:24px auto 0; color:#C9A84C; letter-spacing:0.3em; text-transform:uppercase; font-family:Cinzel,serif;">scaliabtp.fr</p>
+      </section>
+
+    </div>
+  </div>
+
+  <div id="notes-panel" style="display:none; position:fixed; top:80px; right:24px; width:340px; max-height:75vh; overflow-y:auto; background:rgba(13,13,13,0.96); border:1px solid #C9A84C; border-radius:6px; padding:18px 20px; z-index:1000; font-family:'Inter',sans-serif; color:#FFFFFF; box-shadow:0 12px 40px rgba(0,0,0,0.6); backdrop-filter:blur(10px);">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #2A2A2A;">
+      <span style="font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.25em; color:#C9A84C; text-transform:uppercase;">Notes prospect</span>
+      <button onclick="window.__toggleNotes()" style="background:none; border:none; color:#666; cursor:pointer; font-size:18px; line-height:1; padding:0;" title="Masquer (N)">×</button>
+    </div>
+    <div id="notes-body"></div>
+    <div style="margin-top:14px; padding-top:10px; border-top:1px solid #2A2A2A; font-size:10px; color:#666; line-height:1.5;">
+      Raccourci : <strong style="color:#C9A84C;">N</strong> pour masquer/afficher · Espace ou → pour slide suivante
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <!-- Moteur d'animation premium -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+  <script>
+    // ============================================================
+    // 1) LECTURE DE LA SESSION DEPUIS ?session=SLUG
+    // ============================================================
+    (function loadSessionContext() {
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get('session');
+      if (!slug) return;
+
+      let state = null;
+      try { state = JSON.parse(localStorage.getItem('scalia-roi-app-state') || '{"sessions":[]}'); }
+      catch (e) { console.warn('storage parse failed', e); return; }
+      const session = (state.sessions || []).find(s => s.slug === slug);
+      if (!session) { console.warn('session not found:', slug); return; }
+
+      const diag = session.diagnostic || {};
+      const inputs = session.inputs || {};
+
+      // ====== Helpers de calcul (taux marché ELCIA/MIT) ======
+      const MARKET = { leadTraite: 1.00, leadRdv: 0.35, rdvHonore: 0.95, devisSignature: 0.43, devisDormants: 0.04 };
+      const n = (k) => +inputs[k] || 0;
+      const leadsRecus = n('leadsRecus'), leadsTraites = n('leadsTraites'), rdvPris = n('rdvPris'),
+            rdvHonores = n('rdvHonores'), signatures = n('signatures'), ticket = n('ticket'),
+            devisDormants = n('devisDormants');
+
+      const pTraite = leadsRecus > 0 ? leadsTraites / leadsRecus : 0;
+      const pLeadRdv = leadsTraites > 0 ? rdvPris / leadsTraites : 0;
+      const pHonore = rdvPris > 0 ? rdvHonores / rdvPris : 0;
+      const pSign = rdvHonores > 0 ? signatures / rdvHonores : 0;
+      const baseSig = leadsRecus * pTraite * pLeadRdv * pHonore * pSign;
+
+      const stepLoss = (key, pVal) => {
+        if (pVal >= MARKET[key]) return 0;
+        const r = { leadTraite: pTraite, leadRdv: pLeadRdv, rdvHonore: pHonore, devisSignature: pSign };
+        r[key] = MARKET[key];
+        const newSigs = leadsRecus * r.leadTraite * r.leadRdv * r.rdvHonore * r.devisSignature;
+        return (newSigs - baseSig) * ticket;
+      };
+      const lossTraite = stepLoss('leadTraite', pTraite);
+      const lossLeadRdv = stepLoss('leadRdv', pLeadRdv);
+      const lossHonore = stepLoss('rdvHonore', pHonore);
+      const lossSign = stepLoss('devisSignature', pSign);
+      const monthly = lossTraite + lossLeadRdv + lossHonore + lossSign;
+      const annual = monthly * 12;
+      const oneShot = devisDormants * MARKET.devisDormants * 0.33 * ticket;
+
+      const fmtEUR = (v) => v == null || isNaN(v) ? '—' : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(v)) + ' €';
+      const fmtPct = (v) => v == null || isNaN(v) ? '—' : Math.round(v * 100) + ' %';
+      const fmtNum = (v) => v == null || isNaN(v) ? '—' : new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(Math.round(v));
+
+      // ====== Remplacement des crochets dans le DOM ======
+      // Stratégie : on n'écrase pas si la valeur source est vide — le crochet
+      // reste affiché et c'est plus propre que "vide".
+      const replacements = [
+        { rx: /\[DOULEUR 1\]/g, val: diag.douleur1 },
+        { rx: /\[DOULEUR 2\]/g, val: diag.douleur2 },
+        { rx: /\[OBJECTIF 1\]/g, val: diag.objectif1 },
+        { rx: /\[OBJECTIF 2\]/g, val: diag.objectif2 },
+      ];
+      function replaceTextNodes(node) {
+        if (node.nodeType === 3) {
+          let txt = node.nodeValue;
+          let changed = false;
+          for (const r of replacements) {
+            if (r.val && r.rx.test(txt)) {
+              txt = txt.replace(r.rx, r.val);
+              changed = true;
+            }
+          }
+          if (changed) node.nodeValue = txt;
+        } else if (node.nodeType === 1 && !['SCRIPT','STYLE','TEXTAREA'].includes(node.tagName)) {
+          for (const child of Array.from(node.childNodes)) replaceTextNodes(child);
+        }
+      }
+      replaceTextNodes(document.querySelector('.slides'));
+
+      // ====== Populate notes panel ======
+      const panel = document.getElementById('notes-panel');
+      const body = document.getElementById('notes-body');
+      const row = (label, value, color) => value
+        ? `<div style="margin-bottom:10px;"><div style="font-size:9px; letter-spacing:0.18em; color:${color || '#888'}; text-transform:uppercase; margin-bottom:2px;">${label}</div><div style="font-size:13px; color:#FFFFFF; line-height:1.4;">${value}</div></div>`
+        : '';
+      const num = (label, value) => `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #1A1A1A; font-size:12px;"><span style="color:#888;">${label}</span><span style="color:#C9A84C; font-weight:700; font-variant-numeric:tabular-nums;">${value}</span></div>`;
+
+      let html = '';
+      html += `<div style="font-family:'Cinzel',serif; font-size:14px; color:#FFFFFF; margin-bottom:4px;">${session.companyName || 'Sans nom'}</div>`;
+      html += `<div style="font-size:11px; color:#888; margin-bottom:14px;">${session.dirigeantName || ''}${session.dirigeantName ? ' · ' : ''}${new Date(session.meetingDate).toLocaleDateString('fr-FR')}</div>`;
+
+      html += '<div style="background:#0D0D0D; padding:10px 12px; border-radius:4px; border-left:2px solid #8B1A1A; margin-bottom:12px;">';
+      html += '<div style="font-size:9px; letter-spacing:0.2em; color:#8B1A1A; text-transform:uppercase; margin-bottom:8px; font-weight:700;">Douleurs</div>';
+      html += row('1', diag.douleur1, '#8B1A1A');
+      html += row('2', diag.douleur2, '#8B1A1A');
+      if (!diag.douleur1 && !diag.douleur2) html += '<div style="color:#666; font-size:11px; font-style:italic;">— vide —</div>';
+      html += '</div>';
+
+      html += '<div style="background:#0D0D0D; padding:10px 12px; border-radius:4px; border-left:2px solid #3A8A3A; margin-bottom:12px;">';
+      html += '<div style="font-size:9px; letter-spacing:0.2em; color:#3A8A3A; text-transform:uppercase; margin-bottom:8px; font-weight:700;">Objectifs</div>';
+      html += row('1', diag.objectif1, '#3A8A3A');
+      html += row('2', diag.objectif2, '#3A8A3A');
+      if (!diag.objectif1 && !diag.objectif2) html += '<div style="color:#666; font-size:11px; font-style:italic;">— vide —</div>';
+      html += '</div>';
+
+      if (leadsRecus > 0 || signatures > 0 || ticket > 0) {
+        html += '<div style="background:#0D0D0D; padding:10px 12px; border-radius:4px; border-left:2px solid #C9A84C; margin-bottom:12px;">';
+        html += '<div style="font-size:9px; letter-spacing:0.2em; color:#C9A84C; text-transform:uppercase; margin-bottom:8px; font-weight:700;">Chiffres à dire</div>';
+        if (monthly > 0) html += num('Pertes / mois', fmtEUR(monthly));
+        if (annual > 0) html += num('Pertes / an', fmtEUR(annual));
+        if (oneShot > 0) html += num('One-shot dormants', fmtEUR(oneShot));
+        if (devisDormants > 0) html += num('Devis dormants', fmtNum(devisDormants));
+        if (lossLeadRdv > 0) html += num('% leads non rappelés', fmtPct(1 - pTraite));
+        if (ticket > 0) html += num('Ticket moyen', fmtEUR(ticket));
+        html += '</div>';
+      }
+
+      body.innerHTML = html;
+      panel.style.display = 'block';
+
+      // Toggle avec touche 'N'
+      window.__toggleNotes = function() {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      };
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'n' || e.key === 'N') {
+          const tag = (e.target.tagName || '').toLowerCase();
+          if (tag === 'input' || tag === 'textarea') return;
+          window.__toggleNotes();
+          e.preventDefault();
+        }
+      });
+    })();
+
+    // ============================================================
+    // 2) REVEAL INIT
+    // ============================================================
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'fade',
+      controls: true,
+      progress: true,
+      center: true,
+      fragments: false,
+      width: 1920,
+      height: 1080,
+      margin: 0.04
+    });
+    // Vue publique : on démarre directement (pas d'écran "Démarrer", pas de plein écran auto).
+    // fragments:false → une flèche = slide suivante entière, tous les blocs déjà visibles.
+    document.body.classList.add('da-started');
+
+    // ============================================================
+    // 3) ÉCRAN DE DÉMARRAGE → ouverture animée
+    // ============================================================
+    (function initStartScreen() {
+      var intro = document.getElementById('da-intro');
+      var btn = document.getElementById('da-start');
+      if (!intro || !btn) return;
+      function launch() {
+        try {
+          var el = document.documentElement;
+          if (el.requestFullscreen) el.requestFullscreen();
+          else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        } catch (e) {}
+        document.body.classList.add('da-started');
+        intro.classList.add('hidden');
+        startAmbient();
+        startFloat();
+        startHeroFilm();
+        // Re-trigger l'animation du hero si on revient dessus
+        try { Reveal.slide(0); } catch (e) {}
+        setTimeout(function(){ if (intro && intro.parentNode) intro.style.display = 'none'; }, 1000);
+      }
+      btn.addEventListener('click', launch);
+
+      // Mouvement flottant continu du cadre média (GSAP si dispo)
+      function startFloat() {
+        if (!window.gsap) return;
+        try {
+          gsap.to('.media-frame', { y: -14, duration: 3.4, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+        } catch (e) {}
+      }
+
+      // Mini-film motion-design du dashboard (boucle GSAP)
+      function startHeroFilm() {
+        if (!window.gsap) return;
+        var num = document.getElementById('mf-num');
+        var line = document.getElementById('mf-chartline');
+        if (!num || !line) return;
+        var len = 300; try { len = line.getTotalLength(); } catch (e) {}
+        var nf = new Intl.NumberFormat('fr-FR');
+        var counter = { v: 0 };
+        try {
+          gsap.to('#mf-orbitdot', { rotation: 360, transformOrigin: '300px 280px', duration: 16, repeat: -1, ease: 'none' });
+          gsap.utils.toArray('.ev-chip').forEach(function(el, i){ gsap.to(el, { y: '+=7', duration: 2.4 + i*0.35, repeat: -1, yoyo: true, ease: 'sine.inOut' }); });
+          var tl = gsap.timeline({ repeat: -1, repeatDelay: 1.8, defaults: { ease: 'power2.out' } });
+          tl.set(counter, { v: 0 }, 0);
+          tl.set(line, { strokeDasharray: len, strokeDashoffset: len }, 0);
+          tl.set('#mf-area', { opacity: 0 }, 0);
+          tl.set(['#mf-bar1', '#mf-bar2', '#mf-bar3'], { scaleY: 0, transformOrigin: '50% 100%' }, 0);
+          tl.set('#mf-delta', { opacity: 0, y: 6 }, 0);
+          tl.set('.ev-chip', { opacity: 0 }, 0);
+          tl.call(function(){ num.textContent = '0 €'; }, null, 0);
+          tl.to(counter, { v: 38400, duration: 1.7, onUpdate: function(){ num.textContent = nf.format(Math.round(counter.v)) + ' €'; } }, 0.15);
+          tl.to(line, { strokeDashoffset: 0, duration: 1.5, ease: 'power1.inOut' }, 0.5);
+          tl.to('#mf-delta', { opacity: 1, y: 0, duration: 0.5 }, 1.0);
+          tl.to('#mf-area', { opacity: 1, duration: 0.8 }, 1.3);
+          tl.to('#mf-bar1', { scaleY: 1, duration: 0.5 }, 1.5);
+          tl.to('#mf-bar2', { scaleY: 1, duration: 0.5 }, 1.65);
+          tl.to('#mf-bar3', { scaleY: 1, duration: 0.5 }, 1.8);
+          tl.to('#ev1', { opacity: 1, duration: 0.45 }, 2.0);
+          tl.to('#ev2', { opacity: 1, duration: 0.45 }, 2.35);
+          tl.to('#ev3', { opacity: 1, duration: 0.45 }, 2.7);
+          tl.to('#ev4', { opacity: 1, duration: 0.45 }, 3.05);
+        } catch (e) {}
+      }
+
+      // Overlays dorés posés sur la scène photo/vidéo IA
+      function startHeroOverlays() {
+        var el = document.getElementById('ov-num');
+        if (!el || !window.gsap) return;
+        try {
+          var nf = new Intl.NumberFormat('fr-FR'); var c = { v: 0 };
+          gsap.fromTo(c, { v: 0 }, { v: 38400, duration: 1.8, ease: 'power2.out', onUpdate: function(){ el.textContent = nf.format(Math.round(c.v)) + ' €'; } });
+          gsap.fromTo('.ov-ca', { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.2 });
+          gsap.fromTo('.ov-pill', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.6 });
+          gsap.fromTo('.ov-toast', { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, delay: 1.4, ease: 'back.out(1.6)' });
+        } catch (e) {}
+      }
+      window.__heroOverlays = startHeroOverlays;
+
+      // Poussière d'or ambiante en continu (canvas léger)
+      var ambientStarted = false;
+      function startAmbient() {
+        if (ambientStarted) return; ambientStarted = true;
+        var c = document.getElementById('ambient-canvas'); if (!c) return;
+        var ctx = c.getContext('2d'); var W, H, parts;
+        function resize(){ W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        var N = 95;
+        parts = [];
+        for (var i=0;i<N;i++) parts.push({
+          x: Math.random()*W, y: Math.random()*H,
+          r: Math.random()*2.1+0.5,
+          vy: -(Math.random()*0.35+0.06), vx: (Math.random()-0.5)*0.18,
+          a: Math.random()*0.55+0.2, tw: Math.random()*6.28
+        });
+        (function loop(){
+          ctx.clearRect(0,0,W,H);
+          for (var i=0;i<parts.length;i++){
+            var p = parts[i];
+            p.y += p.vy; p.x += p.vx; p.tw += 0.03;
+            if (p.y < -6){ p.y = H+6; p.x = Math.random()*W; }
+            var a = p.a * (0.6 + 0.4*Math.sin(p.tw));
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+            ctx.fillStyle = 'rgba(201,168,76,' + a.toFixed(3) + ')'; ctx.fill();
+          }
+          requestAnimationFrame(loop);
+        })();
+      }
+    })();
+  </script>
+  <script>
+    (function(){
+      var el = document.getElementById('roi-ca'); if (!el) return;
+      var nf = new Intl.NumberFormat('fr-FR');
+      function parse(t){ var n = parseInt(String(t).replace(/[^0-9]/g,''),10); return isNaN(n)?0:n; }
+      // Version publique : chiffre TOUJOURS fixe à 98 700 € — non modifiable, ignore URL/localStorage.
+      var val = 98700;
+      el.textContent = nf.format(val);
+    })();
+  </script>
 </body>
 </html>

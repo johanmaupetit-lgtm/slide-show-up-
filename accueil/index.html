@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALIA BTP — Slides</title>
+  <link rel="stylesheet" href="../theme.css">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--noir);
+      color: var(--blanc);
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      box-sizing: border-box;
+    }
+    .logo-scalia { font-size: 72px; margin-bottom: 52px; }
+    .page-title {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--or);
+      font-size: 13px;
+      margin: 0 0 6px 0;
+    }
+    .page-rule {
+      width: 100%;
+      max-width: 720px;
+      height: 1px;
+      background: var(--or);
+      opacity: 0.3;
+      margin-bottom: 40px;
+    }
+    .section-label {
+      font-family: var(--font-serif);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--or);
+      font-size: 10px;
+      margin: 32px 0 12px 0;
+      width: 100%;
+      max-width: 720px;
+    }
+    .list {
+      width: 100%;
+      max-width: 720px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .list a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      background: var(--noir-card);
+      border: 0.5px solid var(--anthracite);
+      border-radius: 4px;
+      color: var(--blanc);
+      text-decoration: none;
+      margin-bottom: 10px;
+      transition: border-color 0.2s;
+    }
+    .list a:hover { border-color: var(--or); }
+    .list .title { font-weight: 600; font-size: 15px; }
+    .list .arrow { color: var(--or); font-family: var(--font-serif); font-size: 16px; }
+    .footer {
+      margin-top: 52px;
+      font-size: 10px;
+      color: var(--gris-leg);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: var(--font-serif);
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-scalia">
+    <span class="scalia">SCALIA</span>
+    <span class="rule"></span>
+    <span class="btp">BTP</span>
+  </div>
+
+  <p class="page-title">Présentations</p>
+  <div class="page-rule"></div>
+
+  <p class="section-label">Show Up</p>
+  <ul class="list">
+    <li>
+      <a href="../show-up/">
+        <span class="title">Préparer votre Audit ROI</span>
+        <span class="arrow">→</span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="section-label">Diagnostic · Cockpit RDV</p>
+  <ul class="list">
+    <li>
+      <a href="../diagnostic/">
+        <span class="title">Phase A — Faisabilité · Chiffres · Douleurs</span>
+        <span class="arrow">→</span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="section-label">Vente · Slides</p>
+  <ul class="list">
+    <li>
+      <a href="../presentation-systeme/">
+        <span class="title">Pitch de vente — Système ROI Pilot</span>
+        <span class="arrow">→</span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="section-label">Vente · Outils</p>
+  <ul class="list">
+    <li>
+      <a href="../presentation-systeme/calculateur-roi/">
+        <span class="title">Calculateur ROI — Pertes / Gains</span>
+        <span class="arrow">→</span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="footer">Scaliabtp.fr</p>
+</body>
+</html>

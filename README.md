@@ -6,12 +6,12 @@ Slides Scalia BTP. Conforme à la charte graphique v1 · Mai 2026.
 
 | Présentation | URL |
 |---|---|
-| Index | https://johanmaupetit-lgtm.github.io/slide-show-up-/ |
+| **Pitch public (RACINE, sans mot de passe)** | https://johanmaupetit-lgtm.github.io/slide-show-up-/ |
+| Accueil (index interne) | https://johanmaupetit-lgtm.github.io/slide-show-up-/accueil/ |
 | Show Up — Audit ROI | https://johanmaupetit-lgtm.github.io/slide-show-up-/show-up/ |
 | **Diagnostic — Cockpit Phase A** | https://johanmaupetit-lgtm.github.io/slide-show-up-/diagnostic/ |
 | Présentation Système — Pitch ROI Pilot | https://johanmaupetit-lgtm.github.io/slide-show-up-/presentation-systeme/ |
 | Présentation Système — Calculateur ROI | https://johanmaupetit-lgtm.github.io/slide-show-up-/presentation-systeme/calculateur-roi/ |
-| **Pitch public (partage, sans mot de passe)** | https://johanmaupetit-lgtm.github.io/slide-show-up-/pitch/ |
 
 Le pitch lit la session via `?session=SLUG` (auto-rempli depuis le diagnostic). Touche `N` pendant le pitch pour afficher / masquer les notes prospect.
 

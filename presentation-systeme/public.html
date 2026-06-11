@@ -9,6 +9,14 @@
   <title>SCALIA BTP — Système ROI PILOT</title>
 
   <!-- Version publique (sans mot de passe) — duplicata exact du pitch -->
+  <style id="public-view">
+    /* Vue publique : on saute l'écran de démarrage, et TOUS les blocs/fragments
+       sont déjà visibles (pas de reveal progressif) — on voit tout le pitch en scrollant. */
+    #da-intro { display: none !important; }
+    .reveal .fragment { opacity: 1 !important; transform: none !important; filter: none !important; visibility: visible !important; }
+    .hero-anim, .chart-area, .node-pop, .hud, .media-overlays, #ambient-canvas { opacity: 1 !important; }
+    .reveal .hero-roi .hero-title.fragment { filter: none !important; transform: none !important; }
+  </style>
 
   <script>
     /* ===========================================================
@@ -1658,6 +1666,8 @@
     // 2) REVEAL INIT
     // ============================================================
     Reveal.initialize({
+      view: 'scroll',
+      scrollProgress: true,
       hash: true,
       slideNumber: 'c/t',
       transition: 'fade',
@@ -1668,6 +1678,8 @@
       height: 1080,
       margin: 0.04
     });
+    // Vue publique : on démarre directement (pas d'écran "Démarrer", pas de plein écran auto)
+    document.body.classList.add('da-started');
 
     // ============================================================
     // 3) ÉCRAN DE DÉMARRAGE → ouverture animée
